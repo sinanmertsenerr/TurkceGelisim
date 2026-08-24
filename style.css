@@ -1,0 +1,221 @@
+:root{
+  --bg:#0b0d12;
+  --surface:#12151c;
+  --surface2:#181c25;
+  --line:#232836;
+  --txt:#eef1f7;
+  --muted:#9aa3b5;
+  --accent:#7c6cff;   /* sakin mor */
+  --accent2:#22d3ee;  /* vurgu cyan */
+  --ok:#34d399;
+  --bad:#fb7185;
+  --warn:#fbbf24;
+  --radius:16px;
+  --shadow:0 10px 40px rgba(0,0,0,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);
+  min-height:100vh;line-height:1.55;
+  overflow-x:hidden;
+}
+h1,h2,h3{font-family:'Sora',sans-serif}
+
+/* arka plan ışıması */
+.bg-glow{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(600px 400px at 15% -10%, rgba(124,108,255,.14), transparent 60%),
+    radial-gradient(500px 350px at 90% 110%, rgba(34,211,238,.08), transparent 60%);
+}
+
+/* ---------- üst bar ---------- */
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px clamp(20px,5vw,64px);
+}
+.logo{font-family:'Sora',sans-serif;font-weight:800;font-size:1.15rem;color:var(--txt);text-decoration:none;letter-spacing:.3px}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:10px}
+.nav-btn,.back-btn{
+  background:var(--surface);border:1px solid var(--line);color:var(--txt);
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:.88rem;cursor:pointer;
+  transition:border-color .15s, transform .15s, background .15s;
+  font-family:inherit;
+}
+.nav-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.back-btn{background:transparent}
+
+/* ---------- ekranlar ---------- */
+.screen{display:none;max-width:1060px;margin:0 auto;padding:24px clamp(20px,5vw,56px) 80px}
+.screen.active{display:block;animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- hero ---------- */
+.hero{text-align:center;margin:44px 0 40px}
+.hero-kicker{font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);font-weight:600}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;margin:14px 0}
+.grad{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{color:var(--muted);max-width:520px;margin:0 auto}
+
+/* ---------- seviye kartları ---------- */
+.level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.level-card{
+  text-align:left;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;cursor:pointer;color:var(--txt);
+  display:flex;flex-direction:column;gap:8px;min-height:170px;
+  transition:transform .18s ease, border-color .18s, box-shadow .18s;
+  font-family:inherit;
+}
+.level-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.l1:hover{border-color:var(--ok)} .l2:hover{border-color:var(--accent2)}
+.l3:hover{border-color:var(--warn)} .l4:hover{border-color:var(--bad)}
+.lv-badge{font-size:.68rem;font-weight:700;letter-spacing:2px;color:var(--muted)}
+.level-card h2{font-size:1.35rem}
+.level-card p{color:var(--muted);font-size:.85rem}
+.lv-meta{margin-top:auto;font-size:.75rem;color:var(--accent2);font-weight:600}
+.home-note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:28px}
+
+/* ---------- quiz ---------- */
+.quiz-top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.progress-wrap{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+.q-count{font-size:.82rem;color:var(--muted);font-weight:600;white-space:nowrap}
+
+.q-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:20px;
+  padding:clamp(22px,4vw,38px);max-width:720px;margin:0 auto;
+}
+.q-tag{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;display:block}
+.q-text{font-size:1.25rem;font-weight:600;margin-bottom:22px}
+.opt{
+  display:flex;width:100%;text-align:left;background:var(--surface2);
+  border:1.5px solid var(--line);border-radius:13px;padding:14px 18px;margin-bottom:11px;
+  color:var(--txt);font-size:1rem;cursor:pointer;gap:12px;align-items:center;
+  transition:border-color .15s, background .15s, transform .12s;font-family:inherit;
+}
+.opt:hover:not(:disabled){border-color:var(--accent);transform:translateX(4px)}
+.opt:disabled{cursor:default}
+.opt .key{
+  flex:0 0 26px;height:26px;border-radius:8px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;color:var(--muted);
+}
+.opt.correct{border-color:var(--ok);background:rgba(52,211,153,.10)}
+.opt.correct .key{border-color:var(--ok);color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:rgba(251,113,133,.10)}
+.opt.wrong .key{border-color:var(--bad);color:var(--bad)}
+
+/* feedback */
+.feedback{margin-top:16px;padding:18px;border-radius:14px;border:1px solid var(--line);animation:fadeUp .3s ease both}
+.feedback.ok{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.07)}
+.feedback.bad{border-color:rgba(251,113,133,.5);background:rgba(251,113,133,.06)}
+.fb-head{font-weight:700;margin-bottom:8px}
+.feedback.ok .fb-head{color:var(--ok)}
+.feedback.bad .fb-head{color:var(--bad)}
+.trick-box{
+  margin-top:12px;padding:14px 16px;border-radius:12px;
+  background:rgba(124,108,255,.09);border:1px dashed rgba(124,108,255,.45);
+  font-size:.93rem;color:var(--txt);
+}
+.trick-box b{color:var(--accent2)}
+.next-btn{
+  margin-top:16px;background:linear-gradient(90deg,var(--accent),#9a8cff);
+  border:none;color:#fff;font-weight:700;padding:12px 26px;border-radius:12px;
+  cursor:pointer;font-size:.95rem;font-family:inherit;
+  transition:transform .15s, box-shadow .15s;
+}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,108,255,.4)}
+
+/* ---------- sonuç ---------- */
+.result-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  max-width:520px;margin:60px auto 0;padding:44px 32px;text-align:center;
+}
+.result-emoji{font-size:3.4rem;margin-bottom:8px}
+.score-ring{
+  width:110px;height:110px;border-radius:50%;margin:22px auto;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;
+  font-family:'Sora',sans-serif;
+  background:
+    radial-gradient(closest-side,var(--surface) 74%,transparent 75% 100%),
+    conic-gradient(var(--accent) calc(var(--pct,50)*1%),var(--line) 0);
+}
+#resMsg{color:var(--muted);margin:6px 0 22px}
+.res-actions{display:flex;flex-direction:column;gap:10px;align-items:center}
+.btn{border-radius:12px;padding:12px 26px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.92rem;transition:transform .15s,box-shadow .15s;width:min(280px,100%)}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#9a8cff);border:none;color:#fff}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,108,255,.4)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.btn.ghost:hover{border-color:var(--accent)}
+
+/* ---------- kütüphane ---------- */
+.lib-head h1{font-size:1.7rem;margin-bottom:14px}
+#trickSearch{
+  width:100%;padding:13px 18px;border-radius:13px;font-size:.95rem;font-family:inherit;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--txt);outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+#trickSearch:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,108,255,.18)}
+.filter-row{display:flex;gap:8px;margin:16px 0 22px;flex-wrap:wrap}
+.chip{
+  background:var(--surface);border:1px solid var(--line);color:var(--muted);
+  padding:7px 15px;border-radius:999px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;
+  transition:all .15s;
+}
+.chip.on{background:rgba(124,108,255,.16);border-color:var(--accent);color:#cfc9ff}
+
+.trick-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.trick-card{
+  background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:18px;
+  animation:fadeUp .25s ease both;
+}
+.trick-card .t-lv{
+  display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;margin-bottom:10px;
+}
+.t-kolay{color:var(--ok)} .t-orta{color:var(--accent2)} .t-zor{color:var(--warn)} .t-expert{color:var(--bad)}
+.trick-card h3{font-size:1rem;margin-bottom:8px}
+.trick-card p{font-size:.87rem;color:var(--muted)}
+.trick-card b{color:var(--txt)}
+
+/* ---------- modal ---------- */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(5,7,10,.72);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;
+  animation:fadeUp .2s ease both;
+}
+.modal{
+  background:var(--surface);border:1px solid var(--line);border-radius:20px;
+  max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:30px;position:relative;
+}
+.modal-x{
+  position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--line);
+  color:var(--txt);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:.85rem;
+}
+.modal-x:hover{border-color:var(--bad)}
+.m-tag{font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;display:block}
+.modal h2{margin-bottom:12px}
+.modal .trick-box{margin-top:14px}
+
+/* ---------- misc ---------- */
+.empty{text-align:center;color:var(--muted);padding:40px 0}
+footer{text-align:center;color:#5b6373;font-size:.78rem;padding:28px 16px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+@media (max-width:640px){
+  nav{gap:6px}
+  .nav-btn{padding:8px 12px;font-size:.78rem}
+  .hero h1 br{display:none}
+}
+
+/* hidden attr her zaman kazanır (modal fix) */
+[hidden]{display:none!important}
+
+/* kütüphane link butonu */
+.link-btn{margin-top:12px;background:none;border:none;color:var(--accent2);cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;text-decoration:underline;padding:0;display:block}
+.link-btn:hover{color:#8be9f7}

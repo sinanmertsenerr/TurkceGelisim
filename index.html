@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Türkçe Gelişim — Yazım Kuralları Antrenmanı</title>
+<meta name="description" content="Türkçe yazım kurallarını kolaydan experta 4 seviyede çalış. Her sorunun ardından püf noktası (trick) açıklaması.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="logo" href="#" id="logoLink">🇹🇷 Türkçe<span>Gelişim</span></a>
+  <nav>
+    <button class="nav-btn" id="navTest">🎯 Test Çöz</button>
+    <button class="nav-btn" id="navTricks">💡 Trick Kütüphanesi</button>
+  </nav>
+</header>
+
+<main id="app">
+
+  <!-- HOME / SEVİYE SEÇİMİ -->
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <p class="hero-kicker">sakin odaklı · reklamsız · girişsiz</p>
+      <h1>Yazım kurallarını<br><span class="grad">odaklanarak</span> öğren.</h1>
+      <p class="hero-sub">Bir seviye seç, soruyu cevapla — doğru da yanlış da olsa <b>püf noktası</b> anında açılır.</p>
+    </div>
+    <div class="level-grid">
+      <button class="level-card l1" data-level="kolay">
+        <span class="lv-badge">SEVİYE 1</span><h2>Kolay</h2>
+        <p>Temel yazım kuralları · ısıtma turu</p>
+        <span class="lv-meta">12 soru</span>
+      </button>
+      <button class="level-card l2" data-level="orta">
+        <span class="lv-badge">SEVİYE 2</span><h2>Orta</h2>
+        <p>"de/da", "ki", birleşik kelimeler</p>
+        <span class="lv-meta">10 soru</span>
+      </button>
+      <button class="level-card l3" data-level="zor">
+        <span class="lv-badge">SEVİYE 3</span><h2>Zor</h2>
+        <p>Fiilimsiler, ek fiil, karma kurallar</p>
+        <span class="lv-meta">8 soru</span>
+      </button>
+      <button class="level-card l4" data-level="expert">
+        <span class="lv-badge">SEVİYE 4</span><h2>Expert</h2>
+        <p>Tuzaklı, TDK kılavuzu detayları</p>
+        <span class="lv-meta">8 soru</span>
+      </button>
+    </div>
+    <p class="home-note">🔒 Zor &amp; Expert'te test sırasında Trick Kütüphanesi kilitlidir — önce kendini dene.</p>
+  </section>
+
+  <!-- TEST EKRANI -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <button class="back-btn" id="quitQuiz">← Çık</button>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <span class="q-count" id="qCount">1/12</span>
+    </div>
+    <article class="q-card" id="qCard"></article>
+  </section>
+
+  <!-- SONUÇ EKRANI -->
+  <section class="screen" id="screen-result">
+    <div class="result-card">
+      <div class="result-emoji" id="resEmoji">🎉</div>
+      <h2 id="resTitle">Bitti!</h2>
+      <div class="score-ring"><span id="resScore">0/0</span></div>
+      <p id="resMsg"></p>
+      <div class="res-actions">
+        <button class="btn primary" id="againBtn">🔁 Tekrar dene</button>
+        <button class="btn ghost" id="trickReviewBtn">💡 Trickleri gözden geçir</button>
+        <button class="btn ghost" id="homeBtn">🏠 Ana sayfa</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRICK KÜTÜPHANESİ -->
+  <section class="screen" id="screen-tricks">
+    <div class="lib-head">
+      <h1>💡 Trick Kütüphanesi</h1>
+      <input type="search" id="trickSearch" placeholder="Ara: de/da, ki, virgül..." autocomplete="off">
+    </div>
+    <div class="filter-row" id="levelFilters">
+      <button class="chip on" data-f="all">Tümü</button>
+      <button class="chip" data-f="kolay">Kolay</button>
+      <button class="chip" data-f="orta">Orta</button>
+      <button class="chip" data-f="zor">Zor</button>
+      <button class="chip" data-f="expert">Expert</button>
+    </div>
+    <div class="trick-list" id="trickList"></div>
+    <div class="empty" id="trickEmpty" hidden>Sonuç yok — başka bir kelime dene.</div>
+  </section>
+
+</main>
+
+<!-- TRICK MODAL -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-x" id="modalClose">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<footer>Bağımsız öğrenme projesi · Kurallar TDK Yazım Kılavuzu esas alınarak hazırlanmıştır · Giriş yok, ücret yok.</footer>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
