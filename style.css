@@ -1077,10 +1077,22 @@ progress::-moz-progress-bar {
 }
 
 .live-score {
+  position: sticky;
+  top: 76px;
   padding: 16px 18px;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
   background: var(--paper);
+}
+
+.next-slot:empty {
+  display: none;
+}
+
+.next-slot .next-button {
+  display: flex;
+  width: 100%;
+  margin-top: 14px;
 }
 
 .live-score h2 {
@@ -1486,10 +1498,28 @@ progress::-moz-progress-bar {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  padding: 18px 20px;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px 18px;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
   background: var(--paper);
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.library-card:hover {
+  border-color: var(--ink-faint);
+  background: var(--hover-wash);
+}
+
+.library-card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.library-card:active {
+  transform: translateY(1px);
 }
 
 .library-card-meta {
@@ -1497,7 +1527,7 @@ progress::-moz-progress-bar {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
+  margin: 0 0 4px;
   color: var(--ink-faint);
   font-family: var(--mono);
   font-size: 0.65rem;
@@ -1505,32 +1535,142 @@ progress::-moz-progress-bar {
   text-transform: uppercase;
 }
 
-.library-card h2 {
-  margin: 0 0 10px;
+.library-word {
   font-family: var(--serif);
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
-.library-answer {
-  margin-bottom: 12px;
-  padding: 9px 12px;
-  border-left: 3px solid var(--correct);
-  background: var(--correct-pale);
-  font-size: 0.85rem;
-  font-weight: 650;
+.library-wrong {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+}
+
+.library-wrong s {
+  text-decoration-color: var(--wrong);
+  text-decoration-thickness: 1.5px;
+}
+
+.library-card-hint {
+  margin-top: auto;
+  padding-top: 8px;
+  color: var(--proof-dark);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
 }
 
 .library-explanation {
   margin-bottom: 8px;
   color: var(--ink-soft);
-  font-size: 0.81rem;
-  line-height: 1.5;
+  font-size: 0.86rem;
+  line-height: 1.55;
 }
 
-.library-card .source-link {
-  margin-top: auto;
+/* ---------- Kural detayı (modal) ---------- */
+
+.library-dialog {
+  width: min(600px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.library-dialog::backdrop {
+  background: rgb(34 32 29 / 0.55);
+}
+
+.library-dialog-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px 24px;
+}
+
+.library-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.library-dialog-head .library-card-meta {
+  margin: 6px 0 0;
+}
+
+.dialog-close {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin: -8px -10px 0 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--ink-faint);
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.dialog-close:hover {
+  color: var(--ink);
+  background: var(--hover-wash);
+}
+
+.dialog-close:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.library-dialog-prompt {
+  margin: 0 0 6px;
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+}
+
+.library-dialog-answer {
+  margin: 0 0 6px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--correct);
+  background: var(--correct-pale);
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.library-dialog-wrong {
+  margin-bottom: 16px;
+}
+
+.library-dialog-wrong[hidden] {
+  display: none;
+}
+
+.library-dialog .tip-box {
+  margin-bottom: 14px;
+}
+
+@media (max-width: 600px) {
+  .library-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+  }
+
+  .library-dialog-inner {
+    padding: 18px 16px 20px;
+  }
 }
 
 .empty-state {
@@ -1574,6 +1714,7 @@ progress::-moz-progress-bar {
   }
 
   .live-score {
+    position: static;
     order: -1;
   }
 

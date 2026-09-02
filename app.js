@@ -3,7 +3,7 @@ import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
 import { renderLevelCards, updateSessionEstimate } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
-import { populateTopics, renderLibrary } from "./ui/library.js";
+import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
 import { showScreen } from "./ui/screens.js";
 import { loadResumableSession } from "./ui/storage.js";
@@ -27,6 +27,16 @@ elements.navLibrary.addEventListener("click", controller.openLibrary);
 elements.saveAndExitButton.addEventListener("click", controller.showHome);
 elements.nextQuestionButton.addEventListener("click", controller.goToNextQuestion);
 
+// Geniş ekranda "Sonraki soru" butonu Oturum kartının altında durur; böylece
+// uzun tüyoların altına kaydırmadan ilerlenir. Dar ekranda geri bildirimin altında kalır.
+const wideQuizLayout = window.matchMedia("(min-width: 1081px)");
+function placeNextButton() {
+  const target = wideQuizLayout.matches ? elements.nextSlot : elements.feedbackPanel;
+  if (elements.nextQuestionButton.parentElement !== target) target.append(elements.nextQuestionButton);
+}
+wideQuizLayout.addEventListener("change", placeNextButton);
+placeNextButton();
+
 elements.resumeButton.addEventListener("click", controller.resumeSession);
 elements.discardResumeButton.addEventListener("click", controller.discardResume);
 
@@ -45,6 +55,15 @@ for (const control of [elements.librarySearch, elements.libraryLevel, elements.l
 elements.libraryMoreButton.addEventListener("click", () => {
   state.libraryLimit += 24;
   renderLibrary(elements);
+});
+
+elements.libraryList.addEventListener("click", (event) => {
+  const card = event.target.closest(".library-card");
+  if (card) openLibraryDetail(elements, card.dataset.questionId);
+});
+elements.libraryDialogClose.addEventListener("click", () => closeLibraryDetail(elements));
+elements.libraryDialog.addEventListener("click", (event) => {
+  if (event.target === elements.libraryDialog) closeLibraryDetail(elements);
 });
 
 window.addEventListener("storage", (event) => {
