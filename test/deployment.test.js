@@ -52,6 +52,7 @@ test("Vercel allowlist'i runtime bağımlılıklarını kapsar ve kaynak dosyala
     "core.js",
     "questions.js",
     "favicon.svg",
+    "fonts",
     "data",
     "ui",
     "vercel.json",

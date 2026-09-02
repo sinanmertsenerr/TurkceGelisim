@@ -39,6 +39,7 @@ export function getElements() {
     questionTopic: byId("questionTopic"),
     questionPrompt: byId("questionPrompt"),
     choiceList: byId("choiceList"),
+    keyboardHint: byId("keyboardHint"),
     feedbackPanel: byId("feedbackPanel"),
     feedbackTitle: byId("feedbackTitle"),
     feedbackExplanation: byId("feedbackExplanation"),
