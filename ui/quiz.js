@@ -5,7 +5,7 @@ import { state, responseFor } from "./state.js";
 import { renderTip } from "./tips.js";
 import * as storage from "./storage.js";
 
-const LETTERS = ["A", "B", "C", "D"];
+const KEYS = ["1", "2", "3", "4"];
 
 export function createQuizView({ elements, onFinish }) {
   function updateQuizStats() {
@@ -23,17 +23,17 @@ export function createQuizView({ elements, onFinish }) {
 
   function updateStreak() {
     const { current, best } = streakFromResponses(state.activeSession.responses);
+    // Seri yalnız oturum içinde yaşar; 2 ve üzeri doğruda küçük bir rozet olarak görünür.
+    elements.streakStrip.hidden = current < 2;
+    elements.streakStrip.classList.toggle("is-hot", current >= 3);
     const dots = document.createDocumentFragment();
-    for (let index = 0; index < 10; index += 1) {
+    for (let index = 0; index < Math.min(current, 5); index += 1) {
       const dot = document.createElement("span");
       dot.className = "streak-dot";
-      if (index < current) dot.classList.add(current >= 3 ? "is-gold" : "is-lit");
       dots.append(dot);
     }
     elements.streakDots.replaceChildren(dots);
-    elements.streakLabel.textContent = current >= 3
-      ? `Seri ${current} · Bu turdaki en uzun serin ${best}`
-      : `Seri ${current} · 3 doğruda halka dolar`;
+    elements.streakLabel.textContent = `Seri ${current}${best > current ? ` · En uzun ${best}` : ""}`;
   }
 
   function clearFeedback() {
@@ -69,8 +69,8 @@ export function createQuizView({ elements, onFinish }) {
     elements.feedbackPanel.className = `feedback-panel ${response.correct ? "is-correct" : "is-wrong"}`;
     const { current } = streakFromResponses(state.activeSession.responses);
     elements.feedbackTitle.textContent = response.correct
-      ? (current >= 3 ? `Doğru — seri ${current}.` : "Doğru.")
-      : `Yanlış. Doğru cevap: ${correctText}`;
+      ? (current >= 3 ? `Doğru yanıt — seri ${current}` : "Doğru yanıt")
+      : `Yanlış. Doğrusu: ${correctText}`;
     elements.feedbackExplanation.textContent = question.explanation;
     elements.feedbackExplanation.hidden = false;
     renderTip(elements.feedbackTip, question.topic);
@@ -102,9 +102,9 @@ export function createQuizView({ elements, onFinish }) {
       const button = elements.choiceTemplate.content.firstElementChild.cloneNode(true);
       button.dataset.choiceId = choice.id;
       button.setAttribute("aria-keyshortcuts", String(index + 1));
-      button.querySelector(".choice-key").textContent = LETTERS[index];
+      button.querySelector(".choice-key").textContent = KEYS[index];
       button.querySelector(".choice-text").textContent = choice.text;
-      button.setAttribute("aria-label", `${LETTERS[index]}: ${choice.text}`);
+      button.setAttribute("aria-label", `${KEYS[index]}: ${choice.text}`);
       button.addEventListener("click", () => answerQuestion(choice.id));
       fragment.append(button);
     });

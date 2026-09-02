@@ -18,6 +18,8 @@ export function renderResult(elements, completedSession) {
   elements.resultTitle.textContent = resultHeading(percent);
   elements.resultMessage.textContent = `${level.label} seviyesinde ${counts.answered} soruluk oturumu tamamladın.`;
   elements.resultPercent.textContent = `%${percent}`;
+  renderScoreRing(elements, percent);
+  renderTopicMastery(elements, completedSession);
   elements.resultCorrect.textContent = counts.correct;
   elements.resultWrong.textContent = counts.wrong;
   elements.resultTotal.textContent = counts.answered;
@@ -25,6 +27,43 @@ export function renderResult(elements, completedSession) {
   renderNextStep(elements, completedSession);
   state.reviewLimit = 12;
   renderReview(elements, completedSession);
+}
+
+const RING_LENGTH = 377;
+
+function renderScoreRing(elements, percent) {
+  const ring = elements.resultRing;
+  ring.style.strokeDashoffset = String(RING_LENGTH);
+  requestAnimationFrame(() => {
+    ring.style.strokeDashoffset = String(RING_LENGTH - (RING_LENGTH * percent) / 100);
+  });
+}
+
+export function topicMastery(responses) {
+  const byTopic = new Map();
+  for (const response of responses) {
+    const { topic } = QUESTION_BY_ID.get(response.questionId);
+    const entry = byTopic.get(topic) ?? { topic, correct: 0, total: 0 };
+    entry.total += 1;
+    if (response.correct) entry.correct += 1;
+    byTopic.set(topic, entry);
+  }
+  return [...byTopic.values()].sort((a, b) => (a.correct / a.total) - (b.correct / b.total) || b.total - a.total);
+}
+
+function renderTopicMastery(elements, completedSession) {
+  const fragment = document.createDocumentFragment();
+  for (const entry of topicMastery(completedSession.responses)) {
+    const percent = Math.round((entry.correct / entry.total) * 100);
+    const node = elements.topicMasteryTemplate.content.firstElementChild.cloneNode(true);
+    node.querySelector(".topic-name").textContent = entry.topic;
+    node.querySelector(".topic-score").textContent = `${entry.correct}/${entry.total} · %${percent}`;
+    node.querySelector(".topic-bar-fill").style.width = `${percent}%`;
+    node.classList.toggle("is-strong", percent >= 80);
+    node.classList.toggle("is-weak", percent < 50);
+    fragment.append(node);
+  }
+  elements.topicMasteryList.replaceChildren(fragment);
 }
 
 export function renderNextStep(elements, completedSession) {
