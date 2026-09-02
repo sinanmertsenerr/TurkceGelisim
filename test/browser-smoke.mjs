@@ -114,11 +114,18 @@ class CdpClient {
     this.events.set(method, listeners);
   }
 
-  send(method, params = {}) {
+  send(method, params = {}, timeoutMs = 15_000) {
     const id = this.nextId;
     this.nextId += 1;
     return new Promise((resolvePromise, reject) => {
-      this.pending.set(id, { resolve: resolvePromise, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`CDP zaman aşımı: ${method} ${JSON.stringify(params).slice(0, 160)}`));
+      }, timeoutMs);
+      this.pending.set(id, {
+        resolve: (value) => { clearTimeout(timer); resolvePromise(value); },
+        reject: (error) => { clearTimeout(timer); reject(error); },
+      });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -280,12 +287,28 @@ async function run() {
     await capture("03-mobile-library");
     const library = await client.evaluate(`(() => ({
       summary: document.querySelector("#librarySummary").textContent,
-      sourceLinks: document.querySelectorAll(".library-card .source-link[href^='https://tdk.gov.tr/']").length,
+      words: [...document.querySelectorAll(".library-card .library-word")].filter((node) => node.textContent.trim()).length,
       overflow: document.documentElement.scrollWidth - window.innerWidth
     }))()`);
     assert.match(library.summary, /^400 sonuç/);
-    assert.equal(library.sourceLinks, 24);
+    assert.equal(library.words, 24);
     assert.ok(library.overflow <= 0, `Kural bankasında ${library.overflow}px yatay taşma var.`);
+
+    await client.evaluate('document.querySelector(".library-card").click()');
+    await waitUntil(client, 'document.querySelector("#libraryDialog").open', "kural detayı");
+    await capture("04-mobile-library-detail");
+    const detail = await client.evaluate(`(() => ({
+      answer: document.querySelector("#libraryDialogAnswer").textContent.trim(),
+      source: document.querySelector("#libraryDialogSource").href,
+      tip: document.querySelector("#libraryDialogTip .tip-title")?.textContent.trim() ?? "",
+      focusInside: document.querySelector("#libraryDialog").contains(document.activeElement)
+    }))()`);
+    assert.ok(detail.answer.length > 0);
+    assert.match(detail.source, /^https:\/\/tdk\.gov\.tr\//);
+    assert.ok(detail.tip.length > 0, "Detayda tüyo görünmeli.");
+    assert.equal(detail.focusInside, true);
+    await client.evaluate('document.querySelector("#libraryDialogClose").click()');
+    await waitUntil(client, '!document.querySelector("#libraryDialog").open', "kural detayı kapanışı");
 
     await client.evaluate(`(() => {
       const level = document.querySelector("#libraryLevel");
@@ -298,10 +321,16 @@ async function run() {
       level.value = "all";
       level.dispatchEvent(new Event("change", { bubbles: true }));
       const search = document.querySelector("#librarySearch");
-      search.value = "iş birliği";
+      search.value = "de";
       search.dispatchEvent(new Event("input", { bubbles: true }));
     })()`);
-    assert.ok(await client.evaluate('document.querySelectorAll(".library-card").length > 0'));
+    const searched = await client.evaluate('document.querySelectorAll(".library-card").length');
+    assert.ok(searched > 0 && searched < 40, `"de" araması ${searched} kart gösterdi.`);
+    await client.evaluate(`(() => {
+      const search = document.querySelector("#librarySearch");
+      search.value = "";
+      search.dispatchEvent(new Event("input", { bubbles: true }));
+    })()`);
 
     await client.evaluate('document.querySelector("#navPractice").click(); document.querySelector("#resumeButton").click()');
     await waitUntil(client, '!document.querySelector("#screen-quiz").hidden', "quiz dönüşü");

@@ -146,6 +146,7 @@
                 <div class="score-row score-correct"><span>Doğru</span><strong id="correctCount">0</strong></div>
                 <div class="score-row score-wrong"><span>Yanlış</span><strong id="wrongCount">0</strong></div>
                 <p class="keyboard-hint">Seçenekler <kbd>1</kbd>–<kbd>3</kbd><br>Sonraki soru <kbd>N</kbd></p>
+                <div class="next-slot" id="nextSlot"></div>
               </aside>
             </div>
           </div>
@@ -230,6 +231,21 @@
             </div>
             <button class="button secondary load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
           </div>
+
+          <dialog class="library-dialog" id="libraryDialog" aria-labelledby="libraryDialogAnswer">
+            <div class="library-dialog-inner">
+              <div class="library-dialog-head">
+                <p class="library-card-meta"><span class="level-pill" id="libraryDialogLevel"></span><span id="libraryDialogTopic"></span></p>
+                <button class="dialog-close" id="libraryDialogClose" type="button" aria-label="Kapat">×</button>
+              </div>
+              <p class="library-dialog-prompt" id="libraryDialogPrompt"></p>
+              <h2 class="library-dialog-answer" id="libraryDialogAnswer"></h2>
+              <p class="library-wrong library-dialog-wrong" id="libraryDialogWrong"></p>
+              <div class="tip-box" id="libraryDialogTip"></div>
+              <p class="library-explanation" id="libraryDialogExplanation"></p>
+              <a class="source-link" id="libraryDialogSource" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
+            </div>
+          </dialog>
         </section>
       </main>
 
@@ -269,14 +285,12 @@
   </template>
 
   <template id="libraryCardTemplate">
-    <article class="library-card">
-      <div class="library-card-meta"><span class="level-pill"></span><span class="library-topic"></span></div>
-      <h2></h2>
-      <p class="library-answer"></p>
-      <div class="tip-box"></div>
-      <p class="library-explanation"></p>
-      <a class="source-link" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
-    </article>
+    <button class="library-card" type="button">
+      <span class="library-card-meta"><span class="level-pill"></span><span class="library-topic"></span></span>
+      <span class="library-word"></span>
+      <span class="library-wrong"></span>
+      <span class="library-card-hint">Tüyo ve kaynak ↗</span>
+    </button>
   </template>
 
   <template id="tipTemplate">
