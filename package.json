@@ -1,0 +1,15 @@
+{
+  "name": "turkce-gelisim",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/core.test.js test/questions.test.js test/deployment.test.js",
+    "test:ci": "npm test && npm run test:browser",
+    "test:browser": "node test/browser-smoke.mjs",
+    "test:sources": "node test/source-presence.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
