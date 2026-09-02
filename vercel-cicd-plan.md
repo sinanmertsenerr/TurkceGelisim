@@ -3,9 +3,9 @@
 ## Durum
 
 - **Hedef:** Statik uygulamayı Vercel Preview + korumalı `main` production akışıyla özel domaine hazırlamak.
-- **Tamamlanan:** Yerel hazırlık, commit/push ve PR #1 tamamlandı; gerçek runner Chrome başlatma ve cleanup yarışları düzeltildi.
-- **Şu anki durum:** Retry'li Chrome profil temizliği yerelde art arda iki kez geçti; PR'a gönderilecek.
-- **Sonraki kesin eylem:** Son cleanup düzeltmesini gönderip GitHub CI sonucunu yeniden almak.
+- **Tamamlanan:** Yerel hazırlık, commit/push ve PR #1 tamamlandı; gerçek GitHub runner `verify` kontrolü başarıyla geçti.
+- **Şu anki durum:** PR birleştirilebilir ve CI yeşil; `main` koruması ile merge bekliyor.
+- **Sonraki kesin eylem:** `main` için PR + `verify` zorunluluğunu etkinleştirip PR #1'i birleştirmek.
 - **Kritik kısıt/engel:** Git push, GitHub ruleset, Vercel proje oluşturma ve DNS değişikliği ayrı onay gerektirir.
 
 ## Hedef ve kapsam
@@ -115,6 +115,7 @@
 - GitHub CI ilk koşu: 12/12 Node testi geçti; Chrome runner'da DevTools portu açamadı. Yalnız `CI` ortamında `--no-sandbox` ve `--disable-dev-shm-usage` uygulanarak yerel `CI=true` browser smoke testi exit 0 alındı.
 - GitHub CI ikinci koşu: Tüm fonksiyonel browser kontrolleri geçti; Chrome profil temizliğinde `ENOTEMPTY` oluştu. Chrome exit'i beklenerek cleanup sırası düzeltildi; `CI=true npm run test:ci` exit 0 alındı.
 - GitHub CI üçüncü koşu: Chrome alt süreçleri nedeniyle aynı cleanup yarışı gözlendi. `fs.rm` için `maxRetries: 10` ve `retryDelay: 250` eklendi; `CI=true npm run test:browser` art arda iki kez exit 0 aldı.
+- GitHub CI dördüncü koşu: run `33625463651`, `verify` sonucu `SUCCESS`, süre 22 saniye; PR merge durumu `CLEAN`.
 - Readiness ve audit: kullanıcı talimatı gereği çalıştırılmadı.
 
 ## Park edilen ihtimaller
