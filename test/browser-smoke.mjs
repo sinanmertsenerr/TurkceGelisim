@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { once } from "node:events";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
@@ -146,6 +147,19 @@ async function waitUntil(client, expression, label, timeoutMs = 6_000) {
     await delay(40);
   }
   throw new Error(`Zaman aşımı: ${label}`);
+}
+
+async function stopProcess(child) {
+  if (child.exitCode !== null) return;
+
+  const gracefulExit = once(child, "exit");
+  child.kill("SIGTERM");
+  await Promise.race([gracefulExit, delay(3_000)]);
+  if (child.exitCode !== null) return;
+
+  const forcedExit = once(child, "exit");
+  child.kill("SIGKILL");
+  await forcedExit;
 }
 
 async function run() {
@@ -344,7 +358,7 @@ async function run() {
     console.log("✓ Erişilebilirlik: durum bölgesi, adlandırılmış kontroller, ≥44px hedefler");
   } finally {
     client?.close();
-    chrome.kill("SIGTERM");
+    await stopProcess(chrome);
     await new Promise((resolvePromise) => server.close(resolvePromise));
     await rm(profileDirectory, { recursive: true, force: true });
   }
