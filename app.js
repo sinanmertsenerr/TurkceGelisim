@@ -3,7 +3,7 @@ import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
 import { renderLevelCards, updateSessionEstimate } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
-import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary } from "./ui/library.js";
+import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
 import { showScreen } from "./ui/screens.js";
 import { loadResumableSession } from "./ui/storage.js";
@@ -26,16 +26,6 @@ elements.navPractice.addEventListener("click", controller.showHome);
 elements.navLibrary.addEventListener("click", controller.openLibrary);
 elements.saveAndExitButton.addEventListener("click", controller.showHome);
 elements.nextQuestionButton.addEventListener("click", controller.goToNextQuestion);
-
-// Geniş ekranda "Sonraki soru" butonu Oturum kartının altında durur; böylece
-// uzun tüyoların altına kaydırmadan ilerlenir. Dar ekranda geri bildirimin altında kalır.
-const wideQuizLayout = window.matchMedia("(min-width: 1081px)");
-function placeNextButton() {
-  const target = wideQuizLayout.matches ? elements.nextSlot : elements.feedbackPanel;
-  if (elements.nextQuestionButton.parentElement !== target) target.append(elements.nextQuestionButton);
-}
-wideQuizLayout.addEventListener("change", placeNextButton);
-placeNextButton();
 
 elements.resumeButton.addEventListener("click", controller.resumeSession);
 elements.discardResumeButton.addEventListener("click", controller.discardResume);
@@ -65,6 +55,21 @@ elements.libraryDialogClose.addEventListener("click", () => closeLibraryDetail(e
 elements.libraryDialog.addEventListener("click", (event) => {
   if (event.target === elements.libraryDialog) closeLibraryDetail(elements);
 });
+elements.libraryDialog.addEventListener("close", () => syncLibraryDetailState(elements));
+
+// Geniş ekranda kural detayı listenin yanında sabit panel olarak, dar ekranda
+// modal olarak açılır. Genişlik değişirse açık detay uygun biçime taşınır.
+const wideLibraryLayout = window.matchMedia("(min-width: 1081px)");
+wideLibraryLayout.addEventListener("change", () => {
+  if (elements.libraryDialog.open) {
+    const questionId = elements.libraryDialog.dataset.questionId;
+    closeLibraryDetail(elements);
+    if (questionId) openLibraryDetail(elements, questionId);
+  } else {
+    syncLibraryDetailState(elements);
+  }
+});
+syncLibraryDetailState(elements);
 
 window.addEventListener("storage", (event) => {
   if (event.key === STORAGE_KEY && document.body.dataset.screen === "home") loadResumableSession(elements);
