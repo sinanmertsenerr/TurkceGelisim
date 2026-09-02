@@ -3,10 +3,10 @@
 ## Durum
 
 - **Hedef:** Statik uygulamayı Vercel Preview + korumalı `main` production akışıyla özel domaine hazırlamak.
-- **Tamamlanan:** Yerel hazırlık, commit/push ve PR #1 tamamlandı; gerçek GitHub runner `verify` kontrolü başarıyla geçti.
-- **Şu anki durum:** PR birleştirilebilir ve CI yeşil; `main` koruması ile merge bekliyor.
-- **Sonraki kesin eylem:** `main` için PR + `verify` zorunluluğunu etkinleştirip PR #1'i birleştirmek.
-- **Kritik kısıt/engel:** Git push, GitHub ruleset, Vercel proje oluşturma ve DNS değişikliği ayrı onay gerektirir.
+- **Tamamlanan:** PR #1 squash merge ile `main`e alındı; zorunlu PR + `verify` ruleset'i, merge sonrası CI ve GitHub Pages yayını doğrulandı.
+- **Şu anki durum:** GitHub yayınlama/CI aşaması tamam; 400 soruluk sürüm mevcut Pages adresinde canlı.
+- **Sonraki kesin eylem:** Kullanıcının domain adı ve eylem-anı onayıyla GitHub reposunu Vercel'e bağlamak.
+- **Kritik kısıt/engel:** Vercel proje oluşturma, hesap/GitHub App bağlantısı ve DNS değişikliği ayrı onay gerektirir.
 
 ## Hedef ve kapsam
 
@@ -116,6 +116,10 @@
 - GitHub CI ikinci koşu: Tüm fonksiyonel browser kontrolleri geçti; Chrome profil temizliğinde `ENOTEMPTY` oluştu. Chrome exit'i beklenerek cleanup sırası düzeltildi; `CI=true npm run test:ci` exit 0 alındı.
 - GitHub CI üçüncü koşu: Chrome alt süreçleri nedeniyle aynı cleanup yarışı gözlendi. `fs.rm` için `maxRetries: 10` ve `retryDelay: 250` eklendi; `CI=true npm run test:browser` art arda iki kez exit 0 aldı.
 - GitHub CI dördüncü koşu: run `33625463651`, `verify` sonucu `SUCCESS`, süre 22 saniye; PR merge durumu `CLEAN`.
+- GitHub ruleset `22102090`: `main` için PR, GitHub Actions kaynaklı `verify`, güncel branch, force-push ve silme koruması aktif.
+- PR #1: `MERGED`; main commit `16ab9ffb3755264903c42e4466a0cc939be42262`.
+- Merge sonrası CI run `33625803637`: `SUCCESS`.
+- GitHub Pages run `33625804544`: build/deploy/report işleri `SUCCESS`; canlı adres HTTP 200 ve HTML içinde 400 soru/4 seviye/14 kaynak metrikleri görüldü.
 - Readiness ve audit: kullanıcı talimatı gereği çalıştırılmadı.
 
 ## Park edilen ihtimaller
