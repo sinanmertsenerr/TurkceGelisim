@@ -45,7 +45,8 @@ Test paketlerinin haricî npm bağımlılığı yoktur.
 ## Yapı
 
 - `index.html` ve `style.css`: semantik sayfa yapısı ile görsel sistem
-- `app.js`: ekranlar, kullanıcı etkileşimleri ve cihaz içi kayıt
+- `app.js`: uygulamanın önyükleme ve bağlama noktası
+- `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, klavye)
 - `core.js`: test edilebilir oturum ve istatistik işlevleri
 - `questions.js`: soru bankasının tek giriş noktası
 - `data/`: TDK kaynak kataloğu, soru fabrikaları ve dört düzeyin verileri
