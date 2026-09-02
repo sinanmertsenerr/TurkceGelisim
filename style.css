@@ -636,14 +636,18 @@ kbd {
 .session-picker {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-inline-size: 0;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--rule-strong);
-  border-radius: 5px;
-  overflow: hidden;
+  border: 0;
 }
 
+/* float, tarayıcının legend'i kenarlığa gömmesini kapatır; başlık kutunun üstünde durur */
 .session-picker legend {
+  float: left;
+  width: 100%;
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
   padding: 0;
   color: var(--ink-faint);
   font-family: var(--mono);
@@ -657,14 +661,23 @@ kbd {
   display: grid;
   min-height: 50px;
   place-items: center;
-  border-right: 1px solid var(--rule);
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 700;
 }
 
-.session-picker label:last-child {
-  border-right: 0;
+.session-picker label + label {
+  margin-left: -1px;
+}
+
+.session-picker label:nth-of-type(1) {
+  border-radius: 5px 0 0 5px;
+}
+
+.session-picker label:nth-of-type(4) {
+  border-radius: 0 5px 5px 0;
 }
 
 .session-picker input {
@@ -679,6 +692,9 @@ kbd {
 }
 
 .session-picker label:has(input:checked) {
+  position: relative;
+  z-index: 1;
+  border-color: var(--ink);
   color: var(--paper);
   background: var(--ink);
 }
@@ -2033,13 +2049,22 @@ progress::-moz-progress-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .session-picker label:nth-child(2n) {
-    border-right: 0;
+  .session-picker label + label {
+    margin-left: 0;
   }
 
-  .session-picker label:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--rule);
+  .session-picker label:nth-of-type(2n) {
+    margin-left: -1px;
   }
+
+  .session-picker label:nth-of-type(n + 3) {
+    margin-top: -1px;
+  }
+
+  .session-picker label:nth-of-type(1) { border-radius: 5px 0 0 0; }
+  .session-picker label:nth-of-type(2) { border-radius: 0 5px 0 0; }
+  .session-picker label:nth-of-type(3) { border-radius: 0 0 0 5px; }
+  .session-picker label:nth-of-type(4) { border-radius: 0 0 5px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
