@@ -1100,8 +1100,24 @@ progress::-moz-progress-bar {
   border-left-color: var(--wrong);
 }
 
-.feedback-title {
+/* Başlık ve "Sonraki soru" aynı satırda: tüyo uzun olsa da buton kaydırmadan görünür */
+.feedback-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
   margin-bottom: 6px;
+}
+
+.feedback-head .next-button {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.feedback-title {
+  flex: 1 1 240px;
+  margin-bottom: 0;
   font-family: var(--serif);
   font-size: 1.1rem;
   font-weight: 600;
@@ -1121,18 +1137,6 @@ progress::-moz-progress-bar {
   font-size: 0.88rem;
 }
 
-.feedback-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 16px;
-  margin-top: 12px;
-}
-
-.feedback-actions .next-button {
-  margin-left: auto;
-}
 
 /* ---------- Tüyo kutusu ---------- */
 
@@ -1979,7 +1983,7 @@ progress::-moz-progress-bar {
     transform: none;
   }
 
-  .feedback-actions .next-button {
+  .feedback-head .next-button {
     width: 100%;
     margin-left: 0;
   }
