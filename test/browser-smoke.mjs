@@ -114,11 +114,18 @@ class CdpClient {
     this.events.set(method, listeners);
   }
 
-  send(method, params = {}) {
+  send(method, params = {}, timeoutMs = 15_000) {
     const id = this.nextId;
     this.nextId += 1;
     return new Promise((resolvePromise, reject) => {
-      this.pending.set(id, { resolve: resolvePromise, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`CDP zaman aşımı: ${method} ${JSON.stringify(params).slice(0, 160)}`));
+      }, timeoutMs);
+      this.pending.set(id, {
+        resolve: (value) => { clearTimeout(timer); resolvePromise(value); },
+        reject: (error) => { clearTimeout(timer); reject(error); },
+      });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
