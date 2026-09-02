@@ -10,6 +10,8 @@ import {
   parseStoredSession,
   selectSessionQuestions,
   STORAGE_SCHEMA_VERSION,
+  streakFromResponses,
+  weakestTopic,
 } from "../core.js";
 
 test("Fisher–Yates kaynak diziyi değiştirmeden öngörülebilir biçimde çalışır", () => {
@@ -105,4 +107,35 @@ test("devam oturumu sıra, seviye, seçenek ve sayaç tutarlılığını korur",
   assert.equal(isResumableSession({ ...valid, questionIds: ["kolay-1", "orta-1"] }, questions), false);
   assert.equal(isResumableSession({ ...valid, responses: [{ ...valid.responses[0], correct: false }] }, questions), false);
   assert.equal(isResumableSession({ ...valid, responses: [{ questionId: "kolay-2", choiceId: "b", correct: true }] }, questions), false);
+});
+
+test("oturum içi seri güncel ve en uzun değeri birlikte verir", () => {
+  const responses = [
+    { correct: true },
+    { correct: true },
+    { correct: true },
+    { correct: false },
+    { correct: true },
+    { correct: true },
+  ];
+  assert.deepEqual(streakFromResponses(responses), { current: 2, best: 3 });
+  assert.deepEqual(streakFromResponses([]), { current: 0, best: 0 });
+  assert.deepEqual(streakFromResponses([{ correct: false }]), { current: 0, best: 0 });
+});
+
+test("en zayıf konu tam doğru konuları eler ve en düşük oranı seçer", () => {
+  const entries = [
+    { topic: "A", correct: true },
+    { topic: "A", correct: true },
+    { topic: "B", correct: false },
+    { topic: "B", correct: false },
+    { topic: "C", correct: true },
+    { topic: "C", correct: false },
+  ];
+  const weakest = weakestTopic(entries);
+  assert.equal(weakest.topic, "B");
+  assert.equal(weakest.correct, 0);
+  assert.equal(weakest.total, 2);
+  assert.equal(weakestTopic([{ topic: "A", correct: true }]), null);
+  assert.equal(weakestTopic([]), null);
 });

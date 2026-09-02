@@ -1,7 +1,8 @@
-import { countResponses } from "../core.js";
+import { countResponses, weakestTopic } from "../core.js";
 import { QUESTION_BY_ID } from "../questions.js";
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state } from "./state.js";
+import { renderTip } from "./tips.js";
 
 export function resultHeading(percent) {
   if (percent >= 90) return "Çok güçlü bir tur.";
@@ -21,8 +22,20 @@ export function renderResult(elements, completedSession) {
   elements.resultWrong.textContent = counts.wrong;
   elements.resultTotal.textContent = counts.answered;
   elements.retryWrongButton.hidden = counts.wrong === 0;
+  renderNextStep(elements, completedSession);
   state.reviewLimit = 12;
   renderReview(elements, completedSession);
+}
+
+export function renderNextStep(elements, completedSession) {
+  const weakest = weakestTopic(completedSession.responses.map((response) => ({
+    topic: QUESTION_BY_ID.get(response.questionId).topic,
+    correct: response.correct,
+  })));
+  elements.nextStepCard.hidden = false;
+  elements.nextStepText.textContent = weakest
+    ? `En çok zorlandığın konu “${weakest.topic}” (${weakest.correct}/${weakest.total} doğru). Kısa bir turla oraya dönmek iyi olur.`
+    : "Bu turda hata yok. Bir üst seviyeye geçmek için doğru an.";
 }
 
 export function renderReview(elements, completedSession) {
@@ -42,6 +55,7 @@ export function renderReview(elements, completedSession) {
       ? `Cevabın: ${chosen.text}`
       : `Cevabın: ${chosen.text} · Doğru: ${correct.text}`;
     card.querySelector(".review-explanation").textContent = question.explanation;
+    renderTip(card.querySelector(".tip-box"), question.topic, { collapsible: true });
     const link = card.querySelector("a");
     link.href = source.url;
     link.textContent = `${source.title} ↗`;
