@@ -3,9 +3,9 @@
 ## Durum
 
 - **Hedef:** Statik uygulamayı Vercel Preview + korumalı `main` production akışıyla özel domaine hazırlamak.
-- **Tamamlanan:** Kısa impact, Vercel config/allowlist, GitHub CI, haftalık kaynak kontrolü, deployment kontrat testi, README ve tüm yerel doğrulamalar tamamlandı.
-- **Şu anki durum:** Yerel hazırlık tamam; dış sistem eylem kapısında bekliyor.
-- **Sonraki kesin eylem:** Kullanıcı onayıyla mevcut tam çalışma ağacını GitHub'a gönderip ilk CI sonucunu almak.
+- **Tamamlanan:** Yerel hazırlık, commit/push ve PR #1 tamamlandı; ilk CI'da runner Chrome başlatma hatası saptanıp düzeltildi.
+- **Şu anki durum:** CI uyumluluk düzeltmesi yerelde geçti; PR'a gönderilecek.
+- **Sonraki kesin eylem:** Düzeltmeyi PR branch'ine gönderip GitHub CI sonucunu yeniden almak.
 - **Kritik kısıt/engel:** Git push, GitHub ruleset, Vercel proje oluşturma ve DNS değişikliği ayrı onay gerektirir.
 
 ## Hedef ve kapsam
@@ -112,6 +112,7 @@
 - `git diff --check`: exit 0.
 - `vercel.json` ve `package.json` JSON parse: exit 0.
 - Her iki GitHub Actions workflow'u YAML parse: exit 0.
+- GitHub CI ilk koşu: 12/12 Node testi geçti; Chrome runner'da DevTools portu açamadı. Yalnız `CI` ortamında `--no-sandbox` ve `--disable-dev-shm-usage` uygulanarak yerel `CI=true` browser smoke testi exit 0 alındı.
 - Readiness ve audit: kullanıcı talimatı gereği çalıştırılmadı.
 
 ## Park edilen ihtimaller

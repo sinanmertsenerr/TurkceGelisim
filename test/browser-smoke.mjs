@@ -152,7 +152,7 @@ async function run() {
   const chromePath = await findChrome();
   const { server, origin } = await startStaticServer();
   const profileDirectory = await mkdtemp(join(tmpdir(), "turkce-gelisim-smoke-"));
-  const chrome = spawn(chromePath, [
+  const chromeArguments = [
     "--headless=new",
     "--remote-debugging-port=0",
     `--user-data-dir=${profileDirectory}`,
@@ -164,7 +164,11 @@ async function run() {
     "--metrics-recording-only",
     "--mute-audio",
     "about:blank",
-  ], { stdio: "ignore" });
+  ];
+  if (process.env.CI) {
+    chromeArguments.splice(-1, 0, "--no-sandbox", "--disable-dev-shm-usage");
+  }
+  const chrome = spawn(chromePath, chromeArguments, { stdio: "ignore" });
 
   let client;
   try {
