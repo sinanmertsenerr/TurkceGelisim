@@ -117,38 +117,35 @@
               </div>
             </div>
 
-            <div class="streak-strip" id="streakStrip" aria-label="Oturum içi seri">
-              <span class="streak-dots" id="streakDots" aria-hidden="true"></span>
-              <span class="streak-label" id="streakLabel">Seri 0 · 3 doğruda halka dolar</span>
+            <div class="session-strip" aria-label="Canlı sonuç">
+              <div class="score-row"><span>Yanıtlanan</span><strong id="answeredCount">0</strong></div>
+              <div class="score-row score-correct"><span>Doğru</span><strong id="correctCount">0</strong></div>
+              <div class="score-row score-wrong"><span>Yanlış</span><strong id="wrongCount">0</strong></div>
+              <div class="streak-strip" id="streakStrip" aria-label="Oturum içi seri">
+                <span class="streak-dots" id="streakDots" aria-hidden="true"></span>
+                <span class="streak-label" id="streakLabel">Seri 0 · 3 doğruda halka dolar</span>
+              </div>
+              <p class="keyboard-hint">Seçenekler <kbd>1</kbd>–<kbd>3</kbd> · Sonraki <kbd>N</kbd></p>
             </div>
 
-            <div class="quiz-layout">
-              <article class="question-card">
-                <div class="question-meta">
-                  <span class="level-pill" id="questionLevel"></span>
-                  <span id="questionTopic"></span>
-                </div>
-                <h1 class="question-prompt" id="questionPrompt" tabindex="-1"></h1>
-                <div class="choice-list" id="choiceList" role="group" aria-labelledby="questionPrompt"></div>
+            <article class="question-card">
+              <div class="question-meta">
+                <span class="level-pill" id="questionLevel"></span>
+                <span id="questionTopic"></span>
+              </div>
+              <h1 class="question-prompt" id="questionPrompt" tabindex="-1"></h1>
+              <div class="choice-list" id="choiceList" role="group" aria-labelledby="questionPrompt"></div>
 
-                <section class="feedback-panel is-empty" id="feedbackPanel" aria-labelledby="feedbackTitle">
-                  <p class="feedback-title" id="feedbackTitle" role="status" aria-live="polite" aria-atomic="true"></p>
-                  <p class="feedback-copy" id="feedbackExplanation"></p>
-                  <div class="tip-box" id="feedbackTip"></div>
+              <section class="feedback-panel is-empty" id="feedbackPanel" aria-labelledby="feedbackTitle">
+                <p class="feedback-title" id="feedbackTitle" role="status" aria-live="polite" aria-atomic="true"></p>
+                <p class="feedback-copy" id="feedbackExplanation"></p>
+                <div class="tip-box" id="feedbackTip"></div>
+                <div class="feedback-actions">
                   <a class="source-link" id="feedbackSource" target="_blank" rel="noopener noreferrer">TDK kaynağını aç ↗</a>
                   <button class="button primary next-button" id="nextQuestionButton" type="button">Sonraki soru →</button>
-                </section>
-              </article>
-
-              <aside class="live-score" aria-label="Canlı sonuç">
-                <h2>Oturum</h2>
-                <div class="score-row"><span>Yanıtlanan</span><strong id="answeredCount">0</strong></div>
-                <div class="score-row score-correct"><span>Doğru</span><strong id="correctCount">0</strong></div>
-                <div class="score-row score-wrong"><span>Yanlış</span><strong id="wrongCount">0</strong></div>
-                <p class="keyboard-hint">Seçenekler <kbd>1</kbd>–<kbd>3</kbd><br>Sonraki soru <kbd>N</kbd></p>
-                <div class="next-slot" id="nextSlot"></div>
-              </aside>
-            </div>
+                </div>
+              </section>
+            </article>
           </div>
         </section>
 
@@ -224,15 +221,23 @@
 
             <p id="librarySummary" class="library-summary" role="status" aria-live="polite"></p>
 
-            <div class="library-list" id="libraryList"></div>
-            <div class="empty-state" id="libraryEmpty" hidden>
-              <h2>Sonuç bulunamadı</h2>
-              <p>Arama sözcüğünü kısaltmayı veya filtreyi değiştirmeyi dene.</p>
-            </div>
-            <button class="button secondary load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
-          </div>
+            <div class="library-workspace">
+              <div class="library-results">
+                <div class="library-list" id="libraryList"></div>
+                <div class="empty-state" id="libraryEmpty" hidden>
+                  <h2>Sonuç bulunamadı</h2>
+                  <p>Arama sözcüğünü kısaltmayı veya filtreyi değiştirmeyi dene.</p>
+                </div>
+                <button class="button secondary load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
+              </div>
 
-          <dialog class="library-dialog" id="libraryDialog" aria-labelledby="libraryDialogAnswer">
+              <div class="library-detail-column">
+                <div class="library-detail-placeholder" id="libraryPlaceholder">
+                  <p class="eyebrow">Kural detayı</p>
+                  <h2>Soldan bir kural seç</h2>
+                  <p>Tüyosu, gerekçesi ve TDK kaynağı burada açılır.</p>
+                </div>
+                <dialog class="library-dialog" id="libraryDialog" aria-labelledby="libraryDialogAnswer">
             <div class="library-dialog-inner">
               <div class="library-dialog-head">
                 <p class="library-card-meta"><span class="level-pill" id="libraryDialogLevel"></span><span id="libraryDialogTopic"></span></p>
@@ -246,6 +251,9 @@
               <a class="source-link" id="libraryDialogSource" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
             </div>
           </dialog>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

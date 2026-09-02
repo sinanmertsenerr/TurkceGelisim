@@ -68,6 +68,7 @@ export function renderLibrary(elements) {
   }
 
   elements.libraryList.replaceChildren(fragment);
+  markSelectedCard(elements, elements.libraryDialog.open ? elements.libraryDialog.dataset.questionId : "");
   elements.libraryEmpty.hidden = matches.length !== 0;
   elements.libraryMoreButton.hidden = visible.length >= matches.length;
   elements.librarySummary.textContent = matches.length
@@ -75,13 +76,37 @@ export function renderLibrary(elements) {
     : "0 sonuç";
 }
 
+const WIDE_LIBRARY = "(min-width: 1081px)";
+
+function isWideLibrary() {
+  return window.matchMedia(WIDE_LIBRARY).matches;
+}
+
+function markSelectedCard(elements, questionId) {
+  for (const card of elements.libraryList.querySelectorAll(".library-card")) {
+    const selected = Boolean(questionId) && card.dataset.questionId === questionId;
+    card.classList.toggle("is-selected", selected);
+    if (selected) card.setAttribute("aria-current", "true");
+    else card.removeAttribute("aria-current");
+  }
+}
+
+// Geniş ekranda detay paneli boşken yer tutucu görünür; dar ekranda yer tutucu gizlidir.
+export function syncLibraryDetailState(elements) {
+  const dialog = elements.libraryDialog;
+  const wide = isWideLibrary();
+  elements.libraryPlaceholder.hidden = !wide || dialog.open;
+  markSelectedCard(elements, dialog.open ? dialog.dataset.questionId : "");
+}
+
 export function openLibraryDetail(elements, questionId) {
-  const question = QUESTIONS.find(({ id }) => id === questionId);
+  const question = QUESTIONS.find((item) => item.id === questionId);
   if (!question) return;
   const dialog = elements.libraryDialog;
-  const source = sourceFor(question);
   const level = LEVEL_BY_ID.get(question.level);
+  const source = sourceFor(question);
 
+  dialog.dataset.questionId = question.id;
   const pill = elements.libraryDialogLevel;
   pill.className = `level-pill level-pill-${question.level}`;
   pill.textContent = level.label;
@@ -100,13 +125,33 @@ export function openLibraryDetail(elements, questionId) {
   elements.libraryDialogSource.href = source.url;
   elements.libraryDialogSource.textContent = `${source.title} ↗`;
 
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.setAttribute("open", "");
-  elements.libraryDialogClose.focus();
+  const wide = isWideLibrary();
+  if (dialog.open && dialog.matches(":modal") === wide) dialog.close();
+  if (!dialog.open) {
+    if (wide) {
+      // show() odağı panele taşır ve sayfayı kaydırır; liste konumu korunur.
+      const { scrollX, scrollY } = window;
+      if (typeof dialog.show === "function") dialog.show();
+      else dialog.setAttribute("open", "");
+      window.scrollTo(scrollX, scrollY);
+    } else if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+  syncLibraryDetailState(elements);
+  if (wide) {
+    dialog.scrollTop = 0;
+  } else {
+    elements.libraryDialogClose.focus();
+  }
 }
 
 export function closeLibraryDetail(elements) {
   const dialog = elements.libraryDialog;
   if (dialog.open) dialog.close();
   else dialog.removeAttribute("open");
+  delete dialog.dataset.questionId;
+  syncLibraryDetailState(elements);
 }

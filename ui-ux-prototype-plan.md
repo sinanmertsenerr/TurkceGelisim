@@ -73,10 +73,12 @@ Mevcut Türkçe Gelişim uygulamasının içerik ve işlevlerini koruyan; günce
 - **Hedef:** v3 tasarım dilini production’a taşımak.
 - **Tamamlanan:** Prototip v3 hazırlandı ve onaylandı. Sahte sosyal kanıt, taahhüt kartı, kayıp tehdidi ve CTA parıltısı çıkarıldı; kaydet-ve-çık, yanlışları tekrar, şeffaf sonuç, açık/koyu tema ve konu bazlı tüyo katmanı eklendi. Tüyo kütüphanesi ve konu serpiştirme production veri/mantık katmanına alındı.
 - **Şu anki durum:** Veri ve mantık katmanı `main` üzerinde canlıda. Görsel uyarlama ayrı dalda sürüyor.
-- **Sonraki kesin eylem:** v3 görsel dilini `index.html`, `style.css` ve `ui/` modüllerine uyarlamak; tüyoları geri bildirim panelinde ve kural bankasında göstermek.
+- **Sonraki kesin eylem:** `ui-v2-harmanlama` dalındaki soru ekranı ve kural bankası düzenini PR ile canlıya almak.
 - **Kritik kısıt/engel:** Görsel uyarlama kullanıcı onayı olmadan canlıya alınmayacak.
 
 ## Onay kaydı
+
+- **2026-09-03:** Kullanıcının Masaüstü'ndeki `Türkçe-Gelişim-UI-Konsepti-v2.html` konsepti mevcut tasarımla puanlandı (mevcut 7.9, v2 5.3). Karar: mimari ve etik motivasyon çerçevesi korunur; v2'den yalnız soru ekranı odağı (tek sütun, ince durum şeridi, ortalanmış kart) ve kural bankası split-pane düzeni alınır. Alev serisi, kalkan, sarsma animasyonu, tüyosuz otomatik geçiş ve Google Fonts alınmaz.
 
 - **2026-09-02:** Kullanıcı v3 konseptini onayladı ve production entegrasyonunun veri/mantık katmanıyla başlamasına izin verdi. Görsel katman için ayrı onay bekleniyor.
 
