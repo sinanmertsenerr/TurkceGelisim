@@ -1,7 +1,63 @@
 /* Türkçe Gelişim — canlı indigo/mercan teması (v4)
    Açık tema kök değişkenlerde; koyu tema hem sistem tercihine hem de
-   data-theme="dark" seçimine bağlı. Fontlar sistemden gelir: dış kaynak yok.
-   Her etkileşim hedefi en az 44px. */
+   data-theme="dark" seçimine bağlı. Fontlar depodan servis edilir (fonts/),
+   dış kaynak ve takip yok. Her etkileşim hedefi en az 44px. */
+
+/* ---------- Yerel fontlar (Fraunces, Plus Jakarta Sans; SIL OFL) ---------- */
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/fraunces-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/fraunces-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/fraunces-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/fraunces-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/plus-jakarta-sans-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/plus-jakarta-sans-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
   color-scheme: light;
@@ -50,8 +106,8 @@
 
   --overlay: rgb(15 23 42 / 0.6);
 
-  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
-  --font-sans: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   --radius-sm: 8px;
@@ -238,6 +294,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-serif);
+  font-optical-sizing: auto;
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-primary);
@@ -346,7 +403,7 @@ kbd {
   background: linear-gradient(135deg, var(--primary), var(--accent));
   font-family: var(--font-serif);
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   box-shadow: 0 4px 12px var(--primary-glow);
 }
 
@@ -1395,7 +1452,7 @@ progress::-moz-progress-bar {
   margin-top: 0.2rem;
   font-family: var(--font-serif);
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .val-correct { color: var(--success); }
@@ -1773,7 +1830,19 @@ progress::-moz-progress-bar {
   .library-card-meta { grid-area: meta; }
   .library-word { grid-area: word; font-size: 1.15rem; }
   .library-wrong { grid-area: wrong; }
-  .library-card-hint { grid-area: hint; margin: 0; padding: 0; }
+  .library-card-hint {
+    grid-area: hint;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    transition: opacity var(--fast);
+  }
+
+  .library-card:hover .library-card-hint,
+  .library-card:focus-visible .library-card-hint,
+  .library-card.is-selected .library-card-hint {
+    opacity: 1;
+  }
 
   .library-detail-column {
     position: sticky;
@@ -1922,6 +1991,30 @@ progress::-moz-progress-bar {
     display: none;
   }
 
+  .home-hero {
+    margin: 0.75rem auto 1.25rem;
+  }
+
+  .home-hero p {
+    font-size: 0.98rem;
+  }
+
+  .setup-stack {
+    gap: 1rem;
+  }
+
+  .selection-group {
+    padding: 1.15rem 1rem;
+  }
+
+  /* Başlat düğmesi kaydırırken ekranın altında görünür kalır */
+  .btn-start {
+    position: sticky;
+    bottom: 12px;
+    z-index: 5;
+    box-shadow: 0 6px 20px var(--accent-glow), 0 0 0 6px var(--bg-page);
+  }
+
   .choice-button:not(:disabled):hover {
     transform: none;
   }
@@ -1934,6 +2027,17 @@ progress::-moz-progress-bar {
   .result-actions .btn,
   .inline-actions .btn {
     flex: 1 1 100%;
+  }
+
+  /* Devam kartı mobilde tek sütun ve ortalı */
+  .resume-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .resume-banner .inline-actions {
+    width: 100%;
   }
 
   .library-list {
@@ -1966,9 +2070,39 @@ progress::-moz-progress-bar {
     white-space: nowrap;
   }
 
+  /* Dar ekranda üst çubuk nefes alır: sekmeler daralır, tema düğmesi kenara yapışmaz */
+  .app-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .header-inner {
+    gap: 0.5rem;
+  }
+
+  .brand {
+    padding-right: 0;
+  }
+
+  .header-tabs {
+    min-width: 0;
+    flex: 0 1 auto;
+    gap: 0.2rem;
+    padding: 0.2rem;
+  }
+
   .nav-tab {
-    padding-inline: 0.75rem;
-    font-size: 0.8rem;
+    padding-inline: 0.6rem;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+  }
+
+  .nav-tab svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .theme-toggle {
+    margin-right: 0.1rem;
   }
 
   .choice-grid {

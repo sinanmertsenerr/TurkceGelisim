@@ -83,6 +83,15 @@ export function createQuizView({ elements, onFinish }) {
     elements.nextQuestionButton.hidden = false;
   }
 
+  function renderKeyboardHint(count) {
+    const kbd = (key) => {
+      const node = document.createElement("kbd");
+      node.textContent = key;
+      return node;
+    };
+    elements.keyboardHint.replaceChildren("Seçenekler ", kbd("1"), "–", kbd(String(count)), " · Sonraki ", kbd("N"));
+  }
+
   function renderQuestion() {
     const questionId = state.activeSession.questionIds[state.activeSession.index];
     const question = QUESTION_BY_ID.get(questionId);
@@ -109,6 +118,7 @@ export function createQuizView({ elements, onFinish }) {
       fragment.append(button);
     });
     elements.choiceList.append(fragment);
+    renderKeyboardHint(question.choices.length);
 
     if (existingResponse) {
       markChoices(question, existingResponse);
