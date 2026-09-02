@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   countResponses,
   fisherYates,
+  interleaveByConcept,
   isResumableSession,
   makeStoredSession,
   parseStoredSession,
@@ -25,6 +26,39 @@ test("oturum seçimi istenen sayıyı banka sınırında tutar", () => {
   assert.equal(selectSessionQuestions(pool, 3, () => 0.5).length, 3);
   assert.equal(selectSessionQuestions(pool, 99, () => 0.5).length, 5);
   assert.equal(new Set(selectSessionQuestions(pool, 5, () => 0.5).map(({ id }) => id)).size, 5);
+});
+
+test("konu serpiştirme aynı konuyu arka arkaya getirmez", () => {
+  const questions = [
+    ...Array.from({ length: 4 }, (_, index) => ({ id: `a${index}`, topic: "A" })),
+    ...Array.from({ length: 4 }, (_, index) => ({ id: `b${index}`, topic: "B" })),
+    ...Array.from({ length: 2 }, (_, index) => ({ id: `c${index}`, topic: "C" })),
+  ];
+  const ordered = interleaveByConcept(questions, (question) => question.topic, () => 0.5);
+
+  assert.equal(ordered.length, questions.length);
+  assert.deepEqual(
+    ordered.map(({ id }) => id).sort(),
+    questions.map(({ id }) => id).sort(),
+  );
+  for (let index = 1; index < ordered.length; index += 1) {
+    assert.notEqual(ordered[index].topic, ordered[index - 1].topic);
+  }
+});
+
+test("konu serpiştirme kaynağı bozmaz ve tek konulu listeyi eksiksiz döndürür", () => {
+  const source = [
+    { id: "x1", topic: "Tek" },
+    { id: "x2", topic: "Tek" },
+    { id: "x3", topic: "Tek" },
+  ];
+  const snapshot = structuredClone(source);
+  const ordered = interleaveByConcept(source, (question) => question.topic, () => 0.5);
+
+  assert.deepEqual(source, snapshot);
+  assert.equal(ordered.length, 3);
+  assert.deepEqual(ordered.map(({ id }) => id).sort(), ["x1", "x2", "x3"]);
+  assert.deepEqual(interleaveByConcept([], (question) => question.topic), []);
 });
 
 test("doğru ve yanlış sayaçları yanıtlardan türetilir", () => {

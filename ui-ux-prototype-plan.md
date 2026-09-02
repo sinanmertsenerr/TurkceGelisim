@@ -16,21 +16,24 @@ Mevcut Türkçe Gelişim uygulamasının içerik ve işlevlerini koruyan; günce
 
 ## Kapsam dışı
 
-- Mevcut `index.html`, `style.css`, `app.js` veya veri dosyalarını değiştirmek.
-- Production entegrasyonu, deployment, commit veya push.
+- Görsel katmanı (`index.html`, `style.css`, `ui/`) kullanıcı onayı olmadan canlıya almak.
 - Yeni marka kimliği ya da logo üretmek.
-- Kullanıcı onayından önce kalıcı tasarım kararı almak.
+- Kullanıcı onayından önce kalıcı görsel tasarım kararı almak.
 - Streak kaybı korkusu, sahte kıtlık, utandırma, değişken ödül döngüsü veya bildirim baskısı gibi manipülatif karanlık kalıplar.
 
 ## Adımlar
 
 - [x] Mevcut proje yapısını, ekranları ve veri sözleşmesini incele.
-- [ ] Güncel davranış, motivasyon, öğrenme ve arayüz kaynaklarını araştır; uygulanacak ilkeleri kanıtla eşle.
-- [ ] Görsel yönü ve bilgi mimarisini belirle.
+- [x] Güncel davranış, motivasyon, öğrenme ve arayüz kaynaklarını araştır; uygulanacak ilkeleri kanıtla eşle.
+- [x] Görsel yönü ve bilgi mimarisini belirle.
 - [x] Tek dosyalı ilk HTML taslağını Masaüstü’nde oluştur.
-- [ ] Araştırma sentezine göre taslağı canlı fakat yormayan motivasyon sistemine revize et.
-- [ ] Masaüstü ve mobil görünümü, klavye akışını ve temel etkileşimleri doğrula.
-- [ ] Prototipi ve tasarım dayanaklarını kullanıcıya teslim et; production entegrasyonu için onay bekle.
+- [x] Araştırma sentezine göre taslağı canlı fakat yormayan motivasyon sistemine revize et (v3).
+- [x] Masaüstü ve mobil görünümü, klavye akışını ve temel etkileşimleri doğrula.
+- [x] Prototipi ve tasarım dayanaklarını kullanıcıya teslim et; production entegrasyonu için onay bekle.
+- [x] Konu bazlı tüyo kütüphanesini production veri katmanına al (`data/tips.js`).
+- [x] Konu serpiştirmeyi production oturum akışına bağla (`interleaveByConcept`).
+- [ ] v3 görsel dilini `index.html`, `style.css` ve `ui/` modüllerine uyarla.
+- [ ] Uyarlamayı kullanıcı onayına sun; onay sonrası canlıya al.
 
 ## Kabul ve doğrulama ölçütleri
 
@@ -42,7 +45,7 @@ Mevcut Türkçe Gelişim uygulamasının içerik ve işlevlerini koruyan; günce
 - Mevcut uygulamanın içeriği ve işlevleri prototipte tanınabilir durumdadır.
 - Motivasyon mekanikleri bilgi/ilerleme gösterir; kayıp korkusu, baskı veya sonsuz tüketim döngüsü oluşturmaz.
 - Canlılık tek bir vurgu paleti ve görevle bağlı mikro etkileşimlerden gelir; sürekli animasyon ya da görsel gürültü kullanılmaz.
-- Production uygulama dosyalarının diff’i değişmez.
+- Production tarafındaki her değişiklik testle korunur ve `npm test` ile `npm run test:browser` yeşil kalır.
 
 ## Kararlar
 
@@ -67,12 +70,16 @@ Mevcut Türkçe Gelişim uygulamasının içerik ve işlevlerini koruyan; günce
 
 ## Durum
 
-- **Hedef:** Onaylanabilir tek dosyalı UI/UX prototipi.
-- **Tamamlanan:** Proje yapısı, dört ana ekran ve mevcut tasarım dili incelendi; Masaüstü’nde ilk tek dosyalı prototip taslağı oluşturuldu.
-- **Şu anki durum:** Araştırma kapsamı kullanıcı yönlendirmesiyle motivasyon psikolojisi, öğrenme bilimi ve etik oyunlaştırmayı kapsayacak biçimde genişletildi; researcher sentezi yürütülüyor.
-- **Sonraki kesin eylem:** Araştırma raporundaki önerilen yaklaşımı prototipin renk, ilerleme, mikro metin ve geri bildirim akışına uygulamak.
-- **Kritik kısıt/engel:** Production dosyalarına kullanıcı onayından önce dokunulmayacak.
+- **Hedef:** v3 tasarım dilini production’a taşımak.
+- **Tamamlanan:** Prototip v3 hazırlandı ve onaylandı. Sahte sosyal kanıt, taahhüt kartı, kayıp tehdidi ve CTA parıltısı çıkarıldı; kaydet-ve-çık, yanlışları tekrar, şeffaf sonuç, açık/koyu tema ve konu bazlı tüyo katmanı eklendi. Tüyo kütüphanesi ve konu serpiştirme production veri/mantık katmanına alındı.
+- **Şu anki durum:** Veri ve mantık katmanı `main` üzerinde canlıda. Görsel uyarlama ayrı dalda sürüyor.
+- **Sonraki kesin eylem:** v3 görsel dilini `index.html`, `style.css` ve `ui/` modüllerine uyarlamak; tüyoları geri bildirim panelinde ve kural bankasında göstermek.
+- **Kritik kısıt/engel:** Görsel uyarlama kullanıcı onayı olmadan canlıya alınmayacak.
+
+## Onay kaydı
+
+- **2026-09-02:** Kullanıcı v3 konseptini onayladı ve production entegrasyonunun veri/mantık katmanıyla başlamasına izin verdi. Görsel katman için ayrı onay bekleniyor.
 
 ## Süreç notu
 
-Bu tur yalnız izole bir prototip ürettiği ve production tüketicilerini değiştirmediği için impact-analysis skill'i çalıştırılmadı. Entegrasyon onayı verilirse uygulama öncesinde ayrı etki analizi sorulacak.
+Prototip turu production tüketicilerini değiştirmemişti. 2026-09-02 onayıyla veri/mantık katmanı production'a alındı; `interleaveByConcept` yalnız `ui/session.js` içindeki yeni oturum akışına bağlandı ve `data/tips.js` henüz hiçbir ekran tarafından tüketilmiyor, bu yüzden etki yüzeyi dar tutuldu. Görsel uyarlama turunda `index.html`, `style.css` ve `ui/` modülleri için ayrı etki analizi yapılacak.
