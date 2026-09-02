@@ -360,7 +360,12 @@ async function run() {
     client?.close();
     await stopProcess(chrome);
     await new Promise((resolvePromise) => server.close(resolvePromise));
-    await rm(profileDirectory, { recursive: true, force: true });
+    await rm(profileDirectory, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 250,
+    });
   }
 }
 
