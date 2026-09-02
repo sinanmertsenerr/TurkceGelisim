@@ -1,115 +1,242 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Türkçe Gelişim — Yazım Kuralları Antrenmanı</title>
-<meta name="description" content="Türkçe yazım kurallarını kolaydan experta 4 seviyede çalış. Her sorunun ardından püf noktası (trick) açıklaması.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="description" content="TDK kaynaklı 400 soruyla Türkçe yazım kurallarını sade ve odaklı oturumlarda çalış.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Türkçe Gelişim — TDK Kaynaklı Yazım Antrenmanı</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="bg-glow" aria-hidden="true"></div>
+  <a class="skip-link" href="#app">İçeriğe geç</a>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
 
-<header class="topbar">
-  <a class="logo" href="#" id="logoLink">🇹🇷 Türkçe<span>Gelişim</span></a>
-  <nav>
-    <button class="nav-btn" id="navTest">🎯 Test Çöz</button>
-    <button class="nav-btn" id="navTricks">💡 Trick Kütüphanesi</button>
-  </nav>
-</header>
+  <header class="topbar">
+    <button class="brand" id="homeLogo" type="button" aria-label="Türkçe Gelişim ana sayfası">
+      <span class="brand-mark" aria-hidden="true">TG</span>
+      <span>Türkçe <b>Gelişim</b></span>
+    </button>
+    <nav class="main-nav" aria-label="Ana menü">
+      <button class="nav-button" id="navPractice" type="button">Çalış</button>
+      <button class="nav-button" id="navLibrary" type="button">Kural bankası</button>
+    </nav>
+  </header>
 
-<main id="app">
-
-  <!-- HOME / SEVİYE SEÇİMİ -->
-  <section class="screen active" id="screen-home">
-    <div class="hero">
-      <p class="hero-kicker">sakin odaklı · reklamsız · girişsiz</p>
-      <h1>Yazım kurallarını<br><span class="grad">odaklanarak</span> öğren.</h1>
-      <p class="hero-sub">Bir seviye seç, soruyu cevapla — doğru da yanlış da olsa <b>püf noktası</b> anında açılır.</p>
-    </div>
-    <div class="level-grid">
-      <button class="level-card l1" data-level="kolay">
-        <span class="lv-badge">SEVİYE 1</span><h2>Kolay</h2>
-        <p>Temel yazım kuralları · ısıtma turu</p>
-        <span class="lv-meta">12 soru</span>
-      </button>
-      <button class="level-card l2" data-level="orta">
-        <span class="lv-badge">SEVİYE 2</span><h2>Orta</h2>
-        <p>"de/da", "ki", birleşik kelimeler</p>
-        <span class="lv-meta">10 soru</span>
-      </button>
-      <button class="level-card l3" data-level="zor">
-        <span class="lv-badge">SEVİYE 3</span><h2>Zor</h2>
-        <p>Fiilimsiler, ek fiil, karma kurallar</p>
-        <span class="lv-meta">8 soru</span>
-      </button>
-      <button class="level-card l4" data-level="expert">
-        <span class="lv-badge">SEVİYE 4</span><h2>Expert</h2>
-        <p>Tuzaklı, TDK kılavuzu detayları</p>
-        <span class="lv-meta">8 soru</span>
-      </button>
-    </div>
-    <p class="home-note">🔒 Zor &amp; Expert'te test sırasında Trick Kütüphanesi kilitlidir — önce kendini dene.</p>
-  </section>
-
-  <!-- TEST EKRANI -->
-  <section class="screen" id="screen-quiz">
-    <div class="quiz-top">
-      <button class="back-btn" id="quitQuiz">← Çık</button>
-      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-      <span class="q-count" id="qCount">1/12</span>
-    </div>
-    <article class="q-card" id="qCard"></article>
-  </section>
-
-  <!-- SONUÇ EKRANI -->
-  <section class="screen" id="screen-result">
-    <div class="result-card">
-      <div class="result-emoji" id="resEmoji">🎉</div>
-      <h2 id="resTitle">Bitti!</h2>
-      <div class="score-ring"><span id="resScore">0/0</span></div>
-      <p id="resMsg"></p>
-      <div class="res-actions">
-        <button class="btn primary" id="againBtn">🔁 Tekrar dene</button>
-        <button class="btn ghost" id="trickReviewBtn">💡 Trickleri gözden geçir</button>
-        <button class="btn ghost" id="homeBtn">🏠 Ana sayfa</button>
+  <main id="app">
+    <section class="screen" id="screen-home" data-title="Yazım antrenmanı">
+      <div class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow">TDK kaynaklı · reklamsız · hesapsız</p>
+          <h1 tabindex="-1">Türkçeyi ezberlemeden,<br><span>mantığıyla çalış.</span></h1>
+          <p class="hero-text">Her sorudan sonra kısa gerekçeyi ve doğrudan TDK kaynağını gör. Bir oturumda yalnız seçtiğin kadar soru çöz.</p>
+          <div class="hero-metrics" aria-label="Soru bankası özeti">
+            <span><b>400</b> yeni soru</span>
+            <span><b>4</b> seviye</span>
+            <span><b>14</b> resmî kaynak</span>
+          </div>
+        </div>
+        <aside class="focus-card" aria-label="Oturum ayarı">
+          <span class="focus-icon" aria-hidden="true">◎</span>
+          <h2>Bugünkü hedefin</h2>
+          <p>Kısa başla; istersen 100 soruya kadar çık.</p>
+          <fieldset class="session-picker" id="sessionPicker">
+            <legend>Soru sayısı</legend>
+            <label><input type="radio" name="session-size" value="10"> <span>10</span></label>
+            <label><input type="radio" name="session-size" value="20" checked> <span>20</span></label>
+            <label><input type="radio" name="session-size" value="50"> <span>50</span></label>
+            <label><input type="radio" name="session-size" value="100"> <span>100</span></label>
+          </fieldset>
+        </aside>
       </div>
-    </div>
-  </section>
 
-  <!-- TRICK KÜTÜPHANESİ -->
-  <section class="screen" id="screen-tricks">
-    <div class="lib-head">
-      <h1>💡 Trick Kütüphanesi</h1>
-      <input type="search" id="trickSearch" placeholder="Ara: de/da, ki, virgül..." autocomplete="off">
-    </div>
-    <div class="filter-row" id="levelFilters">
-      <button class="chip on" data-f="all">Tümü</button>
-      <button class="chip" data-f="kolay">Kolay</button>
-      <button class="chip" data-f="orta">Orta</button>
-      <button class="chip" data-f="zor">Zor</button>
-      <button class="chip" data-f="expert">Expert</button>
-    </div>
-    <div class="trick-list" id="trickList"></div>
-    <div class="empty" id="trickEmpty" hidden>Sonuç yok — başka bir kelime dene.</div>
-  </section>
+      <section class="resume-panel shell" id="resumePanel" hidden aria-labelledby="resumeTitle">
+        <div>
+          <p class="eyebrow">Kaldığın yer hazır</p>
+          <h2 id="resumeTitle">Oturuma devam et</h2>
+          <p id="resumeText"></p>
+        </div>
+        <div class="inline-actions">
+          <button class="button primary" id="resumeButton" type="button">Devam et</button>
+          <button class="button quiet" id="discardResumeButton" type="button">Kaydı sil</button>
+        </div>
+      </section>
 
-</main>
+      <section class="levels-section shell" aria-labelledby="levelsTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Tek aktif adım</p>
+            <h2 id="levelsTitle">Seviyeni seç</h2>
+          </div>
+          <p>Her seviyede 100 soru var; oturuma seçtiğin sayı gelir.</p>
+        </div>
+        <div class="level-grid" id="levelGrid"></div>
+      </section>
 
-<!-- TRICK MODAL -->
-<div class="modal-backdrop" id="modal" hidden>
-  <div class="modal" role="dialog" aria-modal="true">
-    <button class="modal-x" id="modalClose">✕</button>
-    <div id="modalBody"></div>
-  </div>
-</div>
+      <p class="privacy-note shell"><span aria-hidden="true">◌</span> İlerleme yalnız bu tarayıcıda tutulur. Üyelik, takip kodu ve reklam yoktur.</p>
+    </section>
 
-<footer>Bağımsız öğrenme projesi · Kurallar TDK Yazım Kılavuzu esas alınarak hazırlanmıştır · Giriş yok, ücret yok.</footer>
+    <section class="screen" id="screen-quiz" data-title="Soru" hidden>
+      <div class="quiz-shell shell">
+        <div class="quiz-toolbar">
+          <button class="back-button" id="saveAndExitButton" type="button">← Kaydet ve çık</button>
+          <div class="progress-area">
+            <div class="progress-labels">
+              <span id="questionCounter">Soru 1 / 20</span>
+              <span id="progressPercent">%0</span>
+            </div>
+            <progress id="quizProgress" max="20" value="0" aria-label="Oturum ilerlemesi"></progress>
+          </div>
+        </div>
 
-<script src="questions.js"></script>
-<script src="app.js"></script>
+        <div class="live-score" aria-label="Canlı sonuç">
+          <div><span>Yanıtlanan</span><strong id="answeredCount">0</strong></div>
+          <div class="score-correct"><span>Doğru</span><strong id="correctCount">0</strong></div>
+          <div class="score-wrong"><span>Yanlış</span><strong id="wrongCount">0</strong></div>
+        </div>
+
+        <article class="question-card">
+          <div class="question-meta">
+            <span class="level-pill" id="questionLevel"></span>
+            <span id="questionTopic"></span>
+          </div>
+          <h1 class="question-prompt" id="questionPrompt" tabindex="-1"></h1>
+          <div class="choice-list" id="choiceList" role="group" aria-labelledby="questionPrompt"></div>
+
+          <section class="feedback-panel is-empty" id="feedbackPanel" aria-labelledby="feedbackTitle">
+            <p class="feedback-title" id="feedbackTitle" role="status" aria-live="polite" aria-atomic="true"></p>
+            <p class="feedback-copy" id="feedbackExplanation"></p>
+            <a class="source-link" id="feedbackSource" target="_blank" rel="noopener noreferrer">TDK kaynağını aç ↗</a>
+            <button class="button primary next-button" id="nextQuestionButton" type="button">Sonraki soru →</button>
+          </section>
+        </article>
+        <p class="keyboard-hint">İpucu: Seçenekler için <kbd>1</kbd>–<kbd>3</kbd>, sonraki soru için <kbd>N</kbd>.</p>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-result" data-title="Oturum sonucu" hidden>
+      <div class="result-shell shell">
+        <div class="result-summary">
+          <p class="eyebrow">Oturum tamamlandı</p>
+          <h1 id="resultTitle" tabindex="-1">Sonucun hazır</h1>
+          <p id="resultMessage"></p>
+          <div class="result-score" aria-label="Başarı yüzdesi">
+            <strong id="resultPercent">%0</strong>
+            <span>başarı</span>
+          </div>
+          <div class="result-stats">
+            <div><span>Doğru</span><strong id="resultCorrect">0</strong></div>
+            <div><span>Yanlış</span><strong id="resultWrong">0</strong></div>
+            <div><span>Toplam</span><strong id="resultTotal">0</strong></div>
+          </div>
+          <div class="result-actions">
+            <button class="button primary" id="retryWrongButton" type="button">Yanlışları tekrar et</button>
+            <button class="button secondary" id="newSessionButton" type="button">Yeni oturum</button>
+            <button class="button quiet" id="resultHomeButton" type="button">Ana sayfa</button>
+          </div>
+        </div>
+
+        <section class="review-section" aria-labelledby="reviewTitle">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">Şeffaf sonuç</p>
+              <h2 id="reviewTitle">Cevaplarını gözden geçir</h2>
+            </div>
+          </div>
+          <div class="review-list" id="reviewList"></div>
+          <button class="button quiet load-more" id="reviewMoreButton" type="button" hidden>Daha fazla göster</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-library" data-title="Kural bankası" hidden>
+      <div class="library-shell shell">
+        <div class="library-header">
+          <div>
+            <p class="eyebrow">400 soru · 14 TDK sayfası</p>
+            <h1 tabindex="-1">Kural bankası</h1>
+            <p>Soru, doğru cevap, kısa gerekçe ve resmî kaynak aynı kartta.</p>
+          </div>
+          <div class="library-search">
+            <label for="librarySearch">Sorularda ara</label>
+            <input id="librarySearch" type="search" placeholder="Örnek: de, kısaltma, ön söz" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="library-filters" aria-label="Kural bankası filtreleri">
+          <label for="libraryLevel">Seviye
+            <select id="libraryLevel">
+              <option value="all">Tüm seviyeler</option>
+              <option value="kolay">Kolay</option>
+              <option value="orta">Orta</option>
+              <option value="zor">Zor</option>
+              <option value="uzman">Uzman</option>
+            </select>
+          </label>
+          <label for="libraryTopic">Konu
+            <select id="libraryTopic">
+              <option value="all">Tüm konular</option>
+            </select>
+          </label>
+          <p id="librarySummary" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="library-list" id="libraryList"></div>
+        <div class="empty-state" id="libraryEmpty" hidden>
+          <span aria-hidden="true">⌕</span>
+          <h2>Sonuç bulunamadı</h2>
+          <p>Arama sözcüğünü kısaltmayı veya filtreyi değiştirmeyi dene.</p>
+        </div>
+        <button class="button secondary load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Bağımsız öğrenme projesi · İçerik, bağlantılı TDK Yazım Kuralları sayfalarından kontrol edilmiştir.</p>
+    <p>Sürüm <span id="bankVersion"></span> · Veriler yalnız cihazında</p>
+  </footer>
+
+  <template id="levelCardTemplate">
+    <article class="level-card">
+      <div class="level-topline"><span class="level-number"></span><span class="level-count">100 soru</span></div>
+      <h3></h3>
+      <p></p>
+      <button class="level-start" type="button"><span>Bu seviyeyi başlat</span><span aria-hidden="true">→</span></button>
+    </article>
+  </template>
+
+  <template id="choiceTemplate">
+    <button class="choice-button" type="button">
+      <span class="choice-key" aria-hidden="true"></span>
+      <span class="choice-text"></span>
+      <span class="choice-state" aria-hidden="true"></span>
+    </button>
+  </template>
+
+  <template id="reviewTemplate">
+    <article class="review-card">
+      <div class="review-head"><span class="review-state"></span><span class="review-topic"></span></div>
+      <h3></h3>
+      <p class="review-answer"></p>
+      <p class="review-explanation"></p>
+      <a class="source-link" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
+    </article>
+  </template>
+
+  <template id="libraryCardTemplate">
+    <article class="library-card">
+      <div class="library-card-meta"><span class="level-pill"></span><span class="library-topic"></span></div>
+      <h2></h2>
+      <p class="library-answer"></p>
+      <p class="library-explanation"></p>
+      <a class="source-link" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
+    </article>
+  </template>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>

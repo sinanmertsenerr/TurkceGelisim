@@ -1,0 +1,10 @@
+# Deploy only the browser runtime. Everything else stays in the source repository.
+/*
+!index.html
+!style.css
+!app.js
+!core.js
+!questions.js
+!favicon.svg
+!data
+!vercel.json
