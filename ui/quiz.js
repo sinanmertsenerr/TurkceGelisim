@@ -1,7 +1,8 @@
-import { countResponses } from "../core.js";
+import { countResponses, streakFromResponses } from "../core.js";
 import { QUESTION_BY_ID } from "../questions.js";
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state, responseFor } from "./state.js";
+import { renderTip } from "./tips.js";
 import * as storage from "./storage.js";
 
 const LETTERS = ["A", "B", "C", "D"];
@@ -17,6 +18,22 @@ export function createQuizView({ elements, onFinish }) {
     elements.quizProgress.value = counts.answered;
     elements.questionCounter.textContent = `Soru ${state.activeSession.index + 1} / ${total}`;
     elements.progressPercent.textContent = `%${Math.round((counts.answered / total) * 100)}`;
+    updateStreak();
+  }
+
+  function updateStreak() {
+    const { current, best } = streakFromResponses(state.activeSession.responses);
+    const dots = document.createDocumentFragment();
+    for (let index = 0; index < 10; index += 1) {
+      const dot = document.createElement("span");
+      dot.className = "streak-dot";
+      if (index < current) dot.classList.add(current >= 3 ? "is-gold" : "is-lit");
+      dots.append(dot);
+    }
+    elements.streakDots.replaceChildren(dots);
+    elements.streakLabel.textContent = current >= 3
+      ? `Seri ${current} · Bu turdaki en uzun serin ${best}`
+      : `Seri ${current} · 3 doğruda halka dolar`;
   }
 
   function clearFeedback() {
@@ -24,6 +41,7 @@ export function createQuizView({ elements, onFinish }) {
     elements.feedbackTitle.textContent = "";
     elements.feedbackExplanation.textContent = "";
     elements.feedbackExplanation.hidden = true;
+    elements.feedbackTip.replaceChildren();
     elements.feedbackSource.hidden = true;
     elements.nextQuestionButton.hidden = true;
   }
@@ -49,9 +67,13 @@ export function createQuizView({ elements, onFinish }) {
     const correctText = correctChoiceFor(question).text;
     const source = sourceFor(question);
     elements.feedbackPanel.className = `feedback-panel ${response.correct ? "is-correct" : "is-wrong"}`;
-    elements.feedbackTitle.textContent = response.correct ? "Doğru." : `Yanlış. Doğru cevap: ${correctText}`;
+    const { current } = streakFromResponses(state.activeSession.responses);
+    elements.feedbackTitle.textContent = response.correct
+      ? (current >= 3 ? `Doğru — seri ${current}.` : "Doğru.")
+      : `Yanlış. Doğru cevap: ${correctText}`;
     elements.feedbackExplanation.textContent = question.explanation;
     elements.feedbackExplanation.hidden = false;
+    renderTip(elements.feedbackTip, question.topic);
     elements.feedbackSource.textContent = `Kaynak: ${source.title} ↗`;
     elements.feedbackSource.href = source.url;
     elements.feedbackSource.hidden = false;

@@ -1,6 +1,7 @@
 import { QUESTIONS } from "../questions.js";
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state } from "./state.js";
+import { renderTip } from "./tips.js";
 
 export function populateTopics(elements) {
   const topics = [...new Set(QUESTIONS.map(({ topic }) => topic))].sort((a, b) => a.localeCompare(b, "tr"));
@@ -47,6 +48,7 @@ export function renderLibrary(elements) {
     card.querySelector(".library-topic").textContent = question.topic;
     card.querySelector("h2").textContent = question.prompt;
     card.querySelector(".library-answer").textContent = `Doğru cevap: ${correctChoiceFor(question).text}`;
+    renderTip(card.querySelector(".tip-box"), question.topic, { collapsible: true });
     card.querySelector(".library-explanation").textContent = question.explanation;
     const link = card.querySelector("a");
     link.href = source.url;

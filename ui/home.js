@@ -12,6 +12,12 @@ export function setSelectedSessionSize(size) {
   if (input) input.checked = true;
 }
 
+export function updateSessionEstimate(elements) {
+  const size = selectedSessionSize();
+  const minutes = Math.max(4, Math.round(size * 0.6));
+  elements.sessionEstimate.textContent = `Yaklaşık ${minutes} dakika sürer. İstediğin an kaydedip çıkabilirsin.`;
+}
+
 export function renderLevelCards(elements, { onStartLevel }) {
   const fragment = document.createDocumentFragment();
   LEVELS.forEach((level, index) => {

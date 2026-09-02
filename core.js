@@ -46,6 +46,34 @@ export function interleaveByConcept(questions, conceptOf = (question) => questio
   return ordered;
 }
 
+export function streakFromResponses(responses) {
+  let current = 0;
+  let best = 0;
+  for (const response of responses) {
+    current = response.correct ? current + 1 : 0;
+    if (current > best) best = current;
+  }
+  return { current, best };
+}
+
+export function weakestTopic(entries) {
+  const stats = new Map();
+  for (const { topic, correct } of entries) {
+    if (!stats.has(topic)) stats.set(topic, { topic, correct: 0, total: 0 });
+    const stat = stats.get(topic);
+    stat.total += 1;
+    if (correct) stat.correct += 1;
+  }
+
+  let weakest = null;
+  for (const stat of stats.values()) {
+    if (stat.correct === stat.total) continue;
+    const ratio = stat.correct / stat.total;
+    if (!weakest || ratio < weakest.ratio) weakest = { ...stat, ratio };
+  }
+  return weakest;
+}
+
 export function selectSessionQuestions(pool, requestedSize, rng = Math.random) {
   const size = Math.min(Math.max(Number(requestedSize) || 20, 1), pool.length);
   return fisherYates(pool, rng).slice(0, size);

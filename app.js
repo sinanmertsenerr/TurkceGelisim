@@ -1,18 +1,25 @@
 import { STORAGE_KEY } from "./core.js";
 import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { renderLevelCards } from "./ui/home.js";
+import { renderLevelCards, updateSessionEstimate } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { populateTopics, renderLibrary } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
 import { showScreen } from "./ui/screens.js";
 import { loadResumableSession } from "./ui/storage.js";
 import { state } from "./ui/state.js";
+import { installTheme } from "./ui/theme.js";
 
 const elements = getElements();
 const controller = createSessionController({ elements });
 
+installTheme(elements);
 renderLevelCards(elements, { onStartLevel: controller.startNewSession });
+updateSessionEstimate(elements);
+
+for (const input of document.querySelectorAll('input[name="session-size"]')) {
+  input.addEventListener("change", () => updateSessionEstimate(elements));
+}
 
 elements.homeLogo.addEventListener("click", controller.showHome);
 elements.navPractice.addEventListener("click", controller.showHome);
