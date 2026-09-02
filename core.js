@@ -10,6 +10,42 @@ export function fisherYates(items, rng = Math.random) {
   return copy;
 }
 
+export function interleaveByConcept(questions, conceptOf = (question) => question.topic, rng = Math.random) {
+  const byConcept = new Map();
+  for (const question of questions) {
+    const key = conceptOf(question);
+    if (!byConcept.has(key)) byConcept.set(key, []);
+    byConcept.get(key).push(question);
+  }
+
+  const lanes = [...byConcept.values()].map((lane) => fisherYates(lane, rng));
+  lanes.forEach((lane) => lane.reverse());
+  const ordered = [];
+  let lastConcept = null;
+
+  while (ordered.length < questions.length) {
+    lanes.sort((a, b) => b.length - a.length);
+    let picked = false;
+    for (const lane of lanes) {
+      if (lane.length && conceptOf(lane[lane.length - 1]) !== lastConcept) {
+        const question = lane.pop();
+        lastConcept = conceptOf(question);
+        ordered.push(question);
+        picked = true;
+        break;
+      }
+    }
+    if (!picked) {
+      const lane = lanes.find((entry) => entry.length);
+      if (!lane) break;
+      const question = lane.pop();
+      lastConcept = conceptOf(question);
+      ordered.push(question);
+    }
+  }
+  return ordered;
+}
+
 export function selectSessionQuestions(pool, requestedSize, rng = Math.random) {
   const size = Math.min(Math.max(Number(requestedSize) || 20, 1), pool.length);
   return fisherYates(pool, rng).slice(0, size);
