@@ -2,11 +2,11 @@
 
 ## Durum
 
-- **Hedef:** Statik uygulamayı Vercel Preview + korumalı `main` production akışıyla özel domaine hazırlamak.
-- **Tamamlanan:** PR #1 squash merge ile `main`e alındı; zorunlu PR + `verify` ruleset'i, merge sonrası CI ve GitHub Pages yayını doğrulandı.
-- **Şu anki durum:** GitHub yayınlama/CI aşaması tamam; 400 soruluk sürüm mevcut Pages adresinde canlı.
-- **Sonraki kesin eylem:** Kullanıcının domain adı ve eylem-anı onayıyla GitHub reposunu Vercel'e bağlamak.
-- **Kritik kısıt/engel:** Vercel proje oluşturma, hesap/GitHub App bağlantısı ve DNS değişikliği ayrı onay gerektirir.
+- **Hedef:** Statik uygulamayı Vercel Preview + korumalı `main` production akışıyla özel domaine hazırlamak. **Tamamlandı.**
+- **Tamamlanan:** GitHub CI/ruleset, Vercel Git bağlantısı ve `turkce.sinansener.com` özel domain yayını doğrulandı.
+- **Şu anki durum:** 400 soruluk Türkçe Gelişim sürümü özel domainde HTTPS üzerinden canlı.
+- **Sonraki kesin eylem:** Yeni değişiklikleri PR üzerinden `main`e alarak CI/CD otomatik yayınıyla sürdürmek.
+- **Kritik kısıt/engel:** Yok.
 
 ## Hedef ve kapsam
 
@@ -120,6 +120,7 @@
 - PR #1: `MERGED`; main commit `16ab9ffb3755264903c42e4466a0cc939be42262`.
 - Merge sonrası CI run `33625803637`: `SUCCESS`.
 - GitHub Pages run `33625804544`: build/deploy/report işleri `SUCCESS`; canlı adres HTTP 200 ve HTML içinde 400 soru/4 seviye/14 kaynak metrikleri görüldü.
+- Vercel özel domain `https://turkce.sinansener.com`: HTTP/2 200; geçerli HTTPS yanıtı, `Türkçe Gelişim — TDK Kaynaklı Yazım Antrenmanı` başlığı ve 400 soru içeriği doğrulandı. DNS CNAME hedefi `b4255ffbdcbed817.vercel-dns-017.com`.
 - Readiness ve audit: kullanıcı talimatı gereği çalıştırılmadı.
 
 ## Park edilen ihtimaller
