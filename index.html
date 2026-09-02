@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ece7dc">
+  <meta name="theme-color" content="#f8fafc">
   <meta name="description" content="TDK kaynaklı 400 soruyla Türkçe yazım kurallarını sade ve odaklı oturumlarda çalış.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Türkçe Gelişim — TDK Kaynaklı Yazım Antrenmanı</title>
@@ -13,264 +13,266 @@
 <body>
   <a class="skip-link" href="#app">İçeriğe geç</a>
 
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Uygulama menüsü">
+  <header class="app-header">
+    <div class="header-inner">
       <button class="brand" id="homeLogo" type="button" aria-label="Türkçe Gelişim ana sayfası">
-        <span class="brand-mark" aria-hidden="true">T</span>
-        <span class="brand-copy">Türkçe <b>Gelişim</b></span>
+        <span class="brand-icon" aria-hidden="true">T</span>
+        <span class="brand-title">Türkçe Gelişim</span>
       </button>
 
-      <p class="nav-label">Çalışma alanı</p>
-      <nav class="app-nav" aria-label="Ana menü">
-        <button class="nav-item" id="navPractice" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M8 20a3 3 0 0 1 0-6h11M9 8h6"/></svg>
+      <nav class="header-tabs" aria-label="Ana menü">
+        <button class="nav-tab" id="navPractice" type="button" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span>Antrenman</span>
         </button>
-        <button class="nav-item" id="navLibrary" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
+        <button class="nav-tab" id="navLibrary" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           <span>Kural bankası</span>
         </button>
       </nav>
 
-      <div class="sidebar-spacer"></div>
-      <div class="sidebar-note">
-        <strong>400 soru, 14 kaynak</strong>
-        <p>Hesapsız, reklamsız ve yalnız bu cihazda.</p>
-      </div>
-    </aside>
-
-    <div class="workspace">
-      <div class="workspace-bar">
-        <p class="crumb" id="crumb">Antrenman</p>
-        <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
-          <span class="theme-dot" aria-hidden="true"></span>
-          <span id="themeToggleLabel">Koyu tema</span>
-        </button>
-      </div>
-
-      <main id="app">
-        <section class="screen" id="screen-home" data-title="Yazım antrenmanı">
-          <div class="shell">
-            <div class="page-heading">
-              <div>
-                <p class="eyebrow">Yazım antrenmanı</p>
-                <h1 tabindex="-1">Bugün neyi <em>netleştirelim?</em></h1>
-              </div>
-              <p class="heading-note"><strong>Tek karar, doğrudan başlangıç.</strong><br>Tur uzunluğunu ve seviyeni seç; her cevabın tüyosunu ve TDK kaynağını anında gör.</p>
-            </div>
-
-            <section class="resume-panel" id="resumePanel" hidden aria-labelledby="resumeTitle">
-              <div>
-                <p class="eyebrow">Kaldığın yer hazır</p>
-                <h2 id="resumeTitle">Oturuma devam et</h2>
-                <p id="resumeText"></p>
-              </div>
-              <div class="inline-actions">
-                <button class="button primary" id="resumeButton" type="button">Devam et →</button>
-                <button class="button quiet" id="discardResumeButton" type="button">Kaydı sil</button>
-              </div>
-            </section>
-
-            <aside class="focus-card" aria-label="Oturum ayarı">
-              <div class="sheet-head">
-                <h2>Oturumun</h2>
-                <span class="sheet-index">01 / 02</span>
-              </div>
-              <fieldset class="session-picker" id="sessionPicker">
-                <legend>Soru sayısı</legend>
-                <label><input type="radio" name="session-size" value="10"> <span>10</span></label>
-                <label><input type="radio" name="session-size" value="20" checked> <span>20</span></label>
-                <label><input type="radio" name="session-size" value="50"> <span>50</span></label>
-                <label><input type="radio" name="session-size" value="100"> <span>100</span></label>
-              </fieldset>
-              <p class="focus-note" id="sessionEstimate">Yaklaşık 12 dakika sürer. İstediğin an kaydedip çıkabilirsin.</p>
-            </aside>
-
-            <section class="levels-section" aria-labelledby="levelsTitle">
-              <div class="sheet-head">
-                <h2 id="levelsTitle">Seviyeni seç</h2>
-                <span class="sheet-index">02 / 02</span>
-              </div>
-              <div class="level-grid" id="levelGrid"></div>
-            </section>
-
-            <div class="hero-metrics" aria-label="Soru bankası özeti">
-              <div><strong>400</strong> <span>yeni soru</span></div>
-              <div><strong>4</strong> <span>dengeli seviye</span></div>
-              <div><strong>14</strong> <span>resmî kaynak</span></div>
-            </div>
-
-            <p class="privacy-note">İlerleme yalnız bu tarayıcıda tutulur. Üyelik, takip kodu ve reklam yoktur.</p>
-          </div>
-        </section>
-
-        <section class="screen" id="screen-quiz" data-title="Soru" hidden>
-          <div class="shell quiz-shell">
-            <div class="quiz-toolbar">
-              <button class="back-button" id="saveAndExitButton" type="button">← Kaydet ve çık</button>
-              <div class="progress-area">
-                <div class="progress-labels">
-                  <span id="questionCounter">Soru 1 / 20</span>
-                  <span id="progressPercent">%0</span>
-                </div>
-                <progress id="quizProgress" max="20" value="0" aria-label="Oturum ilerlemesi"></progress>
-              </div>
-            </div>
-
-            <div class="session-strip" aria-label="Canlı sonuç">
-              <div class="score-row"><span>Yanıtlanan</span><strong id="answeredCount">0</strong></div>
-              <div class="score-row score-correct"><span>Doğru</span><strong id="correctCount">0</strong></div>
-              <div class="score-row score-wrong"><span>Yanlış</span><strong id="wrongCount">0</strong></div>
-              <div class="streak-strip" id="streakStrip" aria-label="Oturum içi seri">
-                <span class="streak-dots" id="streakDots" aria-hidden="true"></span>
-                <span class="streak-label" id="streakLabel">Seri 0 · 3 doğruda halka dolar</span>
-              </div>
-              <p class="keyboard-hint">Seçenekler <kbd>1</kbd>–<kbd>3</kbd> · Sonraki <kbd>N</kbd></p>
-            </div>
-
-            <article class="question-card">
-              <div class="question-meta">
-                <span class="level-pill" id="questionLevel"></span>
-                <span id="questionTopic"></span>
-              </div>
-              <h1 class="question-prompt" id="questionPrompt" tabindex="-1"></h1>
-              <div class="choice-list" id="choiceList" role="group" aria-labelledby="questionPrompt"></div>
-
-              <section class="feedback-panel is-empty" id="feedbackPanel" aria-labelledby="feedbackTitle">
-                <div class="feedback-head">
-                  <p class="feedback-title" id="feedbackTitle" role="status" aria-live="polite" aria-atomic="true"></p>
-                  <button class="button primary next-button" id="nextQuestionButton" type="button">Sonraki soru →</button>
-                </div>
-                <p class="feedback-copy" id="feedbackExplanation"></p>
-                <div class="tip-box" id="feedbackTip"></div>
-                <a class="source-link" id="feedbackSource" target="_blank" rel="noopener noreferrer">TDK kaynağını aç ↗</a>
-              </section>
-            </article>
-          </div>
-        </section>
-
-        <section class="screen" id="screen-result" data-title="Oturum sonucu" hidden>
-          <div class="shell result-shell">
-            <div class="result-summary">
-              <p class="eyebrow">Oturum tamamlandı</p>
-              <h1 id="resultTitle" tabindex="-1">Sonucun hazır</h1>
-              <p id="resultMessage"></p>
-              <div class="result-score" aria-label="Başarı yüzdesi">
-                <strong id="resultPercent">%0</strong>
-                <span>başarı</span>
-              </div>
-              <div class="result-stats">
-                <div><strong id="resultCorrect">0</strong><span>Doğru</span></div>
-                <div><strong id="resultWrong">0</strong><span>Yanlış</span></div>
-                <div><strong id="resultTotal">0</strong><span>Toplam</span></div>
-              </div>
-              <div class="next-step-card" id="nextStepCard" hidden>
-                <strong>Sonraki oturum önerisi</strong>
-                <span id="nextStepText"></span>
-              </div>
-              <div class="result-actions">
-                <button class="button primary" id="retryWrongButton" type="button">Yanlışları tekrar et →</button>
-                <button class="button secondary" id="newSessionButton" type="button">Yeni oturum</button>
-                <button class="button quiet" id="resultHomeButton" type="button">Ana sayfa</button>
-              </div>
-            </div>
-
-            <section class="review-section" aria-labelledby="reviewTitle">
-              <div class="sheet-head">
-                <h2 id="reviewTitle">Cevaplarını gözden geçir</h2>
-                <span class="sheet-index">Şeffaf sonuç</span>
-              </div>
-              <div class="review-list" id="reviewList"></div>
-              <button class="button quiet load-more" id="reviewMoreButton" type="button" hidden>Daha fazla göster</button>
-            </section>
-          </div>
-        </section>
-
-        <section class="screen" id="screen-library" data-title="Kural bankası" hidden>
-          <div class="shell library-shell">
-            <div class="page-heading">
-              <div>
-                <p class="eyebrow">Kaynaklı bilgi alanı</p>
-                <h1 tabindex="-1">Kural bankası</h1>
-              </div>
-              <p class="heading-note"><strong>Her kuralın iki saniyelik bir tüyosu var.</strong><br>Önce tüyoyu oku, gerekçeyi ve TDK kaynağını hemen altında bul.</p>
-            </div>
-
-            <div class="library-filters" aria-label="Kural bankası filtreleri">
-              <div class="field">
-                <label for="librarySearch">Sorularda ara</label>
-                <input id="librarySearch" type="search" placeholder="Örnek: de, kısaltma, ön söz" autocomplete="off">
-              </div>
-              <div class="field">
-                <label for="libraryLevel">Seviye</label>
-                <select id="libraryLevel">
-                  <option value="all">Tüm seviyeler</option>
-                  <option value="kolay">Kolay</option>
-                  <option value="orta">Orta</option>
-                  <option value="zor">Zor</option>
-                  <option value="uzman">Uzman</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="libraryTopic">Konu</label>
-                <select id="libraryTopic">
-                  <option value="all">Tüm konular</option>
-                </select>
-              </div>
-            </div>
-
-            <p id="librarySummary" class="library-summary" role="status" aria-live="polite"></p>
-
-            <div class="library-workspace">
-              <div class="library-results">
-                <div class="library-list" id="libraryList"></div>
-                <div class="empty-state" id="libraryEmpty" hidden>
-                  <h2>Sonuç bulunamadı</h2>
-                  <p>Arama sözcüğünü kısaltmayı veya filtreyi değiştirmeyi dene.</p>
-                </div>
-                <button class="button secondary load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
-              </div>
-
-              <div class="library-detail-column">
-                <div class="library-detail-placeholder" id="libraryPlaceholder">
-                  <p class="eyebrow">Kural detayı</p>
-                  <h2>Soldan bir kural seç</h2>
-                  <p>Tüyosu, gerekçesi ve TDK kaynağı burada açılır.</p>
-                </div>
-                <dialog class="library-dialog" id="libraryDialog" aria-labelledby="libraryDialogAnswer">
-            <div class="library-dialog-inner">
-              <div class="library-dialog-head">
-                <p class="library-card-meta"><span class="level-pill" id="libraryDialogLevel"></span><span id="libraryDialogTopic"></span></p>
-                <button class="dialog-close" id="libraryDialogClose" type="button" aria-label="Kapat">×</button>
-              </div>
-              <p class="library-dialog-prompt" id="libraryDialogPrompt"></p>
-              <h2 class="library-dialog-answer" id="libraryDialogAnswer"></h2>
-              <p class="library-wrong library-dialog-wrong" id="libraryDialogWrong"></p>
-              <div class="tip-box" id="libraryDialogTip"></div>
-              <p class="library-explanation" id="libraryDialogExplanation"></p>
-              <a class="source-link" id="libraryDialogSource" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
-            </div>
-          </dialog>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="site-footer">
-        <p>Bağımsız öğrenme projesi · İçerik, bağlantılı TDK Yazım Kuralları sayfalarından kontrol edilmiştir.</p>
-        <p>Sürüm <span id="bankVersion"></span> · Veriler yalnız cihazında</p>
-      </footer>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span class="visually-hidden" id="themeToggleLabel">Koyu tema</span>
+      </button>
     </div>
-  </div>
+  </header>
+
+  <main id="app">
+    <section class="screen" id="screen-home" data-title="Yazım antrenmanı">
+      <div class="shell home-shell">
+        <div class="home-hero">
+          <p class="eyebrow">Yazım antrenmanı</p>
+          <h1 tabindex="-1">Doğru Türkçe, <em>duru zihin.</em></h1>
+          <p>Telaş ve puan kaygısı olmadan TDK yazım kurallarını kalıcı bir kavrayışla çalış. Her cevabın tüyosu ve resmî kaynağı anında önünde.</p>
+        </div>
+
+        <div class="setup-stack">
+          <section class="resume-banner" id="resumePanel" hidden aria-labelledby="resumeTitle">
+            <div class="resume-info">
+              <h2 id="resumeTitle">Yarım kalan oturumun hazır</h2>
+              <p id="resumeText"></p>
+            </div>
+            <div class="inline-actions">
+              <button class="btn btn-primary" id="resumeButton" type="button">Oturuma dön</button>
+              <button class="btn btn-subtle" id="discardResumeButton" type="button">Kaydı sil</button>
+            </div>
+          </section>
+
+          <section class="selection-group" aria-labelledby="levelsTitle">
+            <h2 class="selection-label" id="levelsTitle">Zorluk düzeyi</h2>
+            <p class="selection-hint">Çalışmak istediğin derinliği seç. Her düzeyde 100 soru var.</p>
+            <div class="choice-grid level-grid" id="levelGrid" role="radiogroup" aria-labelledby="levelsTitle"></div>
+          </section>
+
+          <section class="selection-group" aria-labelledby="sizeTitle">
+            <h2 class="selection-label" id="sizeTitle">Soru adedi</h2>
+            <p class="selection-hint" id="sessionEstimate">Yaklaşık 12 dakika sürer. İstediğin an kaydedip çıkabilirsin.</p>
+            <fieldset class="choice-grid session-picker" id="sessionPicker">
+              <legend class="visually-hidden">Soru sayısı</legend>
+              <label class="choice-btn"><input type="radio" name="session-size" value="10"><span>10 soru</span><span class="badge-sub">Hızlı pratik</span></label>
+              <label class="choice-btn"><input type="radio" name="session-size" value="20" checked><span>20 soru</span><span class="badge-sub">Dengeli</span></label>
+              <label class="choice-btn"><input type="radio" name="session-size" value="50"><span>50 soru</span><span class="badge-sub">Yoğunlaşma</span></label>
+              <label class="choice-btn"><input type="radio" name="session-size" value="100"><span>100 soru</span><span class="badge-sub">Tam kapsam</span></label>
+            </fieldset>
+          </section>
+
+          <button class="btn btn-accent btn-start" id="startSessionButton" type="button">Oturumu başlat</button>
+
+          <div class="hero-metrics" aria-label="Soru bankası özeti">
+            <div><strong>400</strong> <span>yeni soru</span></div>
+            <div><strong>4</strong> <span>dengeli seviye</span></div>
+            <div><strong>14</strong> <span>resmî kaynak</span></div>
+          </div>
+
+          <p class="privacy-note">İlerleme yalnız bu tarayıcıda tutulur. Üyelik, takip kodu ve reklam yoktur.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-quiz" data-title="Soru" hidden>
+      <div class="shell quiz-shell">
+        <div class="quiz-top-bar">
+          <button class="btn btn-subtle back-button" id="saveAndExitButton" type="button">← Kaydet ve çık</button>
+          <div class="quiz-stats" aria-label="Canlı sonuç">
+            <span class="stat-pill" title="Yanıtlanan"><span class="visually-hidden">Yanıtlanan </span><strong id="answeredCount">0</strong></span>
+            <span class="stat-pill correct-pill" title="Doğru"><span aria-hidden="true">✓</span><span class="visually-hidden">Doğru </span><strong id="correctCount">0</strong></span>
+            <span class="stat-pill wrong-pill" title="Yanlış"><span aria-hidden="true">✕</span><span class="visually-hidden">Yanlış </span><strong id="wrongCount">0</strong></span>
+            <span class="stat-pill streak-pill" id="streakStrip" aria-label="Oturum içi seri" hidden>
+              <span class="streak-dots" id="streakDots" aria-hidden="true"></span>
+              <span id="streakLabel"></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="progress-area">
+          <div class="progress-labels">
+            <span id="questionCounter">Soru 1 / 20</span>
+            <span id="progressPercent">%0</span>
+          </div>
+          <progress id="quizProgress" max="20" value="0" aria-label="Oturum ilerlemesi"></progress>
+        </div>
+
+        <article class="question-card">
+          <div class="question-meta">
+            <span class="category-chip" id="questionTopic"></span>
+            <span class="level-pill" id="questionLevel"></span>
+          </div>
+          <h1 class="question-prompt" id="questionPrompt" tabindex="-1"></h1>
+          <div class="choice-list" id="choiceList" role="group" aria-labelledby="questionPrompt"></div>
+          <p class="keyboard-hint">Seçenekler <kbd>1</kbd>–<kbd>4</kbd> · Sonraki <kbd>N</kbd></p>
+
+          <section class="feedback-panel is-empty" id="feedbackPanel" aria-labelledby="feedbackTitle">
+            <div class="feedback-head">
+              <div class="feedback-title-wrap">
+                <span class="feedback-indicator" aria-hidden="true"></span>
+                <p class="feedback-title" id="feedbackTitle" role="status" aria-live="polite" aria-atomic="true"></p>
+              </div>
+              <button class="btn btn-primary next-button" id="nextQuestionButton" type="button">Sonraki soru →</button>
+            </div>
+            <p class="feedback-copy" id="feedbackExplanation"></p>
+            <div class="tip-box" id="feedbackTip"></div>
+            <div class="feedback-footer">
+              <a class="source-link" id="feedbackSource" target="_blank" rel="noopener noreferrer">TDK kaynağını aç ↗</a>
+              <span class="feedback-pace">Kendi hızında ilerle.</span>
+            </div>
+          </section>
+        </article>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-result" data-title="Oturum sonucu" hidden>
+      <div class="shell result-shell">
+        <div class="results-card">
+          <div class="score-ring-wrap" aria-hidden="true">
+            <svg class="score-ring-svg" viewBox="0 0 140 140">
+              <circle class="score-ring-bg" cx="70" cy="70" r="60"/>
+              <circle class="score-ring-progress" id="resultRing" cx="70" cy="70" r="60"/>
+            </svg>
+            <span class="score-display-number" id="resultPercent">%0</span>
+          </div>
+          <p class="eyebrow">Oturum tamamlandı</p>
+          <h1 id="resultTitle" tabindex="-1">Sonucun hazır</h1>
+          <p class="results-subtitle" id="resultMessage"></p>
+
+          <div class="stats-breakdown">
+            <div class="breakdown-box"><span class="breakdown-label">Çözülen</span><strong class="breakdown-val" id="resultTotal">0</strong></div>
+            <div class="breakdown-box"><span class="breakdown-label">Kavranan</span><strong class="breakdown-val val-correct" id="resultCorrect">0</strong></div>
+            <div class="breakdown-box"><span class="breakdown-label">Öğrenilecek</span><strong class="breakdown-val val-wrong" id="resultWrong">0</strong></div>
+          </div>
+
+          <div class="topic-mastery" aria-labelledby="topicMasteryTitle">
+            <h2 class="topic-mastery-title" id="topicMasteryTitle">Konu bazında gelişim</h2>
+            <div class="topic-list" id="topicMasteryList"></div>
+          </div>
+
+          <div class="next-step-card" id="nextStepCard" hidden>
+            <strong>Sonraki oturum önerisi</strong>
+            <span id="nextStepText"></span>
+          </div>
+
+          <div class="result-actions">
+            <button class="btn btn-accent" id="retryWrongButton" type="button">Yanlışları tekrar çöz</button>
+            <button class="btn btn-primary" id="newSessionButton" type="button">Yeni oturum</button>
+            <button class="btn btn-outline" id="resultHomeButton" type="button">Ana sayfa</button>
+          </div>
+        </div>
+
+        <section class="review-section" aria-labelledby="reviewTitle">
+          <div class="section-head">
+            <h2 id="reviewTitle">Cevaplarını gözden geçir</h2>
+            <span class="section-index">Şeffaf sonuç</span>
+          </div>
+          <div class="review-list" id="reviewList"></div>
+          <button class="btn btn-outline load-more" id="reviewMoreButton" type="button" hidden>Daha fazla göster</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-library" data-title="Kural bankası" hidden>
+      <div class="shell library-shell">
+        <div class="library-header">
+          <p class="eyebrow">Kaynaklı bilgi alanı</p>
+          <h1 tabindex="-1">Kural bankası</h1>
+          <p>Her kuralın iki saniyelik bir tüyosu var. Önce tüyoyu oku, gerekçeyi ve TDK kaynağını hemen altında bul.</p>
+        </div>
+
+        <div class="library-filters" aria-label="Kural bankası filtreleri">
+          <div class="field search-wrap">
+            <label for="librarySearch">Ara</label>
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input id="librarySearch" type="search" placeholder="Örnek: de, kısaltma, ön söz" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="libraryLevel">Seviye</label>
+            <select id="libraryLevel">
+              <option value="all">Tüm seviyeler</option>
+              <option value="kolay">Kolay</option>
+              <option value="orta">Orta</option>
+              <option value="zor">Zor</option>
+              <option value="uzman">Uzman</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="libraryTopic">Konu</label>
+            <select id="libraryTopic">
+              <option value="all">Tüm konular</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="librarySummary" class="library-summary" role="status" aria-live="polite"></p>
+
+        <div class="library-workspace">
+          <div class="library-results">
+            <div class="library-list" id="libraryList"></div>
+            <div class="empty-state" id="libraryEmpty" hidden>
+              <h2>Sonuç bulunamadı</h2>
+              <p>Arama sözcüğünü kısaltmayı veya filtreyi değiştirmeyi dene.</p>
+            </div>
+            <button class="btn btn-outline load-more" id="libraryMoreButton" type="button" hidden>Daha fazla göster</button>
+          </div>
+
+          <div class="library-detail-column">
+            <div class="library-detail-placeholder" id="libraryPlaceholder">
+              <p class="eyebrow">Kural detayı</p>
+              <h2>Soldan bir kural seç</h2>
+              <p>Tüyosu, gerekçesi ve TDK kaynağı burada açılır.</p>
+            </div>
+            <dialog class="library-dialog" id="libraryDialog" aria-labelledby="libraryDialogAnswer">
+              <div class="library-dialog-inner">
+                <div class="library-dialog-head">
+                  <p class="library-card-meta"><span class="level-pill" id="libraryDialogLevel"></span><span class="category-chip" id="libraryDialogTopic"></span></p>
+                  <button class="dialog-close" id="libraryDialogClose" type="button" aria-label="Kapat">×</button>
+                </div>
+                <p class="library-dialog-prompt" id="libraryDialogPrompt"></p>
+                <h2 class="library-dialog-answer" id="libraryDialogAnswer"></h2>
+                <p class="library-wrong library-dialog-wrong" id="libraryDialogWrong"></p>
+                <div class="tip-box" id="libraryDialogTip"></div>
+                <p class="library-explanation" id="libraryDialogExplanation"></p>
+                <a class="btn btn-outline source-button" id="libraryDialogSource" target="_blank" rel="noopener noreferrer">TDK kaynağı ↗</a>
+              </div>
+            </dialog>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Bağımsız öğrenme projesi · İçerik, bağlantılı TDK Yazım Kuralları sayfalarından kontrol edilmiştir.</p>
+    <p>Sürüm <span id="bankVersion"></span> · Veriler yalnız cihazında</p>
+  </footer>
 
   <template id="levelCardTemplate">
-    <article class="level-card">
-      <div class="level-topline"><span class="level-number"></span><span class="level-count">100 soru</span></div>
-      <h3></h3>
-      <p></p>
-      <button class="level-start" type="button"><span>Bu seviyeyi başlat</span><span aria-hidden="true">→</span></button>
-    </article>
+    <button class="level-card choice-btn" type="button" role="radio" aria-checked="false">
+      <span class="level-dot" aria-hidden="true"></span>
+      <span class="level-name"></span>
+      <span class="badge-sub"></span>
+    </button>
   </template>
 
   <template id="choiceTemplate">
@@ -297,8 +299,15 @@
       <span class="library-card-meta"><span class="level-pill"></span><span class="library-topic"></span></span>
       <span class="library-word"></span>
       <span class="library-wrong"></span>
-      <span class="library-card-hint">Tüyo ve kaynak ↗</span>
+      <span class="library-card-hint">Tüyo ve kaynak →</span>
     </button>
+  </template>
+
+  <template id="topicMasteryTemplate">
+    <div class="topic-item">
+      <div class="topic-item-header"><span class="topic-name"></span><span class="topic-score"></span></div>
+      <div class="topic-bar-bg" aria-hidden="true"><div class="topic-bar-fill"></div></div>
+    </div>
   </template>
 
   <template id="tipTemplate">

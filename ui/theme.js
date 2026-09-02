@@ -23,7 +23,7 @@ export function applyTheme(elements, theme) {
   elements.themeToggle.setAttribute("aria-pressed", String(dark));
   elements.themeToggleLabel.textContent = dark ? "Açık tema" : "Koyu tema";
   elements.themeToggle.setAttribute("aria-label", dark ? "Açık temaya geç" : "Koyu temaya geç");
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#1c1a17" : "#ece7dc");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#070b14" : "#f8fafc");
   storeTheme(theme);
 }
 

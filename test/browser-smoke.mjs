@@ -245,6 +245,8 @@ async function run() {
     assert.equal(home.unnamedButtons, 0);
 
     await client.evaluate('document.querySelector("[data-level=kolay]").click()');
+    assert.equal(await client.evaluate('document.querySelector("[data-level=kolay]").getAttribute("aria-checked")'), "true");
+    await client.evaluate('document.querySelector("#startSessionButton").click()');
     await waitUntil(client, '!document.querySelector("#screen-quiz").hidden && document.querySelectorAll(".choice-button").length === 3', "quiz başlangıcı");
     await capture("02-mobile-quiz");
     let quiz = await client.evaluate(`(() => ({
@@ -348,6 +350,7 @@ async function run() {
         wrong: Number(document.querySelector("#resultWrong").textContent),
         total: Number(document.querySelector("#resultTotal").textContent),
         retryVisible: !document.querySelector("#retryWrongButton").hidden,
+        topicBars: document.querySelectorAll("#topicMasteryList .topic-item").length,
         savedSession: localStorage.getItem("turkce-gelisim:oturum:v2")
       };
     })()`);
@@ -355,6 +358,7 @@ async function run() {
     assert.equal(completion.total, 20);
     assert.equal(completion.correct + completion.wrong, 20);
     assert.equal(completion.retryVisible, completion.wrong > 0);
+    assert.ok(completion.topicBars > 0, "Sonuçta konu bazlı gelişim çubukları görünmeli.");
     assert.equal(completion.savedSession, null);
     await capture("04-mobile-result");
 

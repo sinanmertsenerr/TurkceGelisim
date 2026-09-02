@@ -1,6 +1,6 @@
 import { fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { QUESTIONS_BY_LEVEL } from "../questions.js";
-import { setSelectedSessionSize, updateResumePanel } from "./home.js";
+import { setSelectedLevel, setSelectedSessionSize, updateResumePanel } from "./home.js";
 import { renderLibrary } from "./library.js";
 import { createQuizView } from "./quiz.js";
 import { renderResult, renderReview } from "./result.js";
@@ -28,6 +28,8 @@ export function createSessionController({ elements }) {
     const pool = QUESTIONS_BY_LEVEL[level];
     const selected = interleaveByConcept(selectSessionQuestions(pool, size));
     state.lastSettings = { level, size: selected.length };
+    setSelectedLevel(level);
+    setSelectedSessionSize(selected.length);
     state.activeSession = makeSession(level, selected.map(({ id }) => id), "normal", selected.length);
     state.completedSession = null;
     state.resumableSession = state.activeSession;
@@ -42,6 +44,7 @@ export function createSessionController({ elements }) {
     state.completedSession = null;
     state.lastSettings = { level: state.activeSession.level, size: state.activeSession.requestedSize };
     setSelectedSessionSize(state.activeSession.requestedSize);
+    setSelectedLevel(state.activeSession.level);
     showScreen(elements, "quiz", { focus: false });
     quizView.renderQuestion();
   }
