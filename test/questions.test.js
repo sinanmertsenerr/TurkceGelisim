@@ -2,10 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  ALL_LEVELS_ID,
   LEVELS,
   QUESTIONS,
   QUESTIONS_BY_LEVEL,
   SOURCES,
+  STUDY_TOPICS,
+  questionsForStudy,
+  studyPoolSize,
+  studyTopicIdOf,
   validateQuestionBank,
 } from "../questions.js";
 
@@ -53,4 +58,35 @@ test("doğru seçenek konumu tek bir harfe yığılmaz", () => {
     assert.equal(used.length, 3);
     assert.ok(Math.max(...used) - Math.min(...used) <= 20, `${id}: ${positions.join("/")}`);
   }
+});
+
+test("her ham konu tam olarak bir çalışma konusuna bağlıdır", () => {
+  const rawTopics = new Set(QUESTIONS.map(({ topic }) => topic));
+  const mapped = STUDY_TOPICS.flatMap(({ topics }) => topics);
+  assert.equal(new Set(mapped).size, mapped.length, "bir ham konu iki çalışma konusunda olamaz");
+  assert.deepEqual(new Set(mapped), rawTopics);
+  assert.equal(new Set(STUDY_TOPICS.map(({ id }) => id)).size, STUDY_TOPICS.length);
+  for (const question of QUESTIONS) assert.ok(studyTopicIdOf(question));
+  for (const topic of STUDY_TOPICS) {
+    assert.match(topic.id, /^[a-z-]+$/);
+    assert.ok(topic.label.length > 0 && topic.description.length > 0);
+  }
+});
+
+test("konu havuzu bankanın tamamını kayıpsız böler ve düzeyle daraltılır", () => {
+  const total = STUDY_TOPICS.reduce((sum, { id }) => sum + studyPoolSize(id), 0);
+  assert.equal(total, 400);
+  for (const { id } of STUDY_TOPICS) {
+    const all = questionsForStudy(id, ALL_LEVELS_ID);
+    assert.ok(all.length >= 5, `${id}: en az 5 soru olmalı`);
+    assert.ok(all.every((question) => studyTopicIdOf(question) === id));
+    const perLevel = LEVELS.reduce((sum, level) => sum + studyPoolSize(id, level.id), 0);
+    assert.equal(perLevel, all.length);
+    for (const level of LEVELS) {
+      assert.ok(questionsForStudy(id, level.id).every((question) => question.level === level.id));
+    }
+  }
+  assert.equal(studyPoolSize("birlesik"), 240);
+  assert.equal(studyPoolSize("da-de", "kolay"), 12);
+  assert.equal(studyPoolSize("olmayan-konu"), 0);
 });

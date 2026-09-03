@@ -832,9 +832,68 @@ kbd {
 .level-zor { --level-color: var(--level-zor); }
 .level-uzman { --level-color: var(--level-uzman); }
 
+.level-tum { --level-color: var(--primary); }
+
+/* Konu modunda boş düzeyler ve havuzu aşan soru adetleri seçilemez. */
+.choice-btn.is-disabled,
+.choice-btn:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.choice-btn.is-disabled:hover,
+.choice-btn:has(input:disabled):hover {
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+  background: var(--bg-surface-alt);
+}
+
+.mode-picker {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.topic-grid {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.topic-card {
+  align-items: flex-start;
+  min-height: 84px;
+  padding: 0.85rem 0.9rem;
+  text-align: left;
+  animation: fade-in var(--base) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.topic-card-name {
+  font-size: 0.98rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.topic-card-desc {
+  margin-top: 4px;
+}
+
+.topic-card-count {
+  margin-top: 0.55rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
 .btn-start {
   min-height: 54px;
   font-size: 1.05rem;
+}
+
+.btn-start:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .hero-metrics {

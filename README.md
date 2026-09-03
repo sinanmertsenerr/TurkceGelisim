@@ -7,6 +7,7 @@ Türkçe yazım kurallarını resmî TDK kaynaklarıyla çalışmak için hazır
 - Dört düzeyde 100'er soru: **Kolay, Orta, Zor, Uzman** — toplam 400 soru
 - Birleşik kelime soruları üç gerçek kelime sunar, yalnız biri doğru yazılmıştır; her seçenekte kısa bir anlam notu bulunur (kuşburnu (bitki))
 - Oturum seçimi konu bazlı dengelidir ve arka arkaya aynı konu gelmez
+- İki çalışma biçimi: **Karma** (bir düzeyin tüm konuları karışık) ve **Konu odaklı** (da/de, ki, noktalama gibi 13 kuraldan biri; tek düzey veya tüm düzeyler birlikte)
 - 10, 20, 50 veya 100 soruluk çalışma oturumları
 - Anlık cevaplanan, doğru ve yanlış sayaçları
 - Her cevaptan sonra kısa açıklama ve doğrudan TDK kaynak bağlantısı
@@ -51,7 +52,7 @@ Test paketlerinin haricî npm bağımlılığı yoktur.
 - `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, klavye)
 - `core.js`: test edilebilir oturum ve istatistik işlevleri
 - `questions.js`: soru bankasının tek giriş noktası
-- `data/`: TDK kaynak kataloğu, soru fabrikaları ve dört düzeyin verileri
+- `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları ve dört düzeyin verileri
 - `test/`: birim, veri, canlı kaynak ve gerçek tarayıcı kontrolleri
 
 ## İçerik ve kaynak sözleşmesi

@@ -230,11 +230,11 @@ async function run() {
       mobile: true,
     });
     await client.send("Page.navigate", { url: origin });
-    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".level-card").length === 4', "ana sayfa yüklemesi");
+    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".level-card:not([hidden])").length === 4', "ana sayfa yüklemesi");
     await capture("01-mobile-home");
 
     const home = await client.evaluate(`(() => ({
-      levels: document.querySelectorAll(".level-card").length,
+      levels: document.querySelectorAll(".level-card:not([hidden])").length,
       metrics: document.querySelector(".hero-metrics").textContent.replace(/\\s+/g, " ").trim(),
       overflow: document.documentElement.scrollWidth - window.innerWidth,
       unnamedButtons: [...document.querySelectorAll("button")].filter((button) => !button.textContent.trim() && !button.getAttribute("aria-label")).length
@@ -373,6 +373,78 @@ async function run() {
       assert.equal(retry.total, completion.wrong);
     }
 
+    // Konu odaklı çalışma: da/de konusu, tüm düzeyler, 20 soru.
+    await client.evaluate('document.querySelector("#resultHomeButton").click()');
+    await waitUntil(client, '!document.querySelector("#screen-home").hidden', "sonuçtan ana sayfaya dönüş");
+    assert.equal(await client.evaluate('document.querySelector("#topicSection").hidden'), true, "Karma modda konu bölümü gizli olmalı.");
+    await client.evaluate(`(() => {
+      const mode = document.querySelector('input[name="study-mode"][value="konu"]');
+      mode.checked = true;
+      mode.dispatchEvent(new Event("change", { bubbles: true }));
+    })()`);
+    await waitUntil(client, '!document.querySelector("#topicSection").hidden && document.querySelectorAll(".topic-card").length >= 10', "konu seçimi");
+    await client.evaluate('document.querySelector("[data-topic=da-de]").click()');
+    await client.evaluate('document.querySelector("[data-level=tum]").click()');
+    await capture("05-mobile-topic-mode");
+    const topicHome = await client.evaluate(`(() => ({
+      topicChecked: document.querySelector("[data-topic=da-de]").getAttribute("aria-checked"),
+      levelChecked: document.querySelector("[data-level=tum]").getAttribute("aria-checked"),
+      allLevelsVisible: !document.querySelector("[data-level=tum]").hidden,
+      zorDisabled: document.querySelector("[data-level=zor]").getAttribute("aria-disabled"),
+      hundredDisabled: document.querySelector('input[name="session-size"][value="100"]').disabled,
+      twentyDisabled: document.querySelector('input[name="session-size"][value="20"]').disabled,
+      startDisabled: document.querySelector("#startSessionButton").disabled,
+      overflow: document.documentElement.scrollWidth - window.innerWidth
+    }))()`);
+    assert.equal(topicHome.topicChecked, "true");
+    assert.equal(topicHome.levelChecked, "true");
+    assert.equal(topicHome.allLevelsVisible, true);
+    assert.equal(topicHome.zorDisabled, "false");
+    assert.equal(topicHome.hundredDisabled, true, "23 soruluk konuda 100 seçeneği kapalı olmalı.");
+    assert.equal(topicHome.twentyDisabled, false);
+    assert.equal(topicHome.startDisabled, false);
+    assert.ok(topicHome.overflow <= 0, `Konu modunda ${topicHome.overflow}px yatay taşma var.`);
+
+    await client.evaluate('document.querySelector(\'input[name="session-size"][value="20"]\').click()');
+    await client.evaluate('document.querySelector("#startSessionButton").click()');
+    await waitUntil(client, '!document.querySelector("#screen-quiz").hidden && document.querySelector("#quizProgress").max === 20', "konu oturumu başlangıcı");
+    const topicRun = await client.evaluate(`(async () => {
+      const topics = new Set();
+      const levels = new Set();
+      for (let guard = 0; guard < 120 && document.querySelector("#screen-result").hidden; guard += 1) {
+        topics.add(document.querySelector("#questionTopic").textContent.trim());
+        levels.add(document.querySelector("#questionLevel").textContent.trim());
+        const enabledChoice = document.querySelector(".choice-button:not(:disabled)");
+        if (enabledChoice) enabledChoice.click();
+        const next = document.querySelector("#nextQuestionButton");
+        if (next && !next.hidden) next.click();
+        await new Promise((resolvePromise) => setTimeout(resolvePromise, 0));
+      }
+      return {
+        topics: [...topics],
+        levels: levels.size,
+        total: Number(document.querySelector("#resultTotal").textContent),
+        message: document.querySelector("#resultMessage").textContent,
+        nextStep: document.querySelector("#nextStepText").textContent
+      };
+    })()`);
+    assert.equal(topicRun.total, 20);
+    assert.ok(topicRun.topics.every((topic) => ["Bağlaç olan da/de", "Bulunma durumu eki"].includes(topic)), `Konu dışı soru geldi: ${topicRun.topics.join(", ")}`);
+    assert.ok(topicRun.levels > 1, "Tüm düzeyler seçiminde birden fazla düzey görünmeli.");
+    assert.match(topicRun.message, /da\/de yazımı/);
+    assert.match(topicRun.nextStep, /da\/de yazımı/);
+
+    await client.evaluate('document.querySelector("#newSessionButton").click()');
+    await waitUntil(client, '!document.querySelector("#screen-quiz").hidden', "konu modunda yeni oturum");
+    await client.evaluate('document.querySelector(".choice-button").click()');
+    await client.evaluate('document.querySelector("#saveAndExitButton").click()');
+    await waitUntil(client, '!document.querySelector("#resumePanel").hidden', "konu oturumu devam kartı");
+    await client.send("Page.reload", { ignoreCache: true });
+    await waitUntil(client, 'document.readyState === "complete" && !document.querySelector("#resumePanel").hidden', "yenileme sonrası konu oturumu");
+    assert.match(await client.evaluate('document.querySelector("#resumeText").textContent'), /da\/de yazımı · Tüm düzeyler/);
+    await client.evaluate('document.querySelector("#discardResumeButton").click()');
+    await waitUntil(client, 'document.querySelector("#resumePanel").hidden', "konu oturumu kaydını silme");
+
     const targetSizes = await client.evaluate(`[...document.querySelectorAll("button, a, input, select")]
       .filter((element) => {
         const style = getComputedStyle(element);
@@ -388,6 +460,7 @@ async function run() {
     console.log("✓ Devam: localStorage + sayfa yenileme sonrası geri yükleme");
     console.log("✓ Kural bankası: 400 kayıt, filtre, arama, tembel render");
     console.log(`✓ Sonuç: ${completion.correct} doğru + ${completion.wrong} yanlış = 20; yanlış tekrar kuyruğu çalıştı`);
+    console.log("✓ Konu odaklı çalışma: da/de havuzu, tüm düzeyler, devam kaydı");
     console.log("✓ Erişilebilirlik: durum bölgesi, adlandırılmış kontroller, ≥44px hedefler");
   } finally {
     client?.close();

@@ -136,10 +136,14 @@ export function makeStoredSession(bankVersion, session) {
   };
 }
 
-export function isResumableSession(session, questionById) {
+// Oturum ya bir düzeyin karma havuzundan (topic yok) ya da bir çalışma
+// konusundan gelir. Konu oturumunda düzey "tum" ise dört düzey birlikte kullanılır.
+export function isResumableSession(session, questionById, { allLevelsId = "tum", studyTopicOf = null } = {}) {
   if (
     !session
     || !["normal", "wrong-review"].includes(session.mode)
+    || typeof session.level !== "string"
+    || (session.topic != null && typeof session.topic !== "string")
     || !Number.isInteger(session.requestedSize)
     || session.requestedSize < 1
     || session.requestedSize > 100
@@ -154,7 +158,15 @@ export function isResumableSession(session, questionById) {
     || ![session.index, session.index + 1].includes(session.responses.length)
   ) return false;
 
-  if (!session.questionIds.every((id) => questionById.get(id)?.level === session.level)) return false;
+  const topicSession = typeof session.topic === "string";
+  if (topicSession && typeof studyTopicOf !== "function") return false;
+  if (!topicSession && session.level === allLevelsId) return false;
+  const belongs = (question) => {
+    if (!question) return false;
+    if (topicSession && studyTopicOf(question) !== session.topic) return false;
+    return session.level === allLevelsId || question.level === session.level;
+  };
+  if (!session.questionIds.every((id) => belongs(questionById.get(id)))) return false;
 
   return session.responses.every((response, index) => {
     const question = questionById.get(response.questionId);
