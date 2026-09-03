@@ -372,9 +372,11 @@ kbd {
   transition: background var(--fast), border-color var(--fast);
 }
 
+/* Üst çubuk, ana içerikle (720px) aynı görsel eksende durur; 1080'e yayılınca
+   logo ve tema düğmesi içerikten kopuk görünüyordu. */
 .header-inner {
   display: flex;
-  max-width: 1080px;
+  max-width: 760px;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -645,7 +647,7 @@ kbd {
 /* ---------- Ana sayfa ---------- */
 
 .home-hero {
-  max-width: 620px;
+  max-width: 680px;
   margin: 1.5rem auto 2rem;
   text-align: center;
 }
@@ -675,7 +677,7 @@ kbd {
 
 .setup-stack {
   display: flex;
-  max-width: 650px;
+  max-width: 720px;
   flex-direction: column;
   gap: 1.3rem;
   margin: 0 auto;
@@ -893,6 +895,15 @@ kbd {
   justify-content: space-between;
   gap: 0.75rem;
   min-height: 44px;
+}
+
+/* Henüz seçim yokken özet boş kalır; adım çipleri sağa yapışmak yerine ortalanır. */
+.step-nav:has(.step-summary:empty) {
+  justify-content: center;
+}
+
+.step-nav:has(.step-summary:empty) .step-indicator {
+  margin: 0;
 }
 
 .step-indicator {
