@@ -71,7 +71,7 @@ export function joinedRationale({ id, correct, separated, meaning }) {
     return `“${separated}” artık cümle değil, ${what} adı → bitişik. Fiil kalıplaşıp ad olmuşsa yapıştır.`;
   }
   const tur = turAdi(meaning) ?? "başka bir şey";
-  return `${cap(correct)} gerçek ${lower(separated)} değil, bir ${tur}: ikinci kelime anlamını yitirmiş → bitişik. Anlam korunsaydı (deve dikeni) ayrı olurdu.`;
+  return `Son kelime testi: ${cap(correct)} gerçek ${lower(separated)} değil, bir ${tur} → son kelime anlamını yitirmiş, bitişik. Son kelime gerçek olsaydı (deve dikeni) ayrı olurdu.`;
 }
 
 export function separateRationale({ id, correct, meaning }) {
@@ -108,5 +108,5 @@ export function separateRationale({ id, correct, meaning }) {
   if (TAMLAMA.has(meaning)) {
     return `${cap(correct)}: her iki kelime anlamını koruyor, tamlama bozulmamış → ayrı. Sık hata: bitişik sanılır ama TDK ayrı yazar.`;
   }
-  return `${cap(correct)}: “${second}” gerçek anlamında, ikinci kelime anlamını koruyor → ayrı. Anlam kaysaydı (kuşburnu bir burun değil) bitişik olurdu.`;
+  return `Son kelime testi: ${cap(correct)} hâlâ gerçekten “${second}” → son kelime anlamını koruyor, ayrı. Birinci kelime mecaz olsa da fark etmez; son kelime kaysaydı (kuşburnu) bitişik olurdu.`;
 }

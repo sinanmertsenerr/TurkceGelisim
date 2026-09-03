@@ -49,16 +49,16 @@ export const TIPS_BY_TOPIC = Object.freeze({
     ["masmavi, sapsarı, yemyeşil, kıpkırmızı", "sırılsıklam, çırılçıplak → araya hece girse de bitişik"],
   ),
   "Bitişik yazılan birleşik kelimeler": tip(
-    "Ses değişiyorsa ya da anlam kaymışsa yapıştır",
-    "İki test: (1) Birleşince harf düşüyor veya türüyorsa bitişik. (2) Kelimeler gerçek anlamından kopup yeni bir şeyin adı olmuşsa bitişik.",
-    ["his + etmek → hissetmek · kayıp + olmak → kaybolmak · af + etmek → affetmek", "kuşburnu (bitki, kuşun burnu değil) · hanımgöbeği (tatlı) · aslanağzı (çiçek)"],
+    "Son kelime testi: son kelime hâlâ o şey mi?",
+    "TDK: “Kelimelerden her ikisi veya ikincisi anlam değişmesine uğradığında bitişik yazılır.” Yani sadece ikinci kelimeye bak: tek başına söylediğinde artık o şey değilse bitişik yaz. Birinci kelime önemsiz.",
+    ["kuşburnu → “burun mu?” hayır, bitki → bitişik", "his + etmek → hissetmek: ses türüyor/düşüyorsa yine bitişik", "yapboz, ateşkes, imambayıldı → fiil kalıplaşıp ad olmuş → bitişik"],
     "Ezber grubu: biraz, birçok, birkaç, birtakım, herhangi, hiçbir bitişik. -a/-e ile kaynaşan fiiller de: alıvermek, uyuyakalmak.",
   ),
   "Ayrı yazılan birleşik kelimeler": tip(
-    "Hiçbir şey değişmiyorsa ayrı",
-    "Ses düşmüyor, türemiyor, anlam da kaymıyorsa ayrı yaz. Hayvan ve bitki adlarında ikinci kelime tür adıysa (balığı, kuşu, ağacı, otu) ayrı.",
-    ["dans etmek, terk etmek, var olmak → harf oynamıyor, ayrı", "ton balığı, ardıç kuşu, çam ağacı → gerçekten balık, kuş, ağaç"],
-    "Soruda parantezdeki anlam notuna bak: “balık” yazıyorsa ikinci kelime gerçek, ayrı; “bitki” yazıyorsa (kuşburnu) anlam kaymış, bitişik.",
+    "Son kelime hâlâ o şeyse ayrı",
+    "Son kelimeyi tek başına söyle: hâlâ o şeyse (gerçekten diken, balık, kuş) ayrı yaz. Birinci kelime mecaz olsa bile fark etmez; TDK yalnız ikinci kelimenin değişmesine bakar. Ses de değişmiyorsa (dans etmek) ayrı.",
+    ["deve dikeni → “diken mi?” evet → ayrı · kuşburnu → “burun mu?” hayır → bitişik", "köpek balığı, at kestanesi, deve kuşu → gerçekten balık, kestane, kuş → ayrı", "dans etmek, terk etmek → harf oynamıyor → ayrı"],
+    "Soruda parantezdeki anlam notuna bak: “balık” yazıyorsa son kelime gerçek, ayrı; “bitki” yazıyorsa (kuşburnu) anlam kaymış, bitişik.",
   ),
   "Büyük harfler": tip(
     "Tek olan şey büyük, çoğunun adı küçük",
