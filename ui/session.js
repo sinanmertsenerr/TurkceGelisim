@@ -1,18 +1,20 @@
 import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { ALL_LEVELS_ID, QUESTIONS_BY_LEVEL, questionsForStudy } from "../questions.js";
-import { applyHomeSettings, goToStep, updateResumePanel } from "./home.js";
+import { applySessionSetup, goToStep, setupLevel, setupTopic, updateResumePanel } from "./home.js";
 import { renderLibrary } from "./library.js";
 import { notebookQuestions } from "./notebook.js";
 import { createQuizView } from "./quiz.js";
-import { renderResult, renderReview } from "./result.js";
+import { renderResult } from "./result.js";
 import { showScreen } from "./screens.js";
+import { clearStoredSession, persistSession } from "./session-store.js";
 import { state } from "./state.js";
-import * as storage from "./storage.js";
 
-export function createSessionController({ elements }) {
-  const quizView = createQuizView({ elements, onFinish: finishSession });
+// Oturum yaşam döngüsü: kurulumdan başlatma, devam, yanlış tekrarı, bitirme
+// ve ekranlar arası geçiş. Ekran modülleri bu denetleyiciyi olaylara bağlar.
+export function createSessionController(elements) {
+  const quizView = createQuizView(elements, { onFinish: finishSession });
 
-  function makeSession(level, questionIds, mode, requestedSize, topic = null) {
+  function makeSession({ level, questionIds, mode, requestedSize, topic = null }) {
     return {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       level,
@@ -26,94 +28,85 @@ export function createSessionController({ elements }) {
     };
   }
 
+  // Konu dengeli seçim + serpiştirme. Tek konulu havuzda serpiştirme yalnız
+  // karıştırır; seçim yine alt konular (bağlaç/ek, bitişik/ayrı) arasında dengelenir.
+  function pickQuestionIds(pool, size) {
+    return interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf).map(({ id }) => id);
+  }
+
+  function launch(session) {
+    state.activeSession = session;
+    state.completedSession = null;
+    state.resumableSession = session;
+    state.homeConfigured = true;
+    applySessionSetup(elements, session);
+    persistSession(session);
+    showScreen(elements, "quiz", { focus: false });
+    quizView.renderQuestion();
+  }
+
   function startNewSession(level, size, topic = null) {
     const pool = topic ? questionsForStudy(topic, level) : QUESTIONS_BY_LEVEL[level];
     if (!pool?.length) return;
-    // Konu oturumunda tek konu olduğundan serpiştirme yalnız karıştırır; havuz
-    // seçimi yine alt konular (bağlaç/ek, bitişik/ayrı) arasında dengelenir.
-    const selected = interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf);
-    state.lastSettings = { level, size: selected.length, topic, mode: topic ? "konu" : "karma" };
-    launch(makeSession(level, selected.map(({ id }) => id), "normal", selected.length, topic));
+    launch(makeSession({ level, topic, mode: "normal", requestedSize: size, questionIds: pickQuestionIds(pool, size) }));
   }
 
-  // Yanlış defteri oturumu: düzeyden bağımsız, defterdeki sorulardan konu
-  // dengeli bir seçim. Defter boşsa ana sayfada kalınır.
+  // Yanlış defteri oturumu düzeyden bağımsızdır. Defter boşsa ana sayfada kalınır.
   function startNotebookSession(size) {
     const pool = notebookQuestions();
     if (!pool.length) {
       showHome();
       return;
     }
-    const selected = interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf);
-    state.lastSettings = { level: ALL_LEVELS_ID, size: selected.length, topic: null, mode: "defter" };
-    launch(makeSession(ALL_LEVELS_ID, selected.map(({ id }) => id), "notebook", selected.length));
+    launch(makeSession({ level: ALL_LEVELS_ID, mode: "notebook", requestedSize: size, questionIds: pickQuestionIds(pool, size) }));
   }
 
-  function launch(session) {
-    state.homeConfigured = true;
-    applyHomeSettings(elements, state.lastSettings);
-    state.activeSession = session;
-    state.completedSession = null;
-    state.resumableSession = state.activeSession;
-    storage.persistSession(state.activeSession);
-    showScreen(elements, "quiz", { focus: false });
-    quizView.renderQuestion();
-  }
-
-  function settingsFor(session) {
-    const mode = session.mode === "notebook" ? "defter" : session.topic ? "konu" : "karma";
-    return { level: session.level, size: session.requestedSize, topic: session.topic ?? null, mode };
+  // Ana sayfadaki kurulumla (ve sonuç ekranındaki "Yeni oturum" ile) başlatır.
+  function startFromSetup() {
+    const { mode, size } = state.setup;
+    if (mode === "defter") startNotebookSession(size);
+    else startNewSession(setupLevel(), size, setupTopic());
   }
 
   function resumeSession() {
-    if (!state.resumableSession) return;
-    state.activeSession = state.resumableSession;
-    state.completedSession = null;
-    state.lastSettings = settingsFor(state.activeSession);
-    state.homeConfigured = true;
-    applyHomeSettings(elements, state.lastSettings);
-    showScreen(elements, "quiz", { focus: false });
-    quizView.renderQuestion();
+    if (state.resumableSession) launch(state.resumableSession);
   }
 
   function discardResume() {
     if (state.activeSession === state.resumableSession) state.activeSession = null;
     state.resumableSession = null;
-    storage.safeStorageRemove();
+    clearStoredSession();
     updateResumePanel(elements);
   }
 
+  // Defter oturumunun yanlışları zaten defterde; tekrar da defter oturumu olarak açılır.
   function retryWrong() {
-    if (!state.completedSession) return;
-    const wrongIds = state.completedSession.responses.filter(({ correct }) => !correct).map(({ questionId }) => questionId);
+    const completed = state.completedSession;
+    if (!completed) return;
+    const wrongIds = completed.responses.filter(({ correct }) => !correct).map(({ questionId }) => questionId);
     if (!wrongIds.length) return;
-    // Defter oturumunun yanlışları zaten defterde; tekrar da defter oturumu olarak açılır.
-    const mode = state.completedSession.mode === "notebook" ? "notebook" : "wrong-review";
-    state.activeSession = makeSession(
-      state.completedSession.level,
-      fisherYates(wrongIds),
-      mode,
-      state.completedSession.requestedSize,
-      state.completedSession.topic ?? null,
-    );
-    state.resumableSession = state.activeSession;
-    storage.persistSession(state.activeSession);
-    showScreen(elements, "quiz", { focus: false });
-    quizView.renderQuestion();
+    launch(makeSession({
+      level: completed.level,
+      topic: completed.topic,
+      mode: completed.mode === "notebook" ? "notebook" : "wrong-review",
+      requestedSize: completed.requestedSize,
+      questionIds: fisherYates(wrongIds),
+    }));
   }
 
   function finishSession() {
     state.completedSession = state.activeSession;
     state.resumableSession = null;
-    storage.safeStorageRemove();
+    clearStoredSession();
     renderResult(elements, state.completedSession);
     showScreen(elements, "result");
   }
 
   function saveActiveForResume() {
-    if (state.activeSession && state.activeSession.index < state.activeSession.questionIds.length) {
-      state.resumableSession = state.activeSession;
-      storage.persistSession(state.activeSession);
+    const session = state.activeSession;
+    if (session && session.index < session.questionIds.length) {
+      state.resumableSession = session;
+      persistSession(session);
     }
   }
 
@@ -128,29 +121,9 @@ export function createSessionController({ elements }) {
 
   function openLibrary() {
     saveActiveForResume();
-    state.libraryLimit = 24;
-    renderLibrary(elements);
+    renderLibrary(elements, { resetPage: true });
     showScreen(elements, "library");
   }
 
-  function startNewFromLastSettings() {
-    if (state.lastSettings.mode === "defter") startNotebookSession(state.lastSettings.size);
-    else startNewSession(state.lastSettings.level, state.lastSettings.size, state.lastSettings.topic ?? null);
-  }
-
-  return {
-    startNewSession,
-    startNotebookSession,
-    resumeSession,
-    discardResume,
-    retryWrong,
-    showHome,
-    openLibrary,
-    goToNextQuestion: quizView.goToNextQuestion,
-    startNewFromLastSettings,
-    showMoreReviews: () => {
-      state.reviewLimit += 12;
-      renderReview(elements, state.completedSession);
-    },
-  };
+  return { startFromSetup, resumeSession, discardResume, retryWrong, showHome, openLibrary };
 }

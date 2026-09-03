@@ -47,7 +47,7 @@ test("Vercel allowlist'i runtime bağımlılıklarını kapsar ve kaynak dosyala
   const allowlist = parseAllowlist(ignoreSource);
   assert.deepEqual(new Set(allowlist), new Set([
     "index.html",
-    "style.css",
+    "styles",
     "app.js",
     "core.js",
     "questions.js",
@@ -67,7 +67,7 @@ test("Vercel allowlist'i runtime bağımlılıklarını kapsar ve kaynak dosyala
   for (const path of runtimeFiles) {
     assert.equal(isAllowed(path, allowlist), true, `${path} Vercel allowlist'inde olmalı.`);
   }
-  for (const path of ["README.md", "package.json", "test", "vercel-cicd-plan.md"]) {
+  for (const path of ["README.md", "package.json", "test", "docs", "eslint.config.js", "node_modules"]) {
     assert.equal(isAllowed(path, allowlist), false, `${path} production deployment'a girmemeli.`);
   }
 });

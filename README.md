@@ -36,26 +36,34 @@ Uygulamanın çalışma zamanında paket veya framework bağımlılığı yoktur
 Node.js 20 veya daha yeni bir sürümle:
 
 ```bash
+npm ci
+npm run lint
 npm test
 npm run test:sources
 npm run test:browser
 ```
 
-- `npm test`: soru bankası sözleşmesini ve oturum çekirdeğini doğrular.
+- `npm run lint`: ESLint ile tüm JavaScript dosyalarını denetler (tek geliştirme bağımlılığı).
+- `npm test`: soru bankası sözleşmesini, oturum çekirdeğini ve deployment sözleşmesini doğrular.
 - `npm run test:sources`: ağ üzerinden 14 resmî TDK sayfasına erişir; kaynak metinlerini ve 320 yazım örneğini kontrol eder.
 - `npm run test:browser`: yerel Chrome/Chromium ile mobil quiz, sayaç, kayıtlı oturum, kütüphane, sonuç ve yanlışları tekrar akışlarını sınar. Gerekirse tarayıcı yolu `CHROME_BIN` ile verilebilir.
 
-Test paketlerinin haricî npm bağımlılığı yoktur.
+Testlerin haricî npm bağımlılığı yoktur; `npm ci` yalnız ESLint'i kurar.
 
 ## Yapı
 
-- `index.html` ve `style.css`: semantik sayfa yapısı ile görsel sistem
-- `app.js`: uygulamanın önyükleme ve bağlama noktası
-- `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, yanlış defteri, klavye)
-- `core.js`: test edilebilir oturum ve istatistik işlevleri
-- `questions.js`: soru bankasının tek giriş noktası
+- `index.html`: semantik sayfa yapısı ve şablonlar
+- `styles/`: görsel sistem; belirteçler (`tokens.css`), temel, üst çubuk, düğmeler ve ekran başına birer dosya, `responsive.css` kırılımlar
+- `app.js`: bileşim kökü; modülleri kurar, gezinmeyi ve sekmeler arası eşitlemeyi bağlar
+- `core.js`: saf, test edilebilir oturum ve istatistik işlevleri (DOM yok)
+- `questions.js`: soru bankasının tek giriş noktası; yüklenirken bankayı doğrular
+- `ui/`: ekran modülleri. Her ekran kendi olaylarını `install*` ile bağlar; `state.js` tek gerçek kaynaktır, DOM onu yansıtır
+  - `home.js` kurulum akışı, `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
+  - `session.js` oturum yaşam döngüsü denetleyicisi, `session-store.js` ve `notebook.js` kalıcılık, `local-storage.js` güvenli depolama sarmalayıcısı
+  - `dom.js`, `screens.js`, `keyboard.js`, `theme.js`, `tips.js`, `search.js`, `helpers.js`, `constants.js`
 - `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları, dört düzeyin çekirdek verileri ve `konu-havuzu.js` ek soru havuzu
-- `test/`: birim, veri, canlı kaynak ve gerçek tarayıcı kontrolleri
+- `test/`: birim, veri, deployment sözleşmesi, canlı kaynak ve gerçek tarayıcı kontrolleri; `test/support/chrome.mjs` Chrome/CDP sürücüsü
+- `docs/`: tasarım ve yayın planları
 
 ## İçerik ve kaynak sözleşmesi
 
@@ -71,7 +79,7 @@ Yalnızca yarım kalan oturum ve kullanıcı tercihleri tarayıcının `localSto
 
 Uygulama Vercel'de **Other** framework ayarıyla, kurulum ve build komutu olmadan kök dizinden statik olarak yayınlanır. `.vercelignore` yalnız tarayıcıda gereken dosyaları deployment'a alır; `vercel.json` temel güvenlik header'larını tanımlar.
 
-- Pull request ve `main` push'larında `CI / verify`, birim/kontrat testlerini ve gerçek Chrome smoke testini çalıştırır.
+- Pull request ve `main` push'larında `CI / verify`, lint, birim/kontrat testlerini ve gerçek Chrome smoke testini çalıştırır.
 - TDK canlı kaynak kontrolü her pazartesi 08.17 (Türkiye saati) ve manuel olarak çalışır; harici ağ bağımlılığı nedeniyle production merge kapısı değildir.
 - Vercel Git entegrasyonu feature branch'lere Preview, `main` branch'ine Production deployment üretir.
 - GitHub'da `main` için pull request ve `CI / verify` zorunluluğu etkinleştirilmelidir; doğrudan push production'a gitmemelidir.

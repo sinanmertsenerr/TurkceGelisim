@@ -1,20 +1,11 @@
-const STORAGE_KEY = "turkce-gelisim:tema";
+import { readStorage, writeStorage } from "./local-storage.js";
 
-function readStoredTheme() {
-  try {
-    const value = localStorage.getItem(STORAGE_KEY);
-    return value === "dark" || value === "light" ? value : null;
-  } catch {
-    return null;
-  }
-}
+const THEME_STORAGE_KEY = "turkce-gelisim:tema";
+const THEME_COLORS = { dark: "#070b14", light: "#f8fafc" };
 
-function storeTheme(theme) {
-  try {
-    localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    // Depolama kapalıysa tema yalnız bu sekmede geçerli olur.
-  }
+function storedTheme() {
+  const value = readStorage(THEME_STORAGE_KEY);
+  return value === "dark" || value === "light" ? value : null;
 }
 
 export function applyTheme(elements, theme) {
@@ -23,13 +14,13 @@ export function applyTheme(elements, theme) {
   elements.themeToggle.setAttribute("aria-pressed", String(dark));
   elements.themeToggleLabel.textContent = dark ? "Açık tema" : "Koyu tema";
   elements.themeToggle.setAttribute("aria-label", dark ? "Açık temaya geç" : "Koyu temaya geç");
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#070b14" : "#f8fafc");
-  storeTheme(theme);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
+  writeStorage(THEME_STORAGE_KEY, theme);
 }
 
 export function installTheme(elements) {
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-  applyTheme(elements, readStoredTheme() ?? (prefersDark ? "dark" : "light"));
+  applyTheme(elements, storedTheme() ?? (prefersDark ? "dark" : "light"));
   elements.themeToggle.addEventListener("click", () => {
     applyTheme(elements, document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   });

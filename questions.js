@@ -25,6 +25,7 @@ export const QUESTIONS_BY_LEVEL = Object.freeze(Object.fromEntries(
 
 export const QUESTIONS = Object.freeze(LEVELS.flatMap(({ id }) => QUESTIONS_BY_LEVEL[id]));
 export const QUESTION_BY_ID = new Map(QUESTIONS.map((question) => [question.id, question]));
+export const QUESTION_IDS = new Set(QUESTION_BY_ID.keys());
 
 // Konu odaklı çalışma havuzu: seçilen çalışma konusundaki sorular, istenirse
 // tek bir düzeyle sınırlanır. ALL_LEVELS_ID dört düzeyi birlikte verir.

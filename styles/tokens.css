@@ -1,0 +1,175 @@
+/* Tasarım belirteçleri (v4 indigo/mercan). Açık tema kök değişkenlerde; koyu tema hem sistem
+   tercihine hem de data-theme="dark" seçimine bağlı. */
+
+:root {
+  color-scheme: light;
+
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-soft: #f1f5f9;
+  --bg-surface-alt: #f8fafc;
+
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus: #4f46e5;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eef2ff;
+  --primary-ring: rgb(79 70 229 / 0.25);
+  --primary-glow: rgb(79 70 229 / 0.3);
+
+  --accent: #ea580c;
+  --accent-hover: #c2410c;
+  --accent-light: #fff7ed;
+  --accent-glow: rgb(234 88 12 / 0.35);
+
+  --success: #059669;
+  --success-light: #ecfdf5;
+  --success-border: #a7f3d0;
+
+  --danger: #e11d48;
+  --danger-light: #fff1f2;
+  --danger-border: #fecdd3;
+
+  --tip: #b45309;
+  --tip-light: #fffbeb;
+  --tip-border: #fde68a;
+
+  --level-kolay: #059669;
+  --level-orta: #d97706;
+  --level-zor: #ea580c;
+  --level-uzman: #4f46e5;
+
+  --overlay: rgb(15 23 42 / 0.6);
+
+  --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md: 0 6px 16px -2px rgb(15 23 42 / 0.08);
+  --shadow-card: 0 20px 35px -10px rgb(79 70 229 / 0.07);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --fast: 150ms var(--ease);
+  --base: 240ms var(--ease);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #070b14;
+  --bg-surface: #0e1526;
+  --bg-surface-soft: #18233c;
+  --bg-surface-alt: #0c1221;
+
+  --border-subtle: #1e2d4a;
+  --border-strong: #2f446f;
+  --border-focus: #818cf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #8e9db7;
+  --text-inverse: #070b14;
+
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-light: rgb(99 102 241 / 0.18);
+  --primary-ring: rgb(129 140 248 / 0.4);
+  --primary-glow: rgb(99 102 241 / 0.35);
+
+  --accent: #ff6b4a;
+  --accent-hover: #ff8266;
+  --accent-light: rgb(255 107 74 / 0.16);
+  --accent-glow: rgb(255 107 74 / 0.3);
+
+  --success: #10b981;
+  --success-light: rgb(16 185 129 / 0.18);
+  --success-border: rgb(16 185 129 / 0.4);
+
+  --danger: #f43f5e;
+  --danger-light: rgb(244 63 94 / 0.18);
+  --danger-border: rgb(244 63 94 / 0.45);
+
+  --tip: #fbbf24;
+  --tip-light: rgb(251 191 36 / 0.12);
+  --tip-border: rgb(251 191 36 / 0.35);
+
+  --level-kolay: #34d399;
+  --level-orta: #fbbf24;
+  --level-zor: #ff6b4a;
+  --level-uzman: #818cf8;
+
+  --overlay: rgb(7 11 20 / 0.7);
+
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -4px rgb(0 0 0 / 0.6);
+  --shadow-card: 0 20px 40px -10px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg-page: #070b14;
+    --bg-surface: #0e1526;
+    --bg-surface-soft: #18233c;
+    --bg-surface-alt: #0c1221;
+
+    --border-subtle: #1e2d4a;
+    --border-strong: #2f446f;
+    --border-focus: #818cf8;
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #8e9db7;
+    --text-inverse: #070b14;
+
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --primary-light: rgb(99 102 241 / 0.18);
+    --primary-ring: rgb(129 140 248 / 0.4);
+    --primary-glow: rgb(99 102 241 / 0.35);
+
+    --accent: #ff6b4a;
+    --accent-hover: #ff8266;
+    --accent-light: rgb(255 107 74 / 0.16);
+    --accent-glow: rgb(255 107 74 / 0.3);
+
+    --success: #10b981;
+    --success-light: rgb(16 185 129 / 0.18);
+    --success-border: rgb(16 185 129 / 0.4);
+
+    --danger: #f43f5e;
+    --danger-light: rgb(244 63 94 / 0.18);
+    --danger-border: rgb(244 63 94 / 0.45);
+
+    --tip: #fbbf24;
+    --tip-light: rgb(251 191 36 / 0.12);
+    --tip-border: rgb(251 191 36 / 0.35);
+
+    --level-kolay: #34d399;
+    --level-orta: #fbbf24;
+    --level-zor: #ff6b4a;
+    --level-uzman: #818cf8;
+
+    --overlay: rgb(7 11 20 / 0.7);
+
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 8px 24px -4px rgb(0 0 0 / 0.6);
+    --shadow-card: 0 20px 40px -10px rgb(0 0 0 / 0.7);
+  }
+}

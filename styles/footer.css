@@ -1,0 +1,13 @@
+/* Alt bilgi. */
+
+.site-footer {
+  padding: 1.4rem 1rem 2rem;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0 0 4px;
+}

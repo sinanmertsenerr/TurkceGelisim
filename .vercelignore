@@ -1,7 +1,7 @@
 # Deploy only the browser runtime. Everything else stays in the source repository.
 /*
 !index.html
-!style.css
+!styles
 !app.js
 !core.js
 !questions.js

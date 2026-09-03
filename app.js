@@ -1,106 +1,59 @@
+// Uygulamanın bileşim kökü: modülleri kurar, gezinmeyi ve sekmeler arası
+// eşitlemeyi bağlar. Ekranların kendi olayları ilgili ui/ modülündedir.
 import { NOTEBOOK_STORAGE_KEY, STORAGE_KEY } from "./core.js";
 import { BANK_VERSION, QUESTIONS, SOURCES, STUDY_TOPICS } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedMode, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
+import { installHome, renderHome, updateResumePanel } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
-import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
-import { createSessionController } from "./ui/session.js";
-import { showScreen } from "./ui/screens.js";
+import { installLibrary } from "./ui/library.js";
 import { loadNotebook } from "./ui/notebook.js";
-import { loadResumableSession } from "./ui/storage.js";
-import { state } from "./ui/state.js";
+import { installResult } from "./ui/result.js";
+import { showScreen } from "./ui/screens.js";
+import { createSessionController } from "./ui/session.js";
+import { loadResumableSession } from "./ui/session-store.js";
 import { installTheme } from "./ui/theme.js";
 
-const elements = getElements();
-const controller = createSessionController({ elements });
-
-installTheme(elements);
-loadNotebook();
-renderModeCards(elements);
-renderLevelCards(elements);
-renderTopicCards(elements);
-elements.startSessionButton.addEventListener("click", () => {
-  if (selectedMode() === "defter") controller.startNotebookSession(selectedSessionSize());
-  else controller.startNewSession(selectedLevel(), selectedSessionSize(), selectedTopic());
-});
-syncHomeSelections(elements);
-
-for (const input of document.querySelectorAll('input[name="session-size"]')) {
-  input.addEventListener("change", () => syncHomeSelections(elements));
+function installNavigation(elements, { showHome, openLibrary }) {
+  elements.homeLogo.addEventListener("click", showHome);
+  elements.navPractice.addEventListener("click", showHome);
+  elements.navLibrary.addEventListener("click", openLibrary);
+  elements.saveAndExitButton.addEventListener("click", showHome);
 }
 
-history.replaceState({ homeStep: "mode" }, "");
-window.addEventListener("popstate", (event) => {
-  if (document.body.dataset.screen !== "home" || !event.state?.homeStep) return;
-  goToStep(elements, event.state.homeStep, { push: false });
-});
-
-elements.homeLogo.addEventListener("click", controller.showHome);
-elements.navPractice.addEventListener("click", controller.showHome);
-elements.navLibrary.addEventListener("click", controller.openLibrary);
-elements.saveAndExitButton.addEventListener("click", controller.showHome);
-elements.nextQuestionButton.addEventListener("click", controller.goToNextQuestion);
-
-elements.resumeButton.addEventListener("click", controller.resumeSession);
-elements.discardResumeButton.addEventListener("click", controller.discardResume);
-
-elements.retryWrongButton.addEventListener("click", controller.retryWrong);
-elements.newSessionButton.addEventListener("click", controller.startNewFromLastSettings);
-elements.resultHomeButton.addEventListener("click", controller.showHome);
-elements.reviewMoreButton.addEventListener("click", controller.showMoreReviews);
-
-for (const control of [elements.librarySearch, elements.libraryLevel, elements.libraryTopic]) {
-  control.addEventListener(control === elements.librarySearch ? "input" : "change", () => {
-    state.libraryLimit = 24;
-    renderLibrary(elements);
+// Başka bir sekmede oturum ya da defter değişirse ana sayfa güncel kalır.
+function installCrossTabSync(elements) {
+  window.addEventListener("storage", (event) => {
+    if (document.body.dataset.screen !== "home") return;
+    if (event.key === STORAGE_KEY) {
+      loadResumableSession();
+      updateResumePanel(elements);
+    }
+    if (event.key === NOTEBOOK_STORAGE_KEY) {
+      loadNotebook();
+      renderHome(elements);
+    }
   });
 }
 
-elements.libraryMoreButton.addEventListener("click", () => {
-  state.libraryLimit += 24;
-  renderLibrary(elements);
-});
+function renderBankSummary(elements) {
+  elements.bankVersion.textContent = BANK_VERSION;
+  elements.metricQuestions.textContent = String(QUESTIONS.length);
+  elements.metricTopics.textContent = String(STUDY_TOPICS.length);
+  elements.metricSources.textContent = String(Object.keys(SOURCES).length);
+}
 
-elements.libraryList.addEventListener("click", (event) => {
-  const card = event.target.closest(".library-card");
-  if (card) openLibraryDetail(elements, card.dataset.questionId);
-});
-elements.libraryDialogClose.addEventListener("click", () => closeLibraryDetail(elements));
-elements.libraryDialog.addEventListener("click", (event) => {
-  if (event.target === elements.libraryDialog) closeLibraryDetail(elements);
-});
-elements.libraryDialog.addEventListener("close", () => syncLibraryDetailState(elements));
+const elements = getElements();
+const controller = createSessionController(elements);
 
-// Geniş ekranda kural detayı listenin yanında sabit panel olarak, dar ekranda
-// modal olarak açılır. Genişlik değişirse açık detay uygun biçime taşınır.
-const wideLibraryLayout = window.matchMedia("(min-width: 1081px)");
-wideLibraryLayout.addEventListener("change", () => {
-  if (elements.libraryDialog.open) {
-    const questionId = elements.libraryDialog.dataset.questionId;
-    closeLibraryDetail(elements);
-    if (questionId) openLibraryDetail(elements, questionId);
-  } else {
-    syncLibraryDetailState(elements);
-  }
-});
-syncLibraryDetailState(elements);
-
-window.addEventListener("storage", (event) => {
-  if (document.body.dataset.screen !== "home") return;
-  if (event.key === STORAGE_KEY) loadResumableSession(elements);
-  if (event.key === NOTEBOOK_STORAGE_KEY) {
-    loadNotebook();
-    syncHomeSelections(elements);
-  }
-});
-
+installTheme(elements);
+loadNotebook();
+installHome(elements, controller);
+installResult(elements, controller);
+installLibrary(elements);
+installNavigation(elements, controller);
+installCrossTabSync(elements);
 installKeyboardShortcuts(elements);
-
-elements.bankVersion.textContent = BANK_VERSION;
-elements.metricQuestions.textContent = String(QUESTIONS.length);
-elements.metricTopics.textContent = String(STUDY_TOPICS.length);
-elements.metricSources.textContent = String(Object.keys(SOURCES).length);
-populateTopics(elements);
-loadResumableSession(elements);
-goToStep(elements, "mode", { push: false, focus: false });
+renderBankSummary(elements);
+loadResumableSession();
+updateResumePanel(elements);
 showScreen(elements, "home", { focus: false });

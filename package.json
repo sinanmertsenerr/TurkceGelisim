@@ -4,12 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "lint": "eslint .",
     "test": "node --test test/core.test.js test/questions.test.js test/tips.test.js test/search.test.js test/deployment.test.js",
-    "test:ci": "npm test && npm run test:browser",
     "test:browser": "node test/browser-smoke.mjs",
-    "test:sources": "node test/source-presence.mjs"
+    "test:sources": "node test/source-presence.mjs",
+    "test:ci": "npm run lint && npm test && npm run test:browser"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.12.0"
   }
 }

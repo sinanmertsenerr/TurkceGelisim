@@ -1,0 +1,246 @@
+/* Sonuç ekranı: puan halkası, konu bazlı gelişim, sonraki adım, inceleme listesi. */
+
+.result-shell {
+  width: min(720px, 100%);
+}
+
+.results-card {
+  margin-bottom: 1.5rem;
+  padding: 2.5rem clamp(1rem, 4vw, 2rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.score-ring-wrap {
+  position: relative;
+  display: flex;
+  width: 130px;
+  height: 130px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.score-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: var(--bg-surface-soft);
+  stroke-width: 10;
+}
+
+.score-ring-progress {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 377;
+  stroke-dashoffset: 377;
+  transition: stroke-dashoffset 800ms ease-out;
+}
+
+.score-display-number {
+  position: absolute;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.results-card h1 {
+  margin-bottom: 0.4rem;
+  font-size: clamp(1.6rem, 4vw, 1.9rem);
+}
+
+.results-subtitle {
+  margin-bottom: 1.75rem;
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+}
+
+.stats-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.breakdown-box {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-soft);
+}
+
+.breakdown-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.breakdown-val {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.val-correct { color: var(--success); }
+.val-wrong { color: var(--danger); }
+
+.topic-mastery {
+  margin-bottom: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.topic-mastery-title {
+  margin-bottom: 1rem;
+  font-size: 1.12rem;
+}
+
+.topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.topic-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.topic-item-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.topic-score {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.topic-bar-bg {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-soft);
+  overflow: hidden;
+}
+
+.topic-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  transition: width 500ms ease-out;
+}
+
+.topic-item.is-strong .topic-bar-fill { background: var(--success); }
+.topic-item.is-weak .topic-bar-fill { background: var(--accent); }
+
+.next-step-card {
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent-light);
+  text-align: left;
+}
+
+.next-step-card strong {
+  display: block;
+  margin-bottom: 3px;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+}
+
+.next-step-card span {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.review-section {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+}
+
+.review-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.review-card {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.review-card.review-correct { border-left-color: var(--success); }
+.review-card.review-wrong { border-left-color: var(--danger); }
+
+.review-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.review-correct .review-state { color: var(--success); }
+.review-wrong .review-state { color: var(--danger); }
+
+.review-topic {
+  color: var(--text-muted);
+}
+
+.review-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.review-answer {
+  margin-bottom: 6px;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.review-explanation {
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}

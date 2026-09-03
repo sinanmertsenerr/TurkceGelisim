@@ -1,4 +1,6 @@
 TurkceGelisim
 .DS_Store
+.history/
 .vercel/
 .env*.local
+node_modules/
