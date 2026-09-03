@@ -2,7 +2,9 @@ export const state = {
   activeSession: null,
   completedSession: null,
   resumableSession: null,
-  lastSettings: { level: "kolay", size: 20, topic: null },
+  // Yanlış defteri: soru kimliği → { missed, streak, lastWrongAt }
+  notebook: {},
+  lastSettings: { level: "kolay", size: 20, topic: null, mode: "karma" },
   reviewLimit: 12,
   libraryLimit: 24,
   homeStep: "mode",

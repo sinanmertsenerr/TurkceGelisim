@@ -42,7 +42,7 @@
   <main id="app">
     <section class="screen" id="screen-home" data-title="Yazım antrenmanı">
       <div class="shell home-shell">
-        <div class="home-hero">
+        <div class="home-hero" id="homeHero">
           <p class="eyebrow" id="homeEyebrow">Yazım antrenmanı</p>
           <h1 tabindex="-1">Doğru Türkçe, <em>duru zihin.</em></h1>
           <p>Telaş ve puan kaygısı olmadan TDK yazım kurallarını kalıcı bir kavrayışla çalış. Her cevabın tüyosu ve resmî kaynağı anında önünde.</p>
@@ -82,6 +82,10 @@
                   <span class="mode-card-name">Konu odaklı</span>
                   <span class="badge-sub">da/de, ki, noktalama gibi tek bir kuralda uzmanlaş</span>
                 </button>
+                <button class="mode-card choice-btn mode-card-notebook" type="button" role="radio" aria-checked="false" aria-disabled="true" data-mode="defter">
+                  <span class="mode-card-name">Yanlış defterim</span>
+                  <span class="badge-sub" id="notebookCardHint">Yanlışladığın sorular burada birikir</span>
+                </button>
               </div>
             </section>
 
@@ -93,7 +97,7 @@
 
             <section class="setup-step" id="step-session" data-step="session" hidden>
 
-              <section class="selection-group" aria-labelledby="levelsTitle">
+              <section class="selection-group" id="levelSection" aria-labelledby="levelsTitle">
                 <h2 class="selection-label" id="levelsTitle" tabindex="-1">Zorluk düzeyi</h2>
                 <p class="selection-hint" id="levelHint">Çalışmak istediğin derinliği seç. Her düzeyde 100 soru var.</p>
                 <div class="choice-grid level-grid" id="levelGrid" role="radiogroup" aria-labelledby="levelsTitle"></div>

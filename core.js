@@ -141,7 +141,7 @@ export function makeStoredSession(bankVersion, session) {
 export function isResumableSession(session, questionById, { allLevelsId = "tum", studyTopicOf = null } = {}) {
   if (
     !session
-    || !["normal", "wrong-review"].includes(session.mode)
+    || !["normal", "wrong-review", "notebook"].includes(session.mode)
     || typeof session.level !== "string"
     || (session.topic != null && typeof session.topic !== "string")
     || !Number.isInteger(session.requestedSize)
@@ -160,7 +160,8 @@ export function isResumableSession(session, questionById, { allLevelsId = "tum",
 
   const topicSession = typeof session.topic === "string";
   if (topicSession && typeof studyTopicOf !== "function") return false;
-  if (!topicSession && session.level === allLevelsId) return false;
+  // Defter oturumu düzeyden bağımsızdır: dört düzey birlikte gelir.
+  if (!topicSession && session.level === allLevelsId && session.mode !== "notebook") return false;
   const belongs = (question) => {
     if (!question) return false;
     if (topicSession && studyTopicOf(question) !== session.topic) return false;
@@ -200,4 +201,54 @@ export function parseStoredSession(raw, bankVersion, validQuestionIds) {
   } catch {
     return null;
   }
+}
+
+// ---- Yanlış defteri ---------------------------------------------------------
+// Yanlış cevaplanan sorular oturumlar arasında bu defterde birikir. Bir soru
+// üst üste iki kez doğru cevaplanınca "kavrandı" sayılır ve defterden çıkar.
+export const NOTEBOOK_STORAGE_KEY = "turkce-gelisim:yanlis-defteri:v1";
+export const NOTEBOOK_SCHEMA_VERSION = 1;
+export const NOTEBOOK_CLEAR_STREAK = 2;
+
+export function applyResponseToNotebook(entries, questionId, correct, now = new Date().toISOString()) {
+  const next = { ...entries };
+  const existing = next[questionId];
+  if (!correct) {
+    next[questionId] = { missed: (existing?.missed ?? 0) + 1, streak: 0, lastWrongAt: now };
+    return next;
+  }
+  if (!existing) return next;
+  const streak = existing.streak + 1;
+  if (streak >= NOTEBOOK_CLEAR_STREAK) delete next[questionId];
+  else next[questionId] = { ...existing, streak };
+  return next;
+}
+
+export function makeStoredNotebook(bankVersion, entries) {
+  return { schemaVersion: NOTEBOOK_SCHEMA_VERSION, bankVersion, savedAt: new Date().toISOString(), entries };
+}
+
+// Banka sürümü değişse bile defter korunur; yalnız artık var olmayan sorular düşer.
+export function parseStoredNotebook(raw, validQuestionIds) {
+  if (!raw) return {};
+  try {
+    const value = JSON.parse(raw);
+    if (value?.schemaVersion !== NOTEBOOK_SCHEMA_VERSION || typeof value.entries !== "object" || value.entries === null) return {};
+    const entries = {};
+    for (const [questionId, entry] of Object.entries(value.entries)) {
+      if (!validQuestionIds.has(questionId)) continue;
+      if (!Number.isInteger(entry?.missed) || entry.missed < 1 || !Number.isInteger(entry?.streak) || entry.streak < 0) continue;
+      entries[questionId] = { missed: entry.missed, streak: entry.streak, lastWrongAt: typeof entry.lastWrongAt === "string" ? entry.lastWrongAt : null };
+    }
+    return entries;
+  } catch {
+    return {};
+  }
+}
+
+// En son yanlışlanan en önde gelir; oturum seçimi yine konu dengesini korur.
+export function notebookQuestionIds(entries) {
+  return Object.entries(entries)
+    .sort(([, a], [, b]) => (b.lastWrongAt ?? "").localeCompare(a.lastWrongAt ?? "") || b.missed - a.missed)
+    .map(([questionId]) => questionId);
 }

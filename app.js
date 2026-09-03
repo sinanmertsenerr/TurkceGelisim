@@ -1,11 +1,12 @@
-import { STORAGE_KEY } from "./core.js";
+import { NOTEBOOK_STORAGE_KEY, STORAGE_KEY } from "./core.js";
 import { BANK_VERSION, QUESTIONS, SOURCES, STUDY_TOPICS } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
+import { goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedMode, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
 import { showScreen } from "./ui/screens.js";
+import { loadNotebook } from "./ui/notebook.js";
 import { loadResumableSession } from "./ui/storage.js";
 import { state } from "./ui/state.js";
 import { installTheme } from "./ui/theme.js";
@@ -14,10 +15,14 @@ const elements = getElements();
 const controller = createSessionController({ elements });
 
 installTheme(elements);
+loadNotebook();
 renderModeCards(elements);
 renderLevelCards(elements);
 renderTopicCards(elements);
-elements.startSessionButton.addEventListener("click", () => controller.startNewSession(selectedLevel(), selectedSessionSize(), selectedTopic()));
+elements.startSessionButton.addEventListener("click", () => {
+  if (selectedMode() === "defter") controller.startNotebookSession(selectedSessionSize());
+  else controller.startNewSession(selectedLevel(), selectedSessionSize(), selectedTopic());
+});
 syncHomeSelections(elements);
 
 for (const input of document.querySelectorAll('input[name="session-size"]')) {
@@ -81,7 +86,12 @@ wideLibraryLayout.addEventListener("change", () => {
 syncLibraryDetailState(elements);
 
 window.addEventListener("storage", (event) => {
-  if (event.key === STORAGE_KEY && document.body.dataset.screen === "home") loadResumableSession(elements);
+  if (document.body.dataset.screen !== "home") return;
+  if (event.key === STORAGE_KEY) loadResumableSession(elements);
+  if (event.key === NOTEBOOK_STORAGE_KEY) {
+    loadNotebook();
+    syncHomeSelections(elements);
+  }
 });
 
 installKeyboardShortcuts(elements);

@@ -3,6 +3,7 @@ import { ALL_LEVELS_ID, QUESTION_BY_ID, STUDY_TOPIC_BY_ID } from "../questions.j
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state } from "./state.js";
 import { renderTip } from "./tips.js";
+import { isInNotebook, notebookSize } from "./notebook.js";
 
 export function resultHeading(percent) {
   if (percent >= 90) return "Çok güçlü bir tur.";
@@ -18,9 +19,11 @@ export function renderResult(elements, completedSession) {
   const topic = completedSession.topic ? STUDY_TOPIC_BY_ID.get(completedSession.topic) : null;
   const levelText = completedSession.level === ALL_LEVELS_ID ? "tüm düzeylerden" : `${level.label} seviyesinde`;
   elements.resultTitle.textContent = resultHeading(percent);
-  elements.resultMessage.textContent = topic
-    ? `“${topic.label}” konusunda, ${levelText} ${counts.answered} soruluk oturumu tamamladın.`
-    : `${levelText} ${counts.answered} soruluk oturumu tamamladın.`;
+  elements.resultMessage.textContent = completedSession.mode === "notebook"
+    ? `Yanlış defterinden ${counts.answered} soruluk oturumu tamamladın.`
+    : topic
+      ? `“${topic.label}” konusunda, ${levelText} ${counts.answered} soruluk oturumu tamamladın.`
+      : `${levelText} ${counts.answered} soruluk oturumu tamamladın.`;
   elements.resultPercent.textContent = `%${percent}`;
   renderScoreRing(elements, percent);
   renderTopicMastery(elements, completedSession);
@@ -28,6 +31,8 @@ export function renderResult(elements, completedSession) {
   elements.resultWrong.textContent = counts.wrong;
   elements.resultTotal.textContent = counts.answered;
   elements.retryWrongButton.hidden = counts.wrong === 0;
+  // Defter boşaldıysa aynı ayarlarla yeni oturum kurulamaz.
+  elements.newSessionButton.hidden = completedSession.mode === "notebook" && notebookSize() === 0;
   renderNextStep(elements, completedSession);
   state.reviewLimit = 12;
   renderReview(elements, completedSession);
@@ -76,6 +81,14 @@ export function renderNextStep(elements, completedSession) {
     correct: response.correct,
   })));
   elements.nextStepCard.hidden = false;
+  if (completedSession.mode === "notebook") {
+    const cleared = completedSession.questionIds.filter((id) => !isInNotebook(id)).length;
+    const remaining = notebookSize();
+    elements.nextStepText.textContent = remaining === 0
+      ? `${cleared} soru defterden çıktı; defter boşaldı. Yeni bir karma oturumla taze yanlışlar toplayabilirsin.`
+      : `${cleared} soru defterden çıktı, ${remaining} soru kaldı. Kalanlar üst üste iki doğruyla temizlenir; bir tur daha at.`;
+    return;
+  }
   if (completedSession.topic) {
     const topic = STUDY_TOPIC_BY_ID.get(completedSession.topic);
     const counts = countResponses(completedSession.responses);

@@ -14,6 +14,7 @@ Türkçe yazım kurallarını resmî TDK kaynaklarıyla çalışmak için hazır
 - Her cevaptan sonra kısa açıklama ve doğrudan TDK kaynak bağlantısı
 - Yarım kalan oturumu bu cihazda saklama ve sürdürme
 - Yanlış cevapları ayrı bir turda yeniden çözme
+- **Yanlış defteri**: yanlışlanan sorular oturumlar arasında bu cihazda birikir; ana sayfadaki üçüncü biçim kartıyla düzeyden bağımsız bir defter oturumu kurulur. Bir soru üst üste iki kez doğru cevaplanınca defterden çıkar
 - Aranabilir ve düzeye göre filtrelenebilir, tüm bankayı kapsayan bilgi kütüphanesi
 - Klavye kullanımı, ekran okuyucu bildirimleri, azaltılmış hareket ve mobil ekran desteği
 - Hesap, reklam, izleyici veya sunucuya veri gönderimi yok
@@ -50,7 +51,7 @@ Test paketlerinin haricî npm bağımlılığı yoktur.
 
 - `index.html` ve `style.css`: semantik sayfa yapısı ile görsel sistem
 - `app.js`: uygulamanın önyükleme ve bağlama noktası
-- `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, klavye)
+- `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, yanlış defteri, klavye)
 - `core.js`: test edilebilir oturum ve istatistik işlevleri
 - `questions.js`: soru bankasının tek giriş noktası
 - `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları, dört düzeyin çekirdek verileri ve `konu-havuzu.js` ek soru havuzu

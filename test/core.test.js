@@ -2,11 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  applyResponseToNotebook,
   countResponses,
   fisherYates,
   interleaveByConcept,
   isResumableSession,
+  makeStoredNotebook,
   makeStoredSession,
+  NOTEBOOK_CLEAR_STREAK,
+  notebookQuestionIds,
+  parseStoredNotebook,
   parseStoredSession,
   selectSessionQuestions,
   STORAGE_SCHEMA_VERSION,
@@ -189,4 +194,53 @@ test("en zayıf konu tam doğru konuları eler ve en düşük oranı seçer", ()
   assert.equal(weakest.total, 2);
   assert.equal(weakestTopic([{ topic: "A", correct: true }]), null);
   assert.equal(weakestTopic([]), null);
+});
+
+test("yanlış defteri: yanlış cevap ekler, üst üste iki doğru siler", () => {
+  let entries = {};
+  entries = applyResponseToNotebook(entries, "q1", true, "2026-09-01T00:00:00.000Z");
+  assert.deepEqual(entries, {}, "Defterde olmayan soru doğru cevaplanınca eklenmemeli.");
+  entries = applyResponseToNotebook(entries, "q1", false, "2026-09-01T00:00:00.000Z");
+  assert.deepEqual(entries.q1, { missed: 1, streak: 0, lastWrongAt: "2026-09-01T00:00:00.000Z" });
+  entries = applyResponseToNotebook(entries, "q1", true);
+  assert.equal(entries.q1.streak, 1, "İlk doğru soruyu defterde tutmalı.");
+  entries = applyResponseToNotebook(entries, "q1", false, "2026-09-02T00:00:00.000Z");
+  assert.deepEqual(entries.q1, { missed: 2, streak: 0, lastWrongAt: "2026-09-02T00:00:00.000Z" }, "Araya giren yanlış seriyi sıfırlamalı.");
+  entries = applyResponseToNotebook(entries, "q1", true);
+  entries = applyResponseToNotebook(entries, "q1", true);
+  assert.equal(entries.q1, undefined, `${NOTEBOOK_CLEAR_STREAK} üst üste doğru soruyu defterden çıkarmalı.`);
+});
+
+test("yanlış defteri kaydı doğrulanır ve banka değişse de korunur", () => {
+  const valid = new Set(["q1", "q2"]);
+  const stored = JSON.stringify(makeStoredNotebook("eski-surum", {
+    q1: { missed: 2, streak: 1, lastWrongAt: "2026-09-01T00:00:00.000Z" },
+    q2: { missed: 0, streak: 0 },
+    silinen: { missed: 1, streak: 0 },
+  }));
+  assert.deepEqual(parseStoredNotebook(stored, valid), {
+    q1: { missed: 2, streak: 1, lastWrongAt: "2026-09-01T00:00:00.000Z" },
+  });
+  assert.deepEqual(parseStoredNotebook(null, valid), {});
+  assert.deepEqual(parseStoredNotebook("{bozuk", valid), {});
+  assert.deepEqual(parseStoredNotebook(JSON.stringify({ schemaVersion: 99, entries: { q1: { missed: 1, streak: 0 } } }), valid), {});
+});
+
+test("yanlış defteri sıralaması en son yanlışı öne alır", () => {
+  const entries = {
+    eski: { missed: 5, streak: 0, lastWrongAt: "2026-08-01T00:00:00.000Z" },
+    yeni: { missed: 1, streak: 0, lastWrongAt: "2026-09-01T00:00:00.000Z" },
+    tarihsiz: { missed: 1, streak: 0, lastWrongAt: null },
+  };
+  assert.deepEqual(notebookQuestionIds(entries), ["yeni", "eski", "tarihsiz"]);
+});
+
+test("defter oturumu düzeyden bağımsız olarak sürdürülebilir", () => {
+  const questionById = new Map([
+    ["a", { level: "kolay", choices: [{ id: "x" }, { id: "y" }], correctChoiceId: "x" }],
+    ["b", { level: "uzman", choices: [{ id: "x" }, { id: "y" }], correctChoiceId: "y" }],
+  ]);
+  const session = { mode: "notebook", level: "tum", topic: null, requestedSize: 2, questionIds: ["a", "b"], index: 1, responses: [{ questionId: "a", choiceId: "y", correct: false }] };
+  assert.equal(isResumableSession(session, questionById), true);
+  assert.equal(isResumableSession({ ...session, mode: "normal" }, questionById), false, "Karma oturum tüm düzeylerle sürdürülemez.");
 });

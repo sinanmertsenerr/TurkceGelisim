@@ -232,7 +232,7 @@ async function run() {
       mobile: true,
     });
     await client.send("Page.navigate", { url: origin });
-    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 2 && !document.querySelector("#step-mode").hidden', "ana sayfa yüklemesi");
+    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 3 && !document.querySelector("#step-mode").hidden', "ana sayfa yüklemesi");
     await capture("01-mobile-home");
     assert.equal(await client.evaluate('document.querySelector("#step-session").hidden'), true, "İlk adımda oturum ayarları gizli olmalı.");
     assert.equal(await client.evaluate('document.querySelectorAll("#stepSummary .summary-chip").length'), 0, "İlk adımda geri çipi olmamalı.");
@@ -462,6 +462,82 @@ async function run() {
     await client.evaluate('document.querySelector("#discardResumeButton").click()');
     await waitUntil(client, 'document.querySelector("#resumePanel").hidden', "konu oturumu kaydını silme");
 
+    // Yanlış defteri: önceki oturumların yanlışları birikmiş olmalı. Yenileme
+    // sonrası ana sayfa zaten biçim adımındadır; çip yalnız varsa tıklanır.
+    await client.evaluate('document.querySelector("#stepSummary .summary-chip[data-step=mode]")?.click()');
+    await waitUntil(client, '!document.querySelector("#step-mode").hidden', "defter için biçim adımı");
+    const notebookHome = await client.evaluate(`(() => {
+      const stored = JSON.parse(localStorage.getItem("turkce-gelisim:yanlis-defteri:v1") ?? '{"entries":{}}');
+      const card = document.querySelector("[data-mode=defter]");
+      return {
+        count: Object.keys(stored.entries).length,
+        disabled: card.getAttribute("aria-disabled"),
+        hint: card.querySelector(".badge-sub").textContent,
+        heroCompact: document.querySelector("#homeHero").classList.contains("is-compact"),
+        heroTitleVisible: getComputedStyle(document.querySelector("#homeHero h1")).display !== "none"
+      };
+    })()`);
+    assert.equal(notebookHome.heroCompact, false, "Biçim adımında hero başlığı görünmeli.");
+    assert.equal(notebookHome.heroTitleVisible, true);
+    assert.equal(notebookHome.disabled, String(notebookHome.count === 0));
+    if (notebookHome.count > 0) {
+      assert.match(notebookHome.hint, new RegExp(`^${notebookHome.count} soru`));
+      await client.evaluate('document.querySelector("[data-mode=defter]").click()');
+      await waitUntil(client, '!document.querySelector("#step-session").hidden', "defter oturum adımı");
+      const notebookStep = await client.evaluate(`(() => ({
+        eyebrow: document.querySelector("#homeEyebrow").textContent,
+        levelHidden: document.querySelector("#levelSection").hidden,
+        estimate: document.querySelector("#sessionEstimate").textContent,
+        startDisabled: document.querySelector("#startSessionButton").disabled,
+        heroTitleVisible: getComputedStyle(document.querySelector("#homeHero h1")).display !== "none"
+      }))()`);
+      assert.equal(notebookStep.eyebrow, "Yanlış defteri");
+      assert.equal(notebookStep.levelHidden, true, "Defter oturumunda düzey seçimi gizli olmalı.");
+      assert.match(notebookStep.estimate, new RegExp(`^Defterde ${notebookHome.count} soru var`));
+      assert.equal(notebookStep.startDisabled, false);
+      assert.equal(notebookStep.heroTitleVisible, false, "Biçim seçildikten sonra hero başlığı gizlenmeli.");
+      await capture("06-mobile-notebook-step");
+
+      await client.evaluate('document.querySelector("#startSessionButton").click()');
+      await waitUntil(client, '!document.querySelector("#screen-quiz").hidden', "defter oturumu");
+      const notebookRun = await client.evaluate(`(async () => {
+        const label = document.querySelector("#questionLevel").textContent;
+        const total = document.querySelector("#quizProgress").max;
+        for (let guard = 0; guard < 120 && document.querySelector("#screen-result").hidden; guard += 1) {
+          const enabledChoice = document.querySelector(".choice-button:not(:disabled)");
+          if (enabledChoice) enabledChoice.click();
+          const next = document.querySelector("#nextQuestionButton");
+          if (next && !next.hidden) next.click();
+          await new Promise((resolvePromise) => setTimeout(resolvePromise, 0));
+        }
+        return {
+          label,
+          total,
+          message: document.querySelector("#resultMessage").textContent,
+          nextStep: document.querySelector("#nextStepText").textContent,
+          remaining: Object.keys(JSON.parse(localStorage.getItem("turkce-gelisim:yanlis-defteri:v1")).entries).length,
+          newSessionHidden: document.querySelector("#newSessionButton").hidden
+        };
+      })()`);
+      assert.match(notebookRun.label, /Yanlış defteri/);
+      assert.ok(notebookRun.total <= notebookHome.count, "Defter oturumu defterden büyük olamaz.");
+      assert.match(notebookRun.message, /^Yanlış defterinden \d+ soruluk/);
+      assert.match(notebookRun.nextStep, /defterden çıktı/);
+      assert.equal(notebookRun.newSessionHidden, notebookRun.remaining === 0);
+      await capture("07-mobile-notebook-result");
+
+      await client.evaluate('document.querySelector("#resultHomeButton").click()');
+      await waitUntil(client, '!document.querySelector("#screen-home").hidden', "defter sonucundan ana sayfa");
+      await client.send("Page.reload", { ignoreCache: true });
+      await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 3', "yenileme sonrası defter kartı");
+      const persisted = await client.evaluate(`(() => ({
+        disabled: document.querySelector("[data-mode=defter]").getAttribute("aria-disabled"),
+        hint: document.querySelector("[data-mode=defter] .badge-sub").textContent
+      }))()`);
+      assert.equal(persisted.disabled, String(notebookRun.remaining === 0));
+      if (notebookRun.remaining > 0) assert.match(persisted.hint, new RegExp(`^${notebookRun.remaining} soru`));
+    }
+
     const targetSizes = await client.evaluate(`[...document.querySelectorAll("button, a, input, select")]
       .filter((element) => {
         const style = getComputedStyle(element);
@@ -478,6 +554,7 @@ async function run() {
     console.log(`✓ Kural bankası: ${QUESTIONS.length} kayıt, filtre, arama, tembel render`);
     console.log(`✓ Sonuç: ${completion.correct} doğru + ${completion.wrong} yanlış = 20; yanlış tekrar kuyruğu çalıştı`);
     console.log("✓ Konu odaklı çalışma: da/de havuzu, tüm düzeyler, devam kaydı");
+    console.log(`✓ Yanlış defteri: ${notebookHome.count} soru birikti, defter oturumu ve yenileme sonrası kalıcılık`);
     console.log("✓ Erişilebilirlik: durum bölgesi, adlandırılmış kontroller, ≥44px hedefler");
   } finally {
     client?.close();

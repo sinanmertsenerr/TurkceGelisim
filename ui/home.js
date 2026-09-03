@@ -1,6 +1,7 @@
 import { countResponses } from "../core.js";
 import { ALL_LEVELS_ID, LEVELS, QUESTIONS_BY_LEVEL, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyPoolSize } from "../questions.js";
 import { LEVEL_BY_ID } from "./helpers.js";
+import { notebookSize } from "./notebook.js";
 import { state } from "./state.js";
 
 // Konu odaklı oturumda dört düzey birlikte de çalışılabilir; bu sanal düzey
@@ -65,6 +66,7 @@ export function setSelectedLevel(levelId) {
 // Seçime göre havuzdaki soru sayısı: karma modda düzeyin 100 sorusu,
 // konu modunda konu × düzey kesişimi.
 export function availablePoolSize() {
+  if (selectedMode() === "defter") return notebookSize();
   const level = selectedLevel();
   const topic = selectedTopic();
   if (topic) return studyPoolSize(topic, level);
@@ -75,7 +77,12 @@ export function updateSessionEstimate(elements) {
   const pool = availablePoolSize();
   const size = Math.min(selectedSessionSize(), pool);
   const minutes = Math.max(2, Math.round(size * 0.6));
-  if (!pool) {
+  const notebookMode = selectedMode() === "defter";
+  if (notebookMode) {
+    elements.sessionEstimate.textContent = pool
+      ? `Defterde ${pool} soru var; oturum ${size} soruyla kurulur. Üst üste iki kez doğru cevapladığın soru defterden çıkar. Yaklaşık ${minutes} dakika sürer.`
+      : "Defter boş. Karma veya konu odaklı bir oturum çöz; yanlışladığın sorular burada birikir.";
+  } else if (!pool) {
     elements.sessionEstimate.textContent = "Bu konu ve düzey için soru yok. Başka bir düzey seç veya tüm düzeyleri dene.";
   } else if (size < selectedSessionSize()) {
     elements.sessionEstimate.textContent = `Bu seçimde ${pool} soru var; oturum ${size} soruyla kurulur. Yaklaşık ${minutes} dakika sürer.`;
@@ -112,6 +119,10 @@ function levelCountFor(levelId) {
 // Konu modunda düzey kartları o konudaki soru sayısını gösterir; boş düzeyler
 // seçilemez. Karma modda "Tüm düzeyler" kartı gizlenir.
 function syncLevelCards(elements) {
+  // Defter oturumu düzeyden bağımsızdır; düzey bölümü tamamen gizlenir.
+  const notebookMode = selectedMode() === "defter";
+  elements.levelSection.hidden = notebookMode;
+  if (notebookMode) return;
   const topic = selectedTopic();
   const topicMode = Boolean(topic);
   for (const card of elements.levelGrid.querySelectorAll(".level-card")) {
@@ -143,7 +154,21 @@ function syncLevelCards(elements) {
 
 let lastMode = "karma";
 
+// Defter kartı: defterdeki soru sayısını gösterir, defter boşken seçilemez.
+function syncNotebookCard(elements) {
+  const card = elements.modePicker.querySelector('[data-mode="defter"]');
+  const count = notebookSize();
+  card.setAttribute("aria-disabled", String(count === 0));
+  card.classList.toggle("is-disabled", count === 0);
+  card.querySelector(".badge-sub").textContent = count
+    ? `${count} soru seni bekliyor · iki kez doğru cevaplayınca defterden çıkar`
+    : "Yanlışladığın sorular burada birikir";
+  card.setAttribute("aria-label", count ? `Yanlış defterim: ${count} soru` : "Yanlış defterim: henüz boş");
+  if (count === 0 && selectedMode() === "defter") setSelectedMode("karma");
+}
+
 export function syncHomeSelections(elements) {
+  syncNotebookCard(elements);
   const mode = selectedMode();
   const topicMode = mode === "konu";
   // Karma moddan konu moduna geçişte varsayılan düzey "Tüm düzeyler" olur;
@@ -187,9 +212,11 @@ function renderStepSummary(elements) {
 
   elements.homeEyebrow.textContent = state.homeStep === "mode"
     ? "Yazım antrenmanı"
-    : topic
-      ? (state.homeStep === "session" ? `Konu odaklı · ${topicLabel}` : "Konu odaklı")
-      : "Karma çalışma";
+    : selectedMode() === "defter"
+      ? "Yanlış defteri"
+      : topic
+        ? (state.homeStep === "session" ? `Konu odaklı · ${topicLabel}` : "Konu odaklı")
+        : "Karma çalışma";
 }
 
 export function goToStep(elements, step, { push = true, focus = true } = {}) {
@@ -197,6 +224,8 @@ export function goToStep(elements, step, { push = true, focus = true } = {}) {
   const target = steps.includes(step) ? step : steps[0];
   const position = steps.indexOf(target);
   state.homeStep = target;
+  // Biçim seçildikten sonra hero başlığı ve tanıtım metni çekilir; üst yazı kalır.
+  elements.homeHero.classList.toggle("is-compact", target !== "mode");
 
   for (const section of elements.setupSteps.querySelectorAll(".setup-step")) {
     section.hidden = section.dataset.step !== target;
@@ -234,6 +263,7 @@ export function renderModeCards(elements) {
   const cards = [...elements.modePicker.querySelectorAll(".mode-card")];
   cards.forEach((card, index) => {
     card.addEventListener("click", () => {
+      if (card.getAttribute("aria-disabled") === "true") return;
       setSelectedMode(card.dataset.mode);
       syncHomeSelections(elements);
       goToNextStep(elements);
@@ -243,15 +273,15 @@ export function renderModeCards(elements) {
       syncHomeSelections(elements);
     });
   });
-  setSelectedMode(state.lastSettings.topic ? "konu" : "karma");
+  setSelectedMode(state.lastSettings.mode ?? (state.lastSettings.topic ? "konu" : "karma"));
 }
 
 // Ana sayfa seçimini verilen ayarlara getirir (yeni oturum, devam, sonuç sonrası).
-export function applyHomeSettings(elements, { level, size, topic = null }) {
-  lastMode = topic ? "konu" : "karma";
+export function applyHomeSettings(elements, { level, size, topic = null, mode = null }) {
+  lastMode = mode ?? (topic ? "konu" : "karma");
   setSelectedMode(lastMode);
   if (topic) setSelectedTopic(topic);
-  setSelectedLevel(level);
+  if (lastMode !== "defter") setSelectedLevel(level);
   setSelectedSessionSize(size);
   syncHomeSelections(elements);
 }
@@ -325,6 +355,7 @@ export function renderTopicCards(elements) {
 }
 
 export function sessionSummaryLabel(session) {
+  if (session.mode === "notebook") return "Yanlış defteri";
   const level = session.level === ALL_LEVELS_ID ? ALL_LEVELS_CARD : LEVEL_BY_ID.get(session.level);
   const topic = session.topic ? STUDY_TOPIC_BY_ID.get(session.topic) : null;
   return topic ? `${topic.label} · ${level.label}` : level.label;

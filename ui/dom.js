@@ -20,6 +20,8 @@ export function getElements() {
     modePicker: byId("modePicker"),
     setupSteps: byId("setupSteps"),
     homeEyebrow: byId("homeEyebrow"),
+    homeHero: byId("homeHero"),
+    levelSection: byId("levelSection"),
     stepIndicator: byId("stepIndicator"),
     stepSummary: byId("stepSummary"),
     topicGrid: byId("topicGrid"),

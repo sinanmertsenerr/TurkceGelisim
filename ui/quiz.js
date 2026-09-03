@@ -3,6 +3,7 @@ import { QUESTION_BY_ID } from "../questions.js";
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state, responseFor } from "./state.js";
 import { renderTip } from "./tips.js";
+import { recordNotebookResponse } from "./notebook.js";
 import * as storage from "./storage.js";
 
 const KEYS = ["1", "2", "3", "4"];
@@ -99,7 +100,8 @@ export function createQuizView({ elements, onFinish }) {
     const existingResponse = responseFor(question.id);
 
     document.body.dataset.level = question.level;
-    elements.questionLevel.textContent = state.activeSession.mode === "wrong-review" ? `${level.label} · Yanlış tekrarı` : level.label;
+    const modeSuffix = { "wrong-review": " · Yanlış tekrarı", notebook: " · Yanlış defteri" }[state.activeSession.mode] ?? "";
+    elements.questionLevel.textContent = `${level.label}${modeSuffix}`;
     elements.questionLevel.className = `level-pill level-pill-${question.level}`;
     elements.questionTopic.textContent = question.topic;
     elements.questionPrompt.textContent = question.prompt;
@@ -140,6 +142,7 @@ export function createQuizView({ elements, onFinish }) {
     state.activeSession.responses.push(response);
     state.resumableSession = state.activeSession;
     storage.persistSession(state.activeSession);
+    recordNotebookResponse(question.id, response.correct);
     markChoices(question, response);
     showFeedback(question, response);
     updateQuizStats();
