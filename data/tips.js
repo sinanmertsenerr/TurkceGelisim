@@ -61,9 +61,9 @@ export const TIPS_BY_TOPIC = Object.freeze({
     "Soruda parantezdeki anlam notuna bak: “balık” yazıyorsa son kelime gerçek, ayrı; “bitki” yazıyorsa (kuşburnu) anlam kaymış, bitişik.",
   ),
   "Büyük harfler": tip(
-    "Tek olan şey büyük, çoğunun adı küçük",
-    "Kişi, kurum, yer ve dil adları büyük harfle başlar. Akrabalık sözü isimden sonra geliyorsa küçük kalır.",
-    ["Türk Dil Kurumu, Ankara, Türkçe → her biri tek, büyük", "Ayşe teyze, Ali dayı → akrabalık sözü küçük"],
+    "Tek mi, tür mü? Tek olan büyük",
+    "Kelime dünyada tek bir şeyi gösteriyorsa (Ankara, Türkçe, Van Gölü) büyük; bir türü gösteriyorsa (il, gazete, teyze) küçük. Tarih testi: belirli bir gün veriliyorsa ay ve gün adı büyük, verilmiyorsa küçük.",
+    ["Van Gölü (tek göl) · Konya ili (tür sözü) · Ayşe teyze (tür sözü)", "29 Ekim 2025 Çarşamba → belirli tarih, büyük · her cumartesi, eylülde → küçük", "Dünya, Güneş (gezegen) büyük · bu dünyada (yaşam) küçük"],
     "Kurum adının her kelimesi büyük: Türk Dil Kurumu; sadece ilk kelime değil.",
   ),
   "Sayıların yazılışı": tip(
@@ -85,10 +85,9 @@ export const TIPS_BY_TOPIC = Object.freeze({
     "Yapım eki geldikten sonra arkadan gelen eklerde de kesme kullanılmaz: Ankaralıya, Türkçeden.",
   ),
   "Düzeltme işareti": tip(
-    "Şapka anlam ayırır, ayıracak bir şey yoksa koyma",
-    "Aynı yazılan iki kelimeyi birbirinden ayırmak için uzun ünlüye şapka gelir.",
-    ["hâlâ (henüz) / hala (babanın kız kardeşi)", "kâr (kazanç) / kar (yağan) · âdet (gelenek) / adet (sayı)"],
-    "Nispet i'si de şapkalı: askerî, millî, resmî.",
+    "Şapkayı kaldır: başka bir kelime çıkıyor mu?",
+    "Şapkasız yazınca başka anlamda bir kelime çıkıyorsa şapka koy: hâlâ (henüz) / hala (babanın kız kardeşi). Çıkmıyorsa koyma. İnce k ve g’den sonra gelen a ise hep şapkalı: kâğıt, rüzgâr.",
+    ["âdet (gelenek) / adet (sayı) · âlem (dünya) / alem (bayrak)", "resmî (devlete ait) / resmi (onun resmi) → nispet eki -î şapkalı", "kâğıt, dükkân, hikâye, rüzgâr → ince k/g, hep şapka"],
   ),
   "Noktalama işaretleri": tip(
     "İşaret kelimeye yapışır, boşluk sonra gelir",
