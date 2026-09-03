@@ -19,7 +19,7 @@ export function getElements() {
     levelHint: byId("levelHint"),
     modePicker: byId("modePicker"),
     setupSteps: byId("setupSteps"),
-    stepBackButton: byId("stepBackButton"),
+    homeEyebrow: byId("homeEyebrow"),
     stepIndicator: byId("stepIndicator"),
     stepSummary: byId("stepSummary"),
     topicGrid: byId("topicGrid"),

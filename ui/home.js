@@ -166,26 +166,30 @@ export function homeSteps() {
   return selectedMode() === "konu" ? ["mode", "topic", "session"] : ["mode", "session"];
 }
 
+// Üst satırdaki çipler hem seçimi özetler hem de ilgili adıma geri götürür;
+// ayrı bir geri düğmesi yoktur. Seçilen biçim hero'daki üst yazıya işlenir.
 function renderStepSummary(elements) {
-  const chips = [];
-  const chip = (label, detail, step) => {
+  const chip = (label, step) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "summary-chip";
     button.dataset.step = step;
-    const strong = document.createElement("span");
-    strong.textContent = label;
-    const sub = document.createElement("span");
-    sub.textContent = detail;
-    button.append(strong, sub);
-    button.setAttribute("aria-label", `${label}. ${detail}`);
+    button.textContent = `← ${label}`;
     button.addEventListener("click", () => goToStep(elements, step));
     return button;
   };
   const topic = selectedTopic();
-  chips.push(chip(topic ? "Konu odaklı" : "Karma çalışma", "Biçimi değiştir", "mode"));
-  if (topic) chips.push(chip(STUDY_TOPIC_BY_ID.get(topic).label, "Konuyu değiştir", "topic"));
+  const topicLabel = topic ? STUDY_TOPIC_BY_ID.get(topic).label : null;
+  const chips = [];
+  if (state.homeStep !== "mode") chips.push(chip("Biçimi değiştir", "mode"));
+  if (state.homeStep === "session" && topic) chips.push(chip("Konuyu değiştir", "topic"));
   elements.stepSummary.replaceChildren(...chips);
+
+  elements.homeEyebrow.textContent = state.homeStep === "mode"
+    ? "Yazım antrenmanı"
+    : topic
+      ? (state.homeStep === "session" ? `Konu odaklı · ${topicLabel}` : "Konu odaklı")
+      : "Karma çalışma";
 }
 
 export function goToStep(elements, step, { push = true, focus = true } = {}) {
@@ -206,9 +210,7 @@ export function goToStep(elements, step, { push = true, focus = true } = {}) {
     if (itemStep === target) item.setAttribute("aria-current", "step");
     else item.removeAttribute("aria-current");
   }
-  elements.stepBackButton.hidden = position === 0;
-  elements.stepBackButton.textContent = `← ${position > 0 ? stepTitle(steps[position - 1]) : "Geri"}`;
-  if (target === "session") renderStepSummary(elements);
+  renderStepSummary(elements);
 
   if (push && document.body.dataset.screen === "home") {
     history.pushState({ homeStep: target }, "");
@@ -222,20 +224,10 @@ export function goToStep(elements, step, { push = true, focus = true } = {}) {
   }
 }
 
-function stepTitle(step) {
-  return step === "mode" ? "Biçim" : step === "topic" ? "Konu" : "Oturum";
-}
-
 export function goToNextStep(elements) {
   const steps = homeSteps();
   const next = steps[Math.min(steps.indexOf(state.homeStep) + 1, steps.length - 1)];
   goToStep(elements, next);
-}
-
-export function goToPreviousStep(elements) {
-  const steps = homeSteps();
-  const previous = steps[Math.max(steps.indexOf(state.homeStep) - 1, 0)];
-  goToStep(elements, previous, { push: false });
 }
 
 export function renderModeCards(elements) {

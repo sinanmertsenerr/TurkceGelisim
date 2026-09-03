@@ -1,7 +1,7 @@
 import { STORAGE_KEY } from "./core.js";
 import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { goToPreviousStep, goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
+import { goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
@@ -24,7 +24,6 @@ for (const input of document.querySelectorAll('input[name="session-size"]')) {
   input.addEventListener("change", () => syncHomeSelections(elements));
 }
 
-elements.stepBackButton.addEventListener("click", () => goToPreviousStep(elements));
 history.replaceState({ homeStep: "mode" }, "");
 window.addEventListener("popstate", (event) => {
   if (document.body.dataset.screen !== "home" || !event.state?.homeStep) return;
