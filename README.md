@@ -46,19 +46,19 @@ npm run test:browser
 - `npm run lint`: ESLint ile tüm JavaScript dosyalarını denetler (tek geliştirme bağımlılığı).
 - `npm test`: soru bankası sözleşmesini, oturum çekirdeğini ve deployment sözleşmesini doğrular.
 - `npm run test:sources`: ağ üzerinden 14 resmî TDK sayfasına erişir; kaynak metinlerini ve 320 yazım örneğini kontrol eder.
-- `npm run test:browser`: yerel Chrome/Chromium ile mobil quiz, sayaç, kayıtlı oturum, kütüphane, sonuç ve yanlışları tekrar akışlarını sınar. Gerekirse tarayıcı yolu `CHROME_BIN` ile verilebilir.
+- `npm run test:browser`: yerel Chrome/Chromium ile mobil quiz, sayaç, kayıtlı oturum, kütüphane, sonuç, konu odaklı çalışma ve yanlış defteri akışlarını bağımsız adımlar hâlinde sınar. `npm run test:browser -- --only defter` tek adımı çalıştırır. Gerekirse tarayıcı yolu `CHROME_BIN` ile verilebilir.
 
 Testlerin haricî npm bağımlılığı yoktur; `npm ci` yalnız ESLint'i kurar.
 
 ## Yapı
 
 - `index.html`: semantik sayfa yapısı ve şablonlar
-- `styles/`: görsel sistem; belirteçler (`tokens.css`), temel, üst çubuk, düğmeler ve ekran başına birer dosya, `responsive.css` kırılımlar
+- `styles/`: görsel sistem; belirteçler (`tokens.css`), temel, üst çubuk, düğmeler ve ekran başına birer dosya. Kırılımlar ilgili dosyanın sonundadır
 - `app.js`: bileşim kökü; modülleri kurar, gezinmeyi ve sekmeler arası eşitlemeyi bağlar
 - `core.js`: saf, test edilebilir oturum ve istatistik işlevleri (DOM yok)
 - `questions.js`: soru bankasının tek giriş noktası; yüklenirken bankayı doğrular
 - `ui/`: ekran modülleri. Her ekran kendi olaylarını `install*` ile bağlar; `state.js` tek gerçek kaynaktır, DOM onu yansıtır
-  - `home.js` kurulum akışı, `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
+  - `home.js` kurulum akışı (saf mantığı `setup.js`), `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
   - `session.js` oturum yaşam döngüsü denetleyicisi, `session-store.js` ve `notebook.js` kalıcılık, `local-storage.js` güvenli depolama sarmalayıcısı
   - `dom.js`, `screens.js`, `keyboard.js`, `theme.js`, `tips.js`, `search.js`, `helpers.js`, `constants.js`
 - `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları, dört düzeyin çekirdek verileri ve `konu-havuzu.js` ek soru havuzu

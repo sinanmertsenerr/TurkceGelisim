@@ -244,3 +244,17 @@
   font-size: 0.84rem;
   line-height: 1.5;
 }
+
+/* ---- Dar ekran ---- */
+
+@media (max-width: 780px) {
+  .result-actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-breakdown {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

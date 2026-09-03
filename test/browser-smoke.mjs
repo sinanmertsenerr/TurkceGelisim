@@ -1,5 +1,6 @@
-// Gerçek Chrome ile uçtan uca duman testi. Adımlar sırayla çalışır ve önceki
-// adımın bıraktığı durumu kullanır; bir adım kırılınca hata adım adıyla raporlanır.
+// Gerçek Chrome ile uçtan uca duman testi. Her adım uygulamayı temiz depolama
+// ile baştan açar ve kendi ön koşulunu kurar; adımlar birbirinden bağımsızdır.
+// Tek adım: `node test/browser-smoke.mjs --only defter`
 import assert from "node:assert/strict";
 
 import { QUESTIONS, QUESTIONS_BY_LEVEL } from "../questions.js";
@@ -9,6 +10,9 @@ const NOTEBOOK_KEY = "turkce-gelisim:yanlis-defteri:v1";
 const SESSION_KEY = "turkce-gelisim:oturum:v2";
 const NOTEBOOK_COUNT = `Object.keys(JSON.parse(localStorage.getItem(${JSON.stringify(NOTEBOOK_KEY)}) ?? '{"entries":{}}').entries).length`;
 const OVERFLOW = "document.documentElement.scrollWidth - window.innerWidth";
+const HOME_READY = 'document.querySelectorAll(".mode-card").length === 3 && !document.querySelector("#step-mode").hidden';
+const QUIZ_VISIBLE = '!document.querySelector("#screen-quiz").hidden';
+const HOME_VISIBLE = '!document.querySelector("#screen-home").hidden';
 
 // Sonuç ekranına kadar her soruda ilk açık seçeneği işaretleyip ilerler.
 const PLAY_THROUGH = `(async () => {
@@ -38,12 +42,30 @@ const PLAY_THROUGH = `(async () => {
   };
 })()`;
 
+// ---- Ortak ön koşullar ----------------------------------------------------
+
+const openFresh = (page) => page.open({ clearStorage: true, readyExpression: HOME_READY });
+
+async function startMixedSession(page, level = "kolay") {
+  await page.click("[data-mode=karma]");
+  await page.waitFor('!document.querySelector("#step-session").hidden', "karma oturum adımı");
+  await page.click(`[data-level=${level}]`);
+  await page.click("#startSessionButton");
+  await page.waitFor(`${QUIZ_VISIBLE} && document.querySelectorAll(".choice-button").length === 3`, "quiz başlangıcı");
+}
+
+async function answerFirstChoice(page) {
+  await page.click(".choice-button");
+  await page.waitFor('document.querySelector("#answeredCount").textContent === "1"', "ilk cevap");
+}
+
+// ---- Adımlar --------------------------------------------------------------
+
 const steps = [];
 const step = (name, run) => steps.push({ name, run });
-const shared = {};
 
 step("Ana sayfa: adımlı kurulum, metrikler, mobil taşma", async ({ page }) => {
-  await page.waitFor('document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 3 && !document.querySelector("#step-mode").hidden', "ana sayfa yüklemesi");
+  await openFresh(page);
   await page.screenshot("01-mobile-home");
   assert.equal(await page.isHidden("#step-session"), true, "İlk adımda oturum ayarları gizli olmalı.");
   assert.equal(await page.count("#stepSummary .summary-chip"), 0, "İlk adımda geri çipi olmamalı.");
@@ -64,13 +86,13 @@ step("Ana sayfa: adımlı kurulum, metrikler, mobil taşma", async ({ page }) =>
   assert.match(home.metrics, new RegExp(`${QUESTIONS.length} soru`));
   assert.ok(home.overflow <= 0, `Ana sayfada ${home.overflow}px yatay taşma var.`);
   assert.equal(home.unnamedButtons, 0);
+  await page.click("[data-level=kolay]");
+  assert.equal(await page.attr("[data-level=kolay]", "aria-checked"), "true");
 });
 
 step("Quiz: canlı sayaç, TDK kaynağı, seçenek kilidi", async ({ page }) => {
-  await page.click("[data-level=kolay]");
-  assert.equal(await page.attr("[data-level=kolay]", "aria-checked"), "true");
-  await page.click("#startSessionButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden && document.querySelectorAll(".choice-button").length === 3', "quiz başlangıcı");
+  await openFresh(page);
+  await startMixedSession(page);
   await page.screenshot("02-mobile-quiz");
 
   const fresh = await page.evaluate(`(() => ({
@@ -83,16 +105,13 @@ step("Quiz: canlı sayaç, TDK kaynağı, seçenek kilidi", async ({ page }) => 
   }))()`);
   assert.deepEqual(fresh, { answered: "0", correct: "0", wrong: "0", total: 20, statusPresent: true, overflow: 0 });
 
-  await page.click(".choice-button");
-  await page.waitFor('document.querySelector("#answeredCount").textContent === "1"', "canlı sayaç güncellemesi");
+  await answerFirstChoice(page);
   const answered = await page.evaluate(`(() => ({
-    answered: Number(document.querySelector("#answeredCount").textContent),
     sum: Number(document.querySelector("#correctCount").textContent) + Number(document.querySelector("#wrongCount").textContent),
     feedback: document.querySelector("#feedbackTitle").textContent,
     source: document.querySelector("#feedbackSource").href,
     disabledChoices: document.querySelectorAll(".choice-button:disabled").length
   }))()`);
-  assert.equal(answered.answered, 1);
   assert.equal(answered.sum, 1);
   assert.match(answered.feedback, /^(Doğru|Yanlış)/);
   assert.match(answered.source, /^https:\/\/tdk\.gov\.tr\//);
@@ -100,17 +119,21 @@ step("Quiz: canlı sayaç, TDK kaynağı, seçenek kilidi", async ({ page }) => 
 });
 
 step("Devam: kaydet ve çık, yenileme sonrası geri yükleme", async ({ page }) => {
+  await openFresh(page);
+  await startMixedSession(page);
+  await answerFirstChoice(page);
   await page.click("#saveAndExitButton");
   await page.waitFor('!document.querySelector("#resumePanel").hidden', "devam kartı");
   await page.reload('!document.querySelector("#resumePanel").hidden', "yenileme sonrası devam kaydı");
   await page.click("#resumeButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden && document.querySelector("#answeredCount").textContent === "1"', "oturum geri yükleme");
+  await page.waitFor(`${QUIZ_VISIBLE} && document.querySelector("#answeredCount").textContent === "1"`, "oturum geri yükleme");
   assert.equal(await page.count(".choice-button:disabled"), 3);
   await page.click("#nextQuestionButton");
   await page.waitFor('document.querySelector("#questionCounter").textContent === "Soru 2 / 20"', "ikinci soru");
 });
 
 step("Kural bankası: liste, detay, filtre, arama", async ({ page }) => {
+  await openFresh(page);
   await page.click("#navLibrary");
   await page.waitFor('!document.querySelector("#screen-library").hidden && document.querySelectorAll(".library-card").length === 24', "kural bankası");
   await page.screenshot("03-mobile-library");
@@ -145,15 +168,12 @@ step("Kural bankası: liste, detay, filtre, arama", async ({ page }) => {
   await page.setValue("#librarySearch", "de", "input");
   const searched = await page.count(".library-card");
   assert.ok(searched > 0 && searched < 40, `"de" araması ${searched} kart gösterdi.`);
-  await page.setValue("#librarySearch", "", "input");
 });
 
-step("Sonuç: tamamlama, konu çubukları, yanlış tekrarı", async ({ page }) => {
-  await page.click("#navPractice");
-  await page.click("#resumeButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden', "quiz dönüşü");
+step("Sonuç: tamamlama, konu çubukları, yanlış tekrarı, ana sayfaya dönüş", async ({ page }) => {
+  await openFresh(page);
+  await startMixedSession(page);
   const completion = await page.evaluate(PLAY_THROUGH);
-  shared.completion = completion;
   assert.equal(completion.resultVisible, true);
   assert.equal(completion.total, 20);
   assert.equal(completion.correct + completion.wrong, 20);
@@ -162,21 +182,24 @@ step("Sonuç: tamamlama, konu çubukları, yanlış tekrarı", async ({ page }) 
   assert.equal(completion.savedSession, null);
   await page.screenshot("04-mobile-result");
 
-  if (completion.wrong === 0) return;
-  await page.click("#retryWrongButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden', "yanlış tekrar oturumu");
-  assert.match(await page.text("#questionLevel"), /Yanlış tekrarı/);
-  assert.equal(await page.prop("#quizProgress", "max"), completion.wrong);
+  if (completion.wrong > 0) {
+    await page.click("#retryWrongButton");
+    await page.waitFor(QUIZ_VISIBLE, "yanlış tekrar oturumu");
+    assert.match(await page.text("#questionLevel"), /Yanlış tekrarı/);
+    assert.equal(await page.prop("#quizProgress", "max"), completion.wrong);
+    await page.evaluate(PLAY_THROUGH);
+  }
+
+  await page.click("#resultHomeButton");
+  await page.waitFor(HOME_VISIBLE, "sonuçtan ana sayfaya dönüş");
+  assert.equal(await page.isHidden("#step-session"), false, "Oturum kurulduktan sonra ana sayfa son adımda açılmalı.");
+  assert.equal(await page.count("#stepSummary .summary-chip"), 1);
+  await page.click("#stepSummary .summary-chip[data-step=mode]");
+  await page.waitFor('!document.querySelector("#step-mode").hidden', "özetten biçim adımına dönüş");
 });
 
 step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }) => {
-  await page.click("#resultHomeButton");
-  await page.waitFor('!document.querySelector("#screen-home").hidden', "sonuçtan ana sayfaya dönüş");
-  assert.equal(await page.isHidden("#step-session"), false, "Oturum kurulduktan sonra ana sayfa son adımda açılmalı.");
-  assert.equal(await page.count("#stepSummary .summary-chip"), 1);
-
-  await page.click("#stepSummary .summary-chip[data-step=mode]");
-  await page.waitFor('!document.querySelector("#step-mode").hidden', "özetten biçim adımına dönüş");
+  await openFresh(page);
   await page.click("[data-mode=konu]");
   await page.waitFor('!document.querySelector("#step-topic").hidden && document.querySelectorAll(".topic-card").length >= 10', "konu adımı");
   assert.equal(await page.text("#homeEyebrow"), "Konu odaklı");
@@ -190,11 +213,9 @@ step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }
   await page.waitFor('!document.querySelector("#step-session").hidden && document.querySelectorAll("#stepSummary .summary-chip").length === 2', "konu sonrası oturum adımı");
   assert.equal(await page.attr("[data-level=tum]", "aria-checked"), "true", "Konu moduna geçince Tüm düzeyler seçili gelmeli.");
   assert.equal(await page.text("#homeEyebrow"), "Konu odaklı · da/de yazımı");
-  await page.click("[data-level=tum]");
   await page.screenshot("05-mobile-topic-mode");
   const topicHome = await page.evaluate(`(() => ({
     topicChecked: document.querySelector("[data-topic=da-de]").getAttribute("aria-checked"),
-    levelChecked: document.querySelector("[data-level=tum]").getAttribute("aria-checked"),
     allLevelsVisible: !document.querySelector("[data-level=tum]").hidden,
     zorDisabled: document.querySelector("[data-level=zor]").getAttribute("aria-disabled"),
     hundredDisabled: document.querySelector('input[name="session-size"][value="100"]').disabled,
@@ -203,7 +224,6 @@ step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }
     overflow: ${OVERFLOW}
   }))()`);
   assert.equal(topicHome.topicChecked, "true");
-  assert.equal(topicHome.levelChecked, "true");
   assert.equal(topicHome.allLevelsVisible, true);
   assert.equal(topicHome.zorDisabled, "false");
   assert.equal(topicHome.hundredDisabled, true, "100 sorudan küçük konuda 100 seçeneği kapalı olmalı.");
@@ -213,7 +233,7 @@ step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }
 
   await page.click('input[name="session-size"][value="20"]');
   await page.click("#startSessionButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden && document.querySelector("#quizProgress").max === 20', "konu oturumu başlangıcı");
+  await page.waitFor(`${QUIZ_VISIBLE} && document.querySelector("#quizProgress").max === 20`, "konu oturumu başlangıcı");
   const topicRun = await page.evaluate(PLAY_THROUGH);
   assert.equal(topicRun.total, 20);
   assert.ok(topicRun.topics.every((topic) => ["Bağlaç olan da/de", "Bulunma durumu eki"].includes(topic)), `Konu dışı soru geldi: ${topicRun.topics.join(", ")}`);
@@ -222,8 +242,8 @@ step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }
   assert.match(topicRun.nextStep, /da\/de yazımı/);
 
   await page.click("#newSessionButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden', "konu modunda yeni oturum");
-  await page.click(".choice-button");
+  await page.waitFor(QUIZ_VISIBLE, "konu modunda yeni oturum");
+  await answerFirstChoice(page);
   await page.click("#saveAndExitButton");
   await page.waitFor('!document.querySelector("#resumePanel").hidden', "konu oturumu devam kartı");
   await page.reload('!document.querySelector("#resumePanel").hidden', "yenileme sonrası konu oturumu");
@@ -233,9 +253,16 @@ step("Konu odaklı: da/de havuzu, tüm düzeyler, devam kaydı", async ({ page }
 });
 
 step("Yanlış defteri: birikim, defter oturumu, yenileme sonrası kalıcılık", async ({ page }) => {
-  // Yenileme sonrası ana sayfa zaten biçim adımındadır; çip yalnız varsa tıklanır.
-  await page.evaluate('document.querySelector("#stepSummary .summary-chip[data-step=mode]")?.click()');
+  await openFresh(page);
+  assert.equal(await page.attr("[data-mode=defter]", "aria-disabled"), "true", "Boş defter seçilemez.");
+  await startMixedSession(page);
+  const seed = await page.evaluate(PLAY_THROUGH);
+  assert.equal(seed.notebookRemaining, seed.wrong, "Her yanlış deftere düşmeli.");
+  await page.click("#resultHomeButton");
+  await page.waitFor(HOME_VISIBLE, "sonuçtan ana sayfa");
+  await page.click("#stepSummary .summary-chip[data-step=mode]");
   await page.waitFor('!document.querySelector("#step-mode").hidden', "defter için biçim adımı");
+
   const notebookHome = await page.evaluate(`(() => {
     const card = document.querySelector("[data-mode=defter]");
     return {
@@ -246,11 +273,13 @@ step("Yanlış defteri: birikim, defter oturumu, yenileme sonrası kalıcılık"
       heroTitleVisible: getComputedStyle(document.querySelector("#homeHero h1")).display !== "none"
     };
   })()`);
-  shared.notebookHome = notebookHome;
   assert.equal(notebookHome.heroCompact, false, "Biçim adımında hero başlığı görünmeli.");
   assert.equal(notebookHome.heroTitleVisible, true);
   assert.equal(notebookHome.disabled, String(notebookHome.count === 0));
-  if (notebookHome.count === 0) return;
+  if (notebookHome.count === 0) {
+    console.warn("  ! Rastgele oturumda hiç yanlış çıkmadı; defter adımı atlandı.");
+    return;
+  }
 
   assert.match(notebookHome.hint, new RegExp(`^${notebookHome.count} soru`));
   await page.click("[data-mode=defter]");
@@ -270,27 +299,28 @@ step("Yanlış defteri: birikim, defter oturumu, yenileme sonrası kalıcılık"
   await page.screenshot("06-mobile-notebook-step");
 
   await page.click("#startSessionButton");
-  await page.waitFor('!document.querySelector("#screen-quiz").hidden', "defter oturumu");
+  await page.waitFor(QUIZ_VISIBLE, "defter oturumu");
   assert.match(await page.text("#questionLevel"), /Yanlış defteri/);
-  const total = await page.prop("#quizProgress", "max");
-  assert.ok(total <= notebookHome.count, "Defter oturumu defterden büyük olamaz.");
+  assert.ok(await page.prop("#quizProgress", "max") <= notebookHome.count, "Defter oturumu defterden büyük olamaz.");
   const notebookRun = await page.evaluate(PLAY_THROUGH);
-  shared.notebookRun = notebookRun;
   assert.match(notebookRun.message, /^Yanlış defterinden \d+ soruluk/);
   assert.match(notebookRun.nextStep, /defterden çıktı/);
   assert.equal(notebookRun.newSessionHidden, notebookRun.notebookRemaining === 0);
   await page.screenshot("07-mobile-notebook-result");
 
   await page.click("#resultHomeButton");
-  await page.waitFor('!document.querySelector("#screen-home").hidden', "defter sonucundan ana sayfa");
-  await page.reload('document.querySelectorAll(".mode-card").length === 3', "yenileme sonrası defter kartı");
+  await page.waitFor(HOME_VISIBLE, "defter sonucundan ana sayfa");
+  await page.reload(HOME_READY, "yenileme sonrası defter kartı");
   assert.equal(await page.attr("[data-mode=defter]", "aria-disabled"), String(notebookRun.notebookRemaining === 0));
   if (notebookRun.notebookRemaining > 0) {
     assert.match(await page.text("[data-mode=defter] .badge-sub"), new RegExp(`^${notebookRun.notebookRemaining} soru`));
   }
 });
 
-step("Erişilebilirlik: ≥44px hedefler, tarayıcı hatası yok", async ({ page, browserErrors }) => {
+step("Erişilebilirlik: görünür hedefler en az 44px", async ({ page }) => {
+  await openFresh(page);
+  await page.click("[data-mode=karma]");
+  await page.waitFor('!document.querySelector("#step-session").hidden', "oturum adımı");
   const targetSizes = await page.evaluate(`[...document.querySelectorAll("button, a, input, select")]
     .filter((element) => {
       const style = getComputedStyle(element);
@@ -299,13 +329,24 @@ step("Erişilebilirlik: ≥44px hedefler, tarayıcı hatası yok", async ({ page
     })
     .map((element) => element.getBoundingClientRect().height)`);
   assert.ok(Math.min(...targetSizes) >= 44, `En küçük görünür etkileşim hedefi ${Math.min(...targetSizes)}px.`);
-  assert.deepEqual(browserErrors, []);
 });
 
+// ---- Çalıştırıcı ----------------------------------------------------------
+
+function selectedSteps(argv) {
+  const index = argv.indexOf("--only");
+  if (index === -1) return steps;
+  const needle = (argv[index + 1] ?? "").toLocaleLowerCase("tr");
+  const matched = steps.filter(({ name }) => name.toLocaleLowerCase("tr").includes(needle));
+  if (!matched.length) throw new Error(`"--only ${needle}" hiçbir adımla eşleşmedi.`);
+  return matched;
+}
+
 async function run() {
+  const chosen = selectedSteps(process.argv.slice(2));
   const browser = await launchBrowser();
   try {
-    for (const { name, run: runStep } of steps) {
+    for (const { name, run: runStep } of chosen) {
       try {
         await runStep(browser);
         console.log(`✓ ${name}`);
@@ -314,8 +355,8 @@ async function run() {
         throw error;
       }
     }
-    const { completion, notebookHome } = shared;
-    console.log(`  ${QUESTIONS.length} soru, ${completion.correct} doğru + ${completion.wrong} yanlış, defterde ${notebookHome.count} soru`);
+    assert.deepEqual(browser.browserErrors, [], "Tarayıcı konsolunda hata olmamalı.");
+    console.log(`  ${chosen.length}/${steps.length} adım, ${QUESTIONS.length} soru, tarayıcı hatası yok`);
   } finally {
     await browser.close();
   }

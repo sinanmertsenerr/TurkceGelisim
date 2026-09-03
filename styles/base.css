@@ -132,3 +132,26 @@ kbd {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* ---- Erişilebilirlik tercihleri ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .nav-tab[aria-pressed="true"],
+  .choice-btn.selected,
+  .choice-btn:has(input:checked),
+  .choice-button.is-correct,
+  .choice-button.is-wrong {
+    border: 3px solid CanvasText;
+  }
+}

@@ -1,6 +1,7 @@
 import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { ALL_LEVELS_ID, QUESTIONS_BY_LEVEL, questionsForStudy } from "../questions.js";
-import { applySessionSetup, goToStep, setupLevel, setupTopic, updateResumePanel } from "./home.js";
+import { applySessionSetup, goToStep, renderHome, updateResumePanel } from "./home.js";
+import { setupLevel, setupTopic } from "./setup.js";
 import { renderLibrary } from "./library.js";
 import { notebookQuestions } from "./notebook.js";
 import { createQuizView } from "./quiz.js";
@@ -65,7 +66,7 @@ export function createSessionController(elements) {
   function startFromSetup() {
     const { mode, size } = state.setup;
     if (mode === "defter") startNotebookSession(size);
-    else startNewSession(setupLevel(), size, setupTopic());
+    else startNewSession(setupLevel(state.setup), size, setupTopic(state.setup));
   }
 
   function resumeSession() {
@@ -111,10 +112,12 @@ export function createSessionController(elements) {
   }
 
   // Bir oturum kurulduysa ana sayfa doğrudan son adımda açılır; seçimler
-  // özet çipleriyle görünür ve oradan geri dönülebilir.
+  // özet çipleriyle görünür ve oradan geri dönülebilir. Defter oturum
+  // sırasında değiştiği için kurulum yeniden çizilir.
   function showHome() {
     saveActiveForResume();
     updateResumePanel(elements);
+    renderHome(elements);
     showScreen(elements, "home");
     goToStep(elements, state.homeConfigured ? "session" : "mode", { push: false, focus: false });
   }

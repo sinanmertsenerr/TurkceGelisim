@@ -1,8 +1,8 @@
 import { countResponses } from "../core.js";
-import { ALL_LEVELS_ID, LEVELS, QUESTIONS_BY_LEVEL, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyPoolSize } from "../questions.js";
-import { SESSION_SIZES } from "./constants.js";
+import { ALL_LEVELS_ID, LEVELS, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyPoolSize } from "../questions.js";
 import { LEVEL_BY_ID } from "./helpers.js";
 import { notebookSize } from "./notebook.js";
+import { homeSteps, isSizeSelectable, normalizeSetup, poolSizeFor, setupFromSession, setupLevel, setupTopic } from "./setup.js";
 import { state } from "./state.js";
 
 // Konu odaklı oturumda dört düzey birlikte de çalışılabilir; bu sanal düzey
@@ -16,45 +16,7 @@ export const ALL_LEVELS_CARD = Object.freeze({
 const LEVEL_CARDS = [...LEVELS, ALL_LEVELS_CARD];
 const levelMeta = (levelId) => (levelId === ALL_LEVELS_ID ? ALL_LEVELS_CARD : LEVEL_BY_ID.get(levelId));
 
-// ---- Kurulum durumu: okuma ------------------------------------------------
-
-// Oturumun düzeyi: karma modda düzey, konu modunda konu düzeyi, defterde tüm düzeyler.
-export function setupLevel() {
-  const { mode, level, topicLevel } = state.setup;
-  if (mode === "konu") return topicLevel;
-  if (mode === "defter") return ALL_LEVELS_ID;
-  return level;
-}
-
-export function setupTopic() {
-  return state.setup.mode === "konu" ? state.setup.topic : null;
-}
-
-// Seçime göre havuzdaki soru sayısı: karma modda düzeyin tamamı, konu modunda
-// konu × düzey kesişimi, defterde biriken yanlışlar.
-export function availablePoolSize() {
-  const { mode, level, topic, topicLevel } = state.setup;
-  if (mode === "defter") return notebookSize();
-  if (mode === "konu") return studyPoolSize(topic, topicLevel);
-  return QUESTIONS_BY_LEVEL[level].length;
-}
-
-// En küçük seçenek her zaman açık kalır ki küçük konular da tek tuşla başlatılabilsin.
-const isSizeSelectable = (size, pool) => size === SESSION_SIZES[0] || size <= pool;
-const largestSelectableSize = (pool) => [...SESSION_SIZES].reverse().find((size) => isSizeSelectable(size, pool));
-const nearestSessionSize = (size) => SESSION_SIZES.find((option) => option >= size) ?? SESSION_SIZES.at(-1);
-
-// Geçersiz kombinasyonları düzeltir: boş defter, bilinmeyen konu/düzey, konuda
-// sorusu olmayan düzey, havuzu aşan soru adedi.
-function normalizeSetup() {
-  const { setup } = state;
-  if (setup.mode === "defter" && notebookSize() === 0) setup.mode = "karma";
-  if (!STUDY_TOPIC_BY_ID.has(setup.topic)) setup.topic = STUDY_TOPICS[0].id;
-  if (!LEVEL_BY_ID.has(setup.level)) setup.level = LEVELS[0].id;
-  if (setup.topicLevel !== ALL_LEVELS_ID && studyPoolSize(setup.topic, setup.topicLevel) === 0) setup.topicLevel = ALL_LEVELS_ID;
-  if (!SESSION_SIZES.includes(setup.size)) setup.size = nearestSessionSize(setup.size);
-  if (!isSizeSelectable(setup.size, availablePoolSize())) setup.size = largestSelectableSize(availablePoolSize());
-}
+const availablePoolSize = () => poolSizeFor(state.setup, notebookSize());
 
 // ---- Kurulum durumu: yazma ------------------------------------------------
 
@@ -81,17 +43,14 @@ export function selectSize(elements, size) {
 
 // Ana sayfa seçimini bir oturumun ayarlarına getirir (başlatma, devam, sonuç sonrası).
 export function applySessionSetup(elements, session) {
-  const size = session.requestedSize;
-  if (session.mode === "notebook") Object.assign(state.setup, { mode: "defter", size });
-  else if (session.topic) Object.assign(state.setup, { mode: "konu", topic: session.topic, topicLevel: session.level, size });
-  else Object.assign(state.setup, { mode: "karma", level: session.level, size });
+  Object.assign(state.setup, setupFromSession(session));
   renderHome(elements);
 }
 
 // ---- Yansıtma: state.setup → DOM -----------------------------------------
 
 export function renderHome(elements) {
-  normalizeSetup();
+  state.setup = normalizeSetup(state.setup, notebookSize());
   renderNotebookCard(elements);
   reflectRadioCards(elements.modePicker.querySelectorAll(".mode-card"), (card) => card.dataset.mode === state.setup.mode);
   renderLevelCards(elements);
@@ -146,7 +105,7 @@ function renderLevelCards(elements) {
     card.setAttribute("aria-label", topicMode ? `${meta.label}: ${count} soru` : `${meta.label}: ${meta.description}`);
     setDisabled(card, topicMode && count === 0);
   }
-  reflectRadioCards(cards, (card) => card.dataset.level === setupLevel());
+  reflectRadioCards(cards, (card) => card.dataset.level === setupLevel(state.setup));
 
   elements.levelHint.textContent = topicMode
     ? "Konudaki sorular düzeylere göre dağılır. Sayılar bu konudaki soru adedini gösterir."
@@ -187,12 +146,7 @@ function renderEstimate(elements) {
 }
 
 // ---- Adımlı kurulum -------------------------------------------------------
-// Karma ve defter modunda iki adım (biçim → oturum), konu modunda üç adım
-// (biçim → konu → oturum). Tarayıcı geri tuşu adımı geri alır.
-
-export function homeSteps() {
-  return state.setup.mode === "konu" ? ["mode", "topic", "session"] : ["mode", "session"];
-}
+// Tarayıcı geri tuşu adımı geri alır (installStepHistory).
 
 // Üst satırdaki çipler hem seçimi özetler hem de ilgili adıma geri götürür;
 // ayrı bir geri düğmesi yoktur. Seçilen biçim hero'daki üst yazıya işlenir.
@@ -206,7 +160,7 @@ function renderStepSummary(elements) {
     button.addEventListener("click", () => goToStep(elements, step));
     return button;
   };
-  const topic = setupTopic();
+  const topic = setupTopic(state.setup);
   const chips = [];
   if (state.homeStep !== "mode") chips.push(chip("Biçimi değiştir", "mode"));
   if (state.homeStep === "session" && topic) chips.push(chip("Konuyu değiştir", "topic"));
@@ -222,7 +176,7 @@ function eyebrowText(topic) {
 }
 
 export function goToStep(elements, step, { push = true, focus = true } = {}) {
-  const steps = homeSteps();
+  const steps = homeSteps(state.setup);
   const target = steps.includes(step) ? step : steps[0];
   const position = steps.indexOf(target);
   state.homeStep = target;
@@ -254,7 +208,7 @@ export function goToStep(elements, step, { push = true, focus = true } = {}) {
 }
 
 function goToNextStep(elements) {
-  const steps = homeSteps();
+  const steps = homeSteps(state.setup);
   goToStep(elements, steps[Math.min(steps.indexOf(state.homeStep) + 1, steps.length - 1)]);
 }
 

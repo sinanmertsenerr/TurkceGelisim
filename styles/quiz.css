@@ -364,3 +364,32 @@ progress::-moz-progress-bar {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* ---- Dar ekran ---- */
+
+@media (max-width: 780px) {
+  .keyboard-hint {
+    display: none;
+  }
+
+  .choice-button:not(:disabled):hover {
+    transform: none;
+  }
+
+  .feedback-head .next-button {
+    width: 100%;
+    min-height: 50px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .quiz-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .back-button {
+    align-self: flex-start;
+  }
+}

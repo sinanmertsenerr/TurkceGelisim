@@ -173,10 +173,17 @@ function chromeArguments(profileDirectory) {
 }
 
 /** Sayfa sürücüsü: sık kullanılan DOM işlemlerini tek satırlık çağrılara indirger. */
-export function createPage(client) {
+export function createPage(client, origin) {
   const selectorLiteral = (selector) => JSON.stringify(selector);
   const page = {
     client,
+    // Uygulamayı baştan açar; clearStorage ile önceki adımın kayıtları silinir.
+    // Eski belgeye işaret bırakılır ki bekleme yeni belgeyi görene kadar sürsün.
+    async open({ clearStorage = false, readyExpression = "true" } = {}) {
+      await client.evaluate(`(() => { ${clearStorage ? "localStorage.clear();" : ""} window.__smokeStale = true; })()`);
+      await client.send("Page.navigate", { url: origin });
+      await page.waitFor(`!window.__smokeStale && document.readyState === "complete" && (${readyExpression})`, "sayfa açılışı");
+    },
     evaluate: (expression) => client.evaluate(expression),
     click: (selector) => client.evaluate(`document.querySelector(${selectorLiteral(selector)}).click()`),
     text: (selector) => client.evaluate(`document.querySelector(${selectorLiteral(selector)}).textContent.trim()`),
@@ -250,10 +257,11 @@ export async function launchBrowser({ width = 390, height = 844 } = {}) {
     await client.send("Page.enable");
     await client.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
     await client.send("Page.navigate", { url: origin });
+    await createPage(client, origin).waitFor('document.readyState === "complete"', "ilk yükleme");
   } catch (error) {
     await close();
     throw error;
   }
 
-  return { page: createPage(client), browserErrors, close };
+  return { page: createPage(client, origin), browserErrors, close };
 }
