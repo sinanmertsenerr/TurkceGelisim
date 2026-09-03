@@ -60,41 +60,61 @@
             </div>
           </section>
 
-          <section class="selection-group" aria-labelledby="modeTitle">
-            <h2 class="selection-label" id="modeTitle">Çalışma biçimi</h2>
-            <p class="selection-hint" id="modeHint">Karma oturumda konular dengeli karışır; konu odaklı oturumda tek bir kuralda derinleşirsin.</p>
-            <fieldset class="choice-grid mode-picker" id="modePicker">
-              <legend class="visually-hidden">Çalışma biçimi</legend>
-              <label class="choice-btn"><input type="radio" name="study-mode" value="karma" checked><span>Karma çalışma</span><span class="badge-sub">Tüm konular karışık</span></label>
-              <label class="choice-btn"><input type="radio" name="study-mode" value="konu"><span>Konu odaklı</span><span class="badge-sub">Tek kuralda uzmanlaş</span></label>
-            </fieldset>
-          </section>
+          <div class="setup-steps" id="setupSteps">
+            <div class="step-nav">
+              <button class="btn btn-subtle step-back" id="stepBackButton" type="button" hidden>← Geri</button>
+              <ol class="step-indicator" id="stepIndicator" aria-label="Kurulum adımları">
+                <li data-step="mode"><span class="step-num">1</span><span class="step-name">Biçim</span></li>
+                <li data-step="topic"><span class="step-num">2</span><span class="step-name">Konu</span></li>
+                <li data-step="session"><span class="step-num">3</span><span class="step-name">Oturum</span></li>
+              </ol>
+            </div>
 
-          <section class="selection-group" id="topicSection" aria-labelledby="topicsTitle" hidden>
-            <h2 class="selection-label" id="topicsTitle">Çalışma konusu</h2>
-            <p class="selection-hint" id="topicHint">Bir kural seç. Her kartta o kuralın bankadaki toplam soru adedi görünür.</p>
-            <div class="choice-grid topic-grid" id="topicGrid" role="radiogroup" aria-labelledby="topicsTitle"></div>
-          </section>
+            <section class="selection-group setup-step" id="step-mode" data-step="mode" aria-labelledby="modeTitle">
+              <h2 class="selection-label" id="modeTitle" tabindex="-1">Nasıl çalışmak istersin?</h2>
+              <p class="selection-hint" id="modeHint">Karma oturumda konular dengeli karışır; konu odaklı oturumda tek bir kuralda derinleşirsin.</p>
+              <div class="choice-grid mode-picker" id="modePicker" role="radiogroup" aria-labelledby="modeTitle">
+                <button class="mode-card choice-btn" type="button" role="radio" aria-checked="true" data-mode="karma">
+                  <span class="mode-card-name">Karma çalışma</span>
+                  <span class="badge-sub">Bir düzeyin tüm konuları dengeli karışık gelir</span>
+                </button>
+                <button class="mode-card choice-btn" type="button" role="radio" aria-checked="false" data-mode="konu">
+                  <span class="mode-card-name">Konu odaklı</span>
+                  <span class="badge-sub">da/de, ki, noktalama gibi tek bir kuralda uzmanlaş</span>
+                </button>
+              </div>
+            </section>
 
-          <section class="selection-group" aria-labelledby="levelsTitle">
-            <h2 class="selection-label" id="levelsTitle">Zorluk düzeyi</h2>
-            <p class="selection-hint" id="levelHint">Çalışmak istediğin derinliği seç. Her düzeyde 100 soru var.</p>
-            <div class="choice-grid level-grid" id="levelGrid" role="radiogroup" aria-labelledby="levelsTitle"></div>
-          </section>
+            <section class="selection-group setup-step" id="step-topic" data-step="topic" aria-labelledby="topicsTitle" hidden>
+              <h2 class="selection-label" id="topicsTitle" tabindex="-1">Hangi kuralı çalışacaksın?</h2>
+              <p class="selection-hint" id="topicHint">Bir kural seç. Her kartta o kuralın bankadaki toplam soru adedi görünür.</p>
+              <div class="choice-grid topic-grid" id="topicGrid" role="radiogroup" aria-labelledby="topicsTitle"></div>
+            </section>
 
-          <section class="selection-group" aria-labelledby="sizeTitle">
-            <h2 class="selection-label" id="sizeTitle">Soru adedi</h2>
-            <p class="selection-hint" id="sessionEstimate">Yaklaşık 12 dakika sürer. İstediğin an kaydedip çıkabilirsin.</p>
-            <fieldset class="choice-grid session-picker" id="sessionPicker">
-              <legend class="visually-hidden">Soru sayısı</legend>
-              <label class="choice-btn"><input type="radio" name="session-size" value="10"><span>10 soru</span><span class="badge-sub">Hızlı pratik</span></label>
-              <label class="choice-btn"><input type="radio" name="session-size" value="20" checked><span>20 soru</span><span class="badge-sub">Dengeli</span></label>
-              <label class="choice-btn"><input type="radio" name="session-size" value="50"><span>50 soru</span><span class="badge-sub">Yoğunlaşma</span></label>
-              <label class="choice-btn"><input type="radio" name="session-size" value="100"><span>100 soru</span><span class="badge-sub">Tam kapsam</span></label>
-            </fieldset>
-          </section>
+            <section class="setup-step" id="step-session" data-step="session" hidden>
+              <p class="step-summary" id="stepSummary" aria-label="Seçimlerin"></p>
 
-          <button class="btn btn-accent btn-start" id="startSessionButton" type="button">Oturumu başlat</button>
+              <section class="selection-group" aria-labelledby="levelsTitle">
+                <h2 class="selection-label" id="levelsTitle" tabindex="-1">Zorluk düzeyi</h2>
+                <p class="selection-hint" id="levelHint">Çalışmak istediğin derinliği seç. Her düzeyde 100 soru var.</p>
+                <div class="choice-grid level-grid" id="levelGrid" role="radiogroup" aria-labelledby="levelsTitle"></div>
+              </section>
+
+              <section class="selection-group" aria-labelledby="sizeTitle">
+                <h2 class="selection-label" id="sizeTitle">Soru adedi</h2>
+                <p class="selection-hint" id="sessionEstimate">Yaklaşık 12 dakika sürer. İstediğin an kaydedip çıkabilirsin.</p>
+                <fieldset class="choice-grid session-picker" id="sessionPicker">
+                  <legend class="visually-hidden">Soru sayısı</legend>
+                  <label class="choice-btn"><input type="radio" name="session-size" value="10"><span>10 soru</span><span class="badge-sub">Hızlı pratik</span></label>
+                  <label class="choice-btn"><input type="radio" name="session-size" value="20" checked><span>20 soru</span><span class="badge-sub">Dengeli</span></label>
+                  <label class="choice-btn"><input type="radio" name="session-size" value="50"><span>50 soru</span><span class="badge-sub">Yoğunlaşma</span></label>
+                  <label class="choice-btn"><input type="radio" name="session-size" value="100"><span>100 soru</span><span class="badge-sub">Tam kapsam</span></label>
+                </fieldset>
+              </section>
+
+              <button class="btn btn-accent btn-start" id="startSessionButton" type="button">Oturumu başlat</button>
+            </section>
+          </div>
 
           <div class="hero-metrics" aria-label="Soru bankası özeti">
             <div><strong>400</strong> <span>yeni soru</span></div>

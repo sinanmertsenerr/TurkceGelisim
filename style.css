@@ -853,6 +853,142 @@ kbd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.mode-card {
+  align-items: flex-start;
+  min-height: 96px;
+  padding: 1rem 1.05rem;
+  text-align: left;
+}
+
+.mode-card-name {
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.mode-card .badge-sub {
+  margin-top: 6px;
+}
+
+/* Adımlı kurulum: her adım tek ekrana sığar, kaydırma gerekmez. */
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.setup-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  animation: fade-in var(--base) both;
+}
+
+.setup-step[hidden] {
+  display: none;
+}
+
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+.step-back {
+  min-height: 44px;
+  padding-inline: 0.75rem;
+}
+
+.step-indicator {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.step-indicator li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.35rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  background: var(--bg-surface);
+}
+
+.step-indicator li[hidden] {
+  display: none;
+}
+
+.step-num {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-surface-alt);
+  font-size: 0.7rem;
+}
+
+.step-indicator li[aria-current="step"] {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.step-indicator li[aria-current="step"] .step-num {
+  color: #fff;
+  background: var(--primary);
+}
+
+.step-indicator li.is-done .step-num {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.step-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.step-summary:empty {
+  display: none;
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  font-size: 0.88rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color var(--fast), color var(--fast);
+}
+
+.summary-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.summary-chip span:last-child {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
 .topic-grid {
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 }

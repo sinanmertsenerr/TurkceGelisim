@@ -230,8 +230,13 @@ async function run() {
       mobile: true,
     });
     await client.send("Page.navigate", { url: origin });
-    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".level-card:not([hidden])").length === 4', "ana sayfa yüklemesi");
+    await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 2 && !document.querySelector("#step-mode").hidden', "ana sayfa yüklemesi");
     await capture("01-mobile-home");
+    assert.equal(await client.evaluate('document.querySelector("#step-session").hidden'), true, "İlk adımda oturum ayarları gizli olmalı.");
+    assert.equal(await client.evaluate('document.querySelector("#stepBackButton").hidden'), true, "İlk adımda geri düğmesi gizli olmalı.");
+    await client.evaluate('document.querySelector("[data-mode=karma]").click()');
+    await waitUntil(client, '!document.querySelector("#step-session").hidden && document.querySelector("#step-mode").hidden', "karma modda oturum adımı");
+    await capture("01b-mobile-session-step");
 
     const home = await client.evaluate(`(() => ({
       levels: document.querySelectorAll(".level-card:not([hidden])").length,
@@ -376,14 +381,20 @@ async function run() {
     // Konu odaklı çalışma: da/de konusu, tüm düzeyler, 20 soru.
     await client.evaluate('document.querySelector("#resultHomeButton").click()');
     await waitUntil(client, '!document.querySelector("#screen-home").hidden', "sonuçtan ana sayfaya dönüş");
-    assert.equal(await client.evaluate('document.querySelector("#topicSection").hidden'), true, "Karma modda konu bölümü gizli olmalı.");
-    await client.evaluate(`(() => {
-      const mode = document.querySelector('input[name="study-mode"][value="konu"]');
-      mode.checked = true;
-      mode.dispatchEvent(new Event("change", { bubbles: true }));
-    })()`);
-    await waitUntil(client, '!document.querySelector("#topicSection").hidden && document.querySelectorAll(".topic-card").length >= 10', "konu seçimi");
+    assert.equal(await client.evaluate('document.querySelector("#step-session").hidden'), false, "Oturum kurulduktan sonra ana sayfa son adımda açılmalı.");
+    assert.equal(await client.evaluate('document.querySelectorAll("#stepSummary .summary-chip").length'), 1);
+    await client.evaluate('document.querySelector("#stepSummary .summary-chip[data-step=mode]").click()');
+    await waitUntil(client, '!document.querySelector("#step-mode").hidden', "özetten biçim adımına dönüş");
+    await client.evaluate('document.querySelector("[data-mode=konu]").click()');
+    await waitUntil(client, '!document.querySelector("#step-topic").hidden && document.querySelectorAll(".topic-card").length >= 10', "konu adımı");
+    await client.evaluate('document.querySelector("#stepBackButton").click()');
+    await waitUntil(client, '!document.querySelector("#step-mode").hidden && document.querySelector("#step-topic").hidden', "geri düğmesiyle biçim adımı");
+    await client.evaluate('document.querySelector("[data-mode=konu]").click()');
+    await waitUntil(client, '!document.querySelector("#step-topic").hidden', "konu adımına yeniden geçiş");
+    await capture("05a-mobile-topic-step");
     await client.evaluate('document.querySelector("[data-topic=da-de]").click()');
+    await waitUntil(client, '!document.querySelector("#step-session").hidden && document.querySelectorAll("#stepSummary .summary-chip").length === 2', "konu sonrası oturum adımı");
+    assert.equal(await client.evaluate('document.querySelector("[data-level=tum]").getAttribute("aria-checked")'), "true", "Konu moduna geçince Tüm düzeyler seçili gelmeli.");
     await client.evaluate('document.querySelector("[data-level=tum]").click()');
     await capture("05-mobile-topic-mode");
     const topicHome = await client.evaluate(`(() => ({

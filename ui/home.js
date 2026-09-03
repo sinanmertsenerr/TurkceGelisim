@@ -23,12 +23,16 @@ export function setSelectedSessionSize(size) {
 }
 
 export function selectedMode() {
-  return document.querySelector('input[name="study-mode"]:checked')?.value ?? "karma";
+  return document.querySelector('.mode-card[aria-checked="true"]')?.dataset.mode ?? "karma";
 }
 
 export function setSelectedMode(mode) {
-  const input = document.querySelector(`input[name="study-mode"][value="${mode}"]`);
-  if (input) input.checked = true;
+  for (const card of document.querySelectorAll(".mode-card")) {
+    const selected = card.dataset.mode === mode;
+    card.setAttribute("aria-checked", String(selected));
+    card.classList.toggle("selected", selected);
+    card.tabIndex = selected ? 0 : -1;
+  }
 }
 
 export function selectedTopic() {
@@ -146,13 +150,108 @@ export function syncHomeSelections(elements) {
   // küçük konular tek düzeyde birkaç soruya sıkışmasın.
   if (topicMode && lastMode !== "konu") setSelectedLevel(ALL_LEVELS_ID);
   lastMode = mode;
-  elements.topicSection.hidden = !topicMode;
   if (topicMode && !document.querySelector('.topic-card[aria-checked="true"]')) {
     setSelectedTopic(state.lastSettings.topic ?? STUDY_TOPICS[0].id);
   }
   syncLevelCards(elements);
   syncSessionSizes(elements);
   updateSessionEstimate(elements);
+  renderStepSummary(elements);
+}
+
+// ---- Adımlı kurulum -------------------------------------------------------
+// Karma modda iki adım (biçim → oturum), konu modunda üç adım (biçim → konu → oturum).
+
+export function homeSteps() {
+  return selectedMode() === "konu" ? ["mode", "topic", "session"] : ["mode", "session"];
+}
+
+function renderStepSummary(elements) {
+  const chips = [];
+  const chip = (label, detail, step) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "summary-chip";
+    button.dataset.step = step;
+    const strong = document.createElement("span");
+    strong.textContent = label;
+    const sub = document.createElement("span");
+    sub.textContent = detail;
+    button.append(strong, sub);
+    button.setAttribute("aria-label", `${label}. ${detail}`);
+    button.addEventListener("click", () => goToStep(elements, step));
+    return button;
+  };
+  const topic = selectedTopic();
+  chips.push(chip(topic ? "Konu odaklı" : "Karma çalışma", "Biçimi değiştir", "mode"));
+  if (topic) chips.push(chip(STUDY_TOPIC_BY_ID.get(topic).label, "Konuyu değiştir", "topic"));
+  elements.stepSummary.replaceChildren(...chips);
+}
+
+export function goToStep(elements, step, { push = true, focus = true } = {}) {
+  const steps = homeSteps();
+  const target = steps.includes(step) ? step : steps[0];
+  const position = steps.indexOf(target);
+  state.homeStep = target;
+
+  for (const section of elements.setupSteps.querySelectorAll(".setup-step")) {
+    section.hidden = section.dataset.step !== target;
+  }
+  for (const item of elements.stepIndicator.querySelectorAll("li")) {
+    const itemStep = item.dataset.step;
+    const index = steps.indexOf(itemStep);
+    item.hidden = index === -1;
+    item.querySelector(".step-num").textContent = String(index + 1);
+    item.classList.toggle("is-done", index !== -1 && index < position);
+    if (itemStep === target) item.setAttribute("aria-current", "step");
+    else item.removeAttribute("aria-current");
+  }
+  elements.stepBackButton.hidden = position === 0;
+  elements.stepBackButton.textContent = `← ${position > 0 ? stepTitle(steps[position - 1]) : "Geri"}`;
+  if (target === "session") renderStepSummary(elements);
+
+  if (push && document.body.dataset.screen === "home") {
+    history.pushState({ homeStep: target }, "");
+  }
+  if (focus) {
+    requestAnimationFrame(() => {
+      const heading = elements.setupSteps.querySelector(`#step-${target} h2`);
+      heading?.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "instant" });
+    });
+  }
+}
+
+function stepTitle(step) {
+  return step === "mode" ? "Biçim" : step === "topic" ? "Konu" : "Oturum";
+}
+
+export function goToNextStep(elements) {
+  const steps = homeSteps();
+  const next = steps[Math.min(steps.indexOf(state.homeStep) + 1, steps.length - 1)];
+  goToStep(elements, next);
+}
+
+export function goToPreviousStep(elements) {
+  const steps = homeSteps();
+  const previous = steps[Math.max(steps.indexOf(state.homeStep) - 1, 0)];
+  goToStep(elements, previous, { push: false });
+}
+
+export function renderModeCards(elements) {
+  const cards = [...elements.modePicker.querySelectorAll(".mode-card")];
+  cards.forEach((card, index) => {
+    card.addEventListener("click", () => {
+      setSelectedMode(card.dataset.mode);
+      syncHomeSelections(elements);
+      goToNextStep(elements);
+    });
+    installRadioNavigation(card, cards, index, (next) => {
+      setSelectedMode(next.dataset.mode);
+      syncHomeSelections(elements);
+    });
+  });
+  setSelectedMode(state.lastSettings.topic ? "konu" : "karma");
 }
 
 // Ana sayfa seçimini verilen ayarlara getirir (yeni oturum, devam, sonuç sonrası).
@@ -220,6 +319,7 @@ export function renderTopicCards(elements) {
     card.addEventListener("click", () => {
       setSelectedTopic(topic.id);
       syncHomeSelections(elements);
+      goToNextStep(elements);
     });
     cards.push(card);
     fragment.append(card);
