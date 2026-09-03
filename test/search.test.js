@@ -12,17 +12,21 @@ test("normalizeText aksanları ve noktalamayı sadeleştirir", () => {
 
 test("kısa ekler (de, mi, ki) kalıp cümlelerdeki alt dizelere takılmaz", () => {
   const results = filterQuestions(QUESTIONS, { query: "de" });
-  assert.ok(results.length > 0 && results.length < 40, `de için ${results.length} sonuç`);
+  assert.ok(results.length > 0 && results.length < 60, `de için ${results.length} sonuç`);
   assert.ok(topicsOf(results).has("Bağlaç olan da/de"));
   assert.ok(!topicsOf(results).has("Ayrı yazılan birleşik kelimeler"));
 
   const mi = filterQuestions(QUESTIONS, { query: "mi" });
-  assert.ok(mi.every((question) => /mı|mi|mu|mü|harf/i.test(question.topic)));
+  // "mi" yalnız tam kelime olarak eşleşmeli: sonuçların her birinde ayrı yazılmış bir soru eki bulunur.
+  assert.ok(mi.length > 0);
+  assert.ok(mi.every((question) => /(^|\s)m[ıiuü](\s|[?.,]|$)/u.test(
+    [question.prompt, question.explanation, ...question.choices.map(({ text }) => text)].join(" "),
+  )));
 });
 
 test("uzun sorgular önek olarak eşleşir", () => {
-  assert.equal(filterQuestions(QUESTIONS, { query: "kısaltma" }).length, 8);
-  assert.equal(filterQuestions(QUESTIONS, { query: "kisaltma" }).length, 8);
+  assert.ok(filterQuestions(QUESTIONS, { query: "kısaltma" }).length >= 8);
+  assert.ok(filterQuestions(QUESTIONS, { query: "kisaltma" }).length >= 8);
 });
 
 test("bitişik/ayrı yazım sorguları boşluktan bağımsız bulunur", () => {

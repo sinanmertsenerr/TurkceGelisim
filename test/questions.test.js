@@ -34,7 +34,7 @@ test("şema, kimlik, seçenek ve tekrar doğrulaması temizdir", () => {
 
 test("her soru güncel kontrol tarihi taşıyan resmî TDK kaynağına bağlıdır", () => {
   const usedSources = new Set(QUESTIONS.map(({ sourceId }) => sourceId));
-  assert.equal(usedSources.size, 14);
+  assert.equal(usedSources.size, 15);
   for (const sourceId of usedSources) {
     const source = SOURCES[sourceId];
     assert.equal(source.publisher, "Türk Dil Kurumu");

@@ -23,5 +23,6 @@ export const SOURCES = Object.freeze({
   "tdk-kisaltmalar": source("tdk-kisaltmalar", "Kısaltmalar", "kisaltmalar"),
   "tdk-buyuk-harf": source("tdk-buyuk-harf", "Büyük Harflerin Kullanıldığı Yerler", "buyuk-harflerin-kullanildigi-yerler"),
   "tdk-duzeltme": source("tdk-duzeltme", "Düzeltme İşareti", "duzeltme-isareti"),
+  "tdk-kesme": source("tdk-kesme", "Kesme İşareti", "kesme-isareti"),
   "tdk-noktalama": source("tdk-noktalama", "Noktalama İşaretleri (Açıklamalar)", "noktalama-isaretleri-aciklamalar"),
 });
