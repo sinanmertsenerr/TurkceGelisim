@@ -30,6 +30,29 @@ test("oturum seçimi istenen sayıyı banka sınırında tutar", () => {
   assert.equal(new Set(selectSessionQuestions(pool, 5, () => 0.5).map(({ id }) => id)).size, 5);
 });
 
+test("oturum seçimi konuları dengeli dağıtır", () => {
+  const pool = [
+    ...Array.from({ length: 40 }, (_, index) => ({ id: `a${index}`, topic: "A" })),
+    ...Array.from({ length: 40 }, (_, index) => ({ id: `b${index}`, topic: "B" })),
+    ...Array.from({ length: 5 }, (_, index) => ({ id: `c${index}`, topic: "C" })),
+    ...Array.from({ length: 3 }, (_, index) => ({ id: `d${index}`, topic: "D" })),
+  ];
+  let seed = 7;
+  const rng = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  const selected = selectSessionQuestions(pool, 20, rng);
+  const counts = new Map();
+  for (const { topic } of selected) counts.set(topic, (counts.get(topic) ?? 0) + 1);
+  assert.equal(selected.length, 20);
+  assert.equal(new Set(selected.map(({ id }) => id)).size, 20);
+  assert.equal(counts.get("C"), 5);
+  assert.equal(counts.get("D"), 3);
+  assert.equal(counts.get("A"), 6);
+  assert.equal(counts.get("B"), 6);
+});
+
 test("konu serpiştirme aynı konuyu arka arkaya getirmez", () => {
   const questions = [
     ...Array.from({ length: 4 }, (_, index) => ({ id: `a${index}`, topic: "A" })),

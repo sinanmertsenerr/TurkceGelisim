@@ -1,4 +1,5 @@
 import { REVIEWED_AT } from "./sources.js";
+import { joinedRationale, separateRationale } from "./rationale.js";
 
 function hash(text) {
   let value = 2166136261;
@@ -54,7 +55,7 @@ export function joinedQuestions(level, records) {
       : "Aşağıdaki seçeneklerden hangisi TDK’ye göre bitişik yazılır?",
     correct,
     distractors: [separated, hyphenate(separated)],
-    explanation: `TDK, “${correct}” biçimini bitişik yazılan birleşik kelimeler arasında gösterir.`,
+    explanation: joinedRationale({ id, correct, separated, meaning }),
     sourceId: "tdk-bitisik",
     familyId: "bitisik-yazim",
   }));
@@ -70,7 +71,7 @@ export function separateQuestions(level, records) {
       : "Aşağıdaki seçeneklerden hangisi TDK’ye göre ayrı yazılır?",
     correct,
     distractors: [joined, hyphenate(correct)],
-    explanation: `TDK, “${correct}” biçimini ayrı yazılan birleşik kelimeler arasında gösterir.`,
+    explanation: separateRationale({ id, correct, joined, meaning }),
     sourceId: "tdk-ayri",
     familyId: "ayri-yazim",
   }));
