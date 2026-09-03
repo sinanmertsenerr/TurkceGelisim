@@ -2,7 +2,7 @@ export const state = {
   activeSession: null,
   completedSession: null,
   resumableSession: null,
-  lastSettings: { level: "kolay", size: 20 },
+  lastSettings: { level: "kolay", size: 20, topic: null },
   reviewLimit: 12,
   libraryLimit: 24,
 };

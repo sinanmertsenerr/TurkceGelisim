@@ -3,8 +3,9 @@ import { ORTA_QUESTIONS } from "./data/orta.js";
 import { UZMAN_QUESTIONS } from "./data/uzman.js";
 import { ZOR_QUESTIONS } from "./data/zor.js";
 import { BANK_VERSION, SOURCES } from "./data/sources.js";
+import { ALL_LEVELS_ID, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyTopicIdOf } from "./data/study-topics.js";
 
-export { BANK_VERSION, SOURCES };
+export { ALL_LEVELS_ID, BANK_VERSION, SOURCES, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyTopicIdOf };
 
 export const LEVELS = Object.freeze([
   Object.freeze({ id: "kolay", label: "Kolay", eyebrow: "Seviye 1", description: "Temel ekler ve sık kullanılan yazımlar" }),
@@ -22,6 +23,19 @@ export const QUESTIONS_BY_LEVEL = Object.freeze({
 
 export const QUESTIONS = Object.freeze(LEVELS.flatMap(({ id }) => QUESTIONS_BY_LEVEL[id]));
 export const QUESTION_BY_ID = new Map(QUESTIONS.map((question) => [question.id, question]));
+
+// Konu odaklı çalışma havuzu: seçilen çalışma konusundaki sorular, istenirse
+// tek bir düzeyle sınırlanır. ALL_LEVELS_ID dört düzeyi birlikte verir.
+export function questionsForStudy(studyTopicId, levelId = ALL_LEVELS_ID) {
+  return QUESTIONS.filter((question) => (
+    studyTopicIdOf(question) === studyTopicId
+    && (levelId === ALL_LEVELS_ID || question.level === levelId)
+  ));
+}
+
+export function studyPoolSize(studyTopicId, levelId = ALL_LEVELS_ID) {
+  return questionsForStudy(studyTopicId, levelId).length;
+}
 
 const normalized = (text) => text.normalize("NFC").trim().replaceAll(/\s+/g, " ");
 
@@ -43,6 +57,7 @@ export function validateQuestionBank() {
     if (!question.prompt.trim()) errors.push(`${question.id}: boş soru kökü.`);
     if (!question.explanation.trim()) errors.push(`${question.id}: boş açıklama.`);
     if (!SOURCES[question.sourceId]) errors.push(`${question.id}: bilinmeyen kaynak.`);
+    if (!studyTopicIdOf(question)) errors.push(`${question.id}: "${question.topic}" konusu hiçbir çalışma konusuna bağlı değil.`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(question.reviewedAt)) errors.push(`${question.id}: geçersiz kontrol tarihi.`);
     if (question.choices.length < 3 || question.choices.length > 4) errors.push(`${question.id}: seçenek sayısı 3 veya 4 olmalı.`);
 

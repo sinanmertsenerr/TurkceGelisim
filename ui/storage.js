@@ -1,5 +1,5 @@
 import { isResumableSession, makeStoredSession, parseStoredSession, STORAGE_KEY } from "../core.js";
-import { BANK_VERSION, QUESTION_BY_ID, QUESTIONS } from "../questions.js";
+import { ALL_LEVELS_ID, BANK_VERSION, QUESTION_BY_ID, QUESTIONS, studyTopicIdOf } from "../questions.js";
 import { updateResumePanel } from "./home.js";
 import { state } from "./state.js";
 
@@ -33,7 +33,8 @@ export function safeStorageRemove() {
 export function loadResumableSession(elements) {
   const storedValue = safeStorageRead();
   const parsed = parseStoredSession(storedValue, BANK_VERSION, VALID_QUESTION_IDS);
-  state.resumableSession = isResumableSession(parsed, QUESTION_BY_ID) ? parsed : null;
+  const resumable = isResumableSession(parsed, QUESTION_BY_ID, { allLevelsId: ALL_LEVELS_ID, studyTopicOf: studyTopicIdOf });
+  state.resumableSession = resumable ? parsed : null;
   if (!state.resumableSession && storedValue) safeStorageRemove();
   updateResumePanel(elements);
 }

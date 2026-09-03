@@ -130,6 +130,34 @@ test("devam oturumu sıra, seviye, seçenek ve sayaç tutarlılığını korur",
   assert.equal(isResumableSession({ ...valid, questionIds: ["kolay-1", "orta-1"] }, questions), false);
   assert.equal(isResumableSession({ ...valid, responses: [{ ...valid.responses[0], correct: false }] }, questions), false);
   assert.equal(isResumableSession({ ...valid, responses: [{ questionId: "kolay-2", choiceId: "b", correct: true }] }, questions), false);
+  assert.equal(isResumableSession({ ...valid, level: "tum" }, questions), false, "karma oturum sanal düzeyle açılmaz");
+});
+
+test("konu odaklı oturum konu ve düzey eşleşmesini korur", () => {
+  const questions = new Map([
+    ["kolay-1", { level: "kolay", topic: "Bağlaç olan da/de", correctChoiceId: "a", choices: [{ id: "a" }, { id: "b" }] }],
+    ["kolay-2", { level: "kolay", topic: "Bulunma durumu eki", correctChoiceId: "b", choices: [{ id: "a" }, { id: "b" }] }],
+    ["uzman-1", { level: "uzman", topic: "Bağlaç olan da/de", correctChoiceId: "a", choices: [{ id: "a" }, { id: "b" }] }],
+    ["orta-1", { level: "orta", topic: "Bağlaç olan ki", correctChoiceId: "a", choices: [{ id: "a" }, { id: "b" }] }],
+  ]);
+  const studyTopicOf = (question) => (question.topic === "Bağlaç olan ki" ? "ki" : "da-de");
+  const options = { allLevelsId: "tum", studyTopicOf };
+  const session = {
+    level: "tum",
+    topic: "da-de",
+    mode: "normal",
+    requestedSize: 3,
+    questionIds: ["kolay-1", "uzman-1", "kolay-2"],
+    index: 0,
+    responses: [],
+  };
+
+  assert.equal(isResumableSession(session, questions, options), true);
+  assert.equal(isResumableSession({ ...session, level: "kolay", questionIds: ["kolay-1", "kolay-2"] }, questions, options), true);
+  assert.equal(isResumableSession({ ...session, level: "kolay" }, questions, options), false, "uzman sorusu kolay düzeyle uyuşmaz");
+  assert.equal(isResumableSession({ ...session, questionIds: ["kolay-1", "orta-1"] }, questions, options), false, "başka konunun sorusu havuza giremez");
+  assert.equal(isResumableSession(session, questions), false, "konu çözümleyici verilmeden konu oturumu açılmaz");
+  assert.equal(isResumableSession({ ...session, topic: 42 }, questions, options), false);
 });
 
 test("oturum içi seri güncel ve en uzun değeri birlikte verir", () => {

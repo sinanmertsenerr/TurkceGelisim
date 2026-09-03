@@ -1,6 +1,6 @@
 import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
-import { QUESTIONS_BY_LEVEL } from "../questions.js";
-import { setSelectedLevel, setSelectedSessionSize, updateResumePanel } from "./home.js";
+import { QUESTIONS_BY_LEVEL, questionsForStudy } from "../questions.js";
+import { applyHomeSettings, updateResumePanel } from "./home.js";
 import { renderLibrary } from "./library.js";
 import { createQuizView } from "./quiz.js";
 import { renderResult, renderReview } from "./result.js";
@@ -11,10 +11,11 @@ import * as storage from "./storage.js";
 export function createSessionController({ elements }) {
   const quizView = createQuizView({ elements, onFinish: finishSession });
 
-  function makeSession(level, questionIds, mode, requestedSize) {
+  function makeSession(level, questionIds, mode, requestedSize, topic = null) {
     return {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       level,
+      topic,
       mode,
       requestedSize,
       questionIds,
@@ -24,13 +25,15 @@ export function createSessionController({ elements }) {
     };
   }
 
-  function startNewSession(level, size) {
-    const pool = QUESTIONS_BY_LEVEL[level];
+  function startNewSession(level, size, topic = null) {
+    const pool = topic ? questionsForStudy(topic, level) : QUESTIONS_BY_LEVEL[level];
+    if (!pool?.length) return;
+    // Konu oturumunda tek konu olduğundan serpiştirme yalnız karıştırır; havuz
+    // seçimi yine alt konular (bağlaç/ek, bitişik/ayrı) arasında dengelenir.
     const selected = interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf);
-    state.lastSettings = { level, size: selected.length };
-    setSelectedLevel(level);
-    setSelectedSessionSize(selected.length);
-    state.activeSession = makeSession(level, selected.map(({ id }) => id), "normal", selected.length);
+    state.lastSettings = { level, size: selected.length, topic };
+    applyHomeSettings(elements, state.lastSettings);
+    state.activeSession = makeSession(level, selected.map(({ id }) => id), "normal", selected.length, topic);
     state.completedSession = null;
     state.resumableSession = state.activeSession;
     storage.persistSession(state.activeSession);
@@ -42,9 +45,8 @@ export function createSessionController({ elements }) {
     if (!state.resumableSession) return;
     state.activeSession = state.resumableSession;
     state.completedSession = null;
-    state.lastSettings = { level: state.activeSession.level, size: state.activeSession.requestedSize };
-    setSelectedSessionSize(state.activeSession.requestedSize);
-    setSelectedLevel(state.activeSession.level);
+    state.lastSettings = { level: state.activeSession.level, size: state.activeSession.requestedSize, topic: state.activeSession.topic ?? null };
+    applyHomeSettings(elements, state.lastSettings);
     showScreen(elements, "quiz", { focus: false });
     quizView.renderQuestion();
   }
@@ -65,6 +67,7 @@ export function createSessionController({ elements }) {
       fisherYates(wrongIds),
       "wrong-review",
       state.completedSession.requestedSize,
+      state.completedSession.topic ?? null,
     );
     state.resumableSession = state.activeSession;
     storage.persistSession(state.activeSession);
@@ -108,7 +111,7 @@ export function createSessionController({ elements }) {
     showHome,
     openLibrary,
     goToNextQuestion: quizView.goToNextQuestion,
-    startNewFromLastSettings: () => startNewSession(state.lastSettings.level, state.lastSettings.size),
+    startNewFromLastSettings: () => startNewSession(state.lastSettings.level, state.lastSettings.size, state.lastSettings.topic ?? null),
     showMoreReviews: () => {
       state.reviewLimit += 12;
       renderReview(elements, state.completedSession);

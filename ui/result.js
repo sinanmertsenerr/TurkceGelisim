@@ -1,5 +1,5 @@
 import { countResponses, weakestTopic } from "../core.js";
-import { QUESTION_BY_ID } from "../questions.js";
+import { ALL_LEVELS_ID, QUESTION_BY_ID, STUDY_TOPIC_BY_ID } from "../questions.js";
 import { LEVEL_BY_ID, correctChoiceFor, sourceFor } from "./helpers.js";
 import { state } from "./state.js";
 import { renderTip } from "./tips.js";
@@ -15,8 +15,12 @@ export function renderResult(elements, completedSession) {
   const counts = countResponses(completedSession.responses);
   const percent = Math.round((counts.correct / counts.answered) * 100);
   const level = LEVEL_BY_ID.get(completedSession.level);
+  const topic = completedSession.topic ? STUDY_TOPIC_BY_ID.get(completedSession.topic) : null;
+  const levelText = completedSession.level === ALL_LEVELS_ID ? "tüm düzeylerden" : `${level.label} seviyesinde`;
   elements.resultTitle.textContent = resultHeading(percent);
-  elements.resultMessage.textContent = `${level.label} seviyesinde ${counts.answered} soruluk oturumu tamamladın.`;
+  elements.resultMessage.textContent = topic
+    ? `“${topic.label}” konusunda, ${levelText} ${counts.answered} soruluk oturumu tamamladın.`
+    : `${levelText} ${counts.answered} soruluk oturumu tamamladın.`;
   elements.resultPercent.textContent = `%${percent}`;
   renderScoreRing(elements, percent);
   renderTopicMastery(elements, completedSession);
@@ -72,6 +76,14 @@ export function renderNextStep(elements, completedSession) {
     correct: response.correct,
   })));
   elements.nextStepCard.hidden = false;
+  if (completedSession.topic) {
+    const topic = STUDY_TOPIC_BY_ID.get(completedSession.topic);
+    const counts = countResponses(completedSession.responses);
+    elements.nextStepText.textContent = counts.wrong === 0
+      ? `“${topic.label}” bu turda hatasız. Karma bir oturumla diğer kuralların arasında da sınamak iyi olur.`
+      : `“${topic.label}” konusunda ${counts.wrong} soru takıldı. Yanlışları tekrar çöz, sonra aynı konuda bir tur daha at.`;
+    return;
+  }
   elements.nextStepText.textContent = weakest
     ? `En çok zorlandığın konu “${weakest.topic}” (${weakest.correct}/${weakest.total} doğru). Kısa bir turla oraya dönmek iyi olur.`
     : "Bu turda hata yok. Bir üst seviyeye geçmek için doğru an.";

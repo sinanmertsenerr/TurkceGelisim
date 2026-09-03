@@ -1,7 +1,7 @@
 import { STORAGE_KEY } from "./core.js";
 import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { renderLevelCards, selectedLevel, selectedSessionSize, updateSessionEstimate } from "./ui/home.js";
+import { renderLevelCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
@@ -15,11 +15,12 @@ const controller = createSessionController({ elements });
 
 installTheme(elements);
 renderLevelCards(elements);
-elements.startSessionButton.addEventListener("click", () => controller.startNewSession(selectedLevel(), selectedSessionSize()));
-updateSessionEstimate(elements);
+renderTopicCards(elements);
+elements.startSessionButton.addEventListener("click", () => controller.startNewSession(selectedLevel(), selectedSessionSize(), selectedTopic()));
+syncHomeSelections(elements);
 
-for (const input of document.querySelectorAll('input[name="session-size"]')) {
-  input.addEventListener("change", () => updateSessionEstimate(elements));
+for (const input of document.querySelectorAll('input[name="session-size"], input[name="study-mode"]')) {
+  input.addEventListener("change", () => syncHomeSelections(elements));
 }
 
 elements.homeLogo.addEventListener("click", controller.showHome);
