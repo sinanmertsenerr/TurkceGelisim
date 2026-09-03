@@ -36,6 +36,9 @@ export function joinedRationale({ id, correct, separated, meaning }) {
     const change = target.length < glued.length ? "ses düşüyor" : "ses türüyor";
     return `${first} + ${second} birleşince ${change}: ${correct}. Ses düşüyor ya da türüyorsa bitişik yaz.`;
   }
+  if (meaning === "belirsizlik sözü") {
+    return `${cap(correct)} gelenekleşmiş bitişik yazılan belirsizlik sözlerinden. Ezber: biraz, birçok, birkaç, birtakım, herhangi, hiçbir.`;
+  }
   if (KIND_FIIL.has(meaning)) {
     return `${first} + ${second}: -a/-e ile kaynaşan fiil (${meaning.replace(" bildiren fiil", "")}). Bu kalıp hep bitişik.`;
   }

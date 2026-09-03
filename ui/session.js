@@ -1,4 +1,4 @@
-import { fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
+import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { QUESTIONS_BY_LEVEL } from "../questions.js";
 import { setSelectedLevel, setSelectedSessionSize, updateResumePanel } from "./home.js";
 import { renderLibrary } from "./library.js";
@@ -26,7 +26,7 @@ export function createSessionController({ elements }) {
 
   function startNewSession(level, size) {
     const pool = QUESTIONS_BY_LEVEL[level];
-    const selected = interleaveByConcept(selectSessionQuestions(pool, size));
+    const selected = interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf);
     state.lastSettings = { level, size: selected.length };
     setSelectedLevel(level);
     setSelectedSessionSize(selected.length);

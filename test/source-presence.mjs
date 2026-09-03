@@ -17,6 +17,7 @@ const expectedRuleText = new Map([
   ["tdk-kisaltmalar", "son harfinin okunuşu esas alınır"],
   ["tdk-buyuk-harf", "büyük harfle başlar"],
   ["tdk-duzeltme", "ayırt etmek için"],
+  ["tdk-kesme", "kesme işaretiyle ayrılır"],
   ["tdk-noktalama", "ait oldukları kelimelere bitişik olarak yazılır"],
 ]);
 
@@ -63,7 +64,8 @@ for (const source of Object.values(SOURCES)) {
 const checkedQuestions = QUESTIONS.filter(({ sourceId }) => literalSourceIds.includes(sourceId));
 const missing = [];
 for (const question of checkedQuestions) {
-  const correct = question.choices.find(({ id }) => id === question.correctChoiceId).text;
+  // Seçenek metnindeki anlam notu ("kuşburnu (bitki)") TDK sayfasında aranmaz.
+  const correct = question.choices.find(({ id }) => id === question.correctChoiceId).text.replace(/ \([^)]*\)$/, "");
   if (!pageTextBySource.get(question.sourceId).includes(normalize(correct))) {
     missing.push(`${question.id}: ${correct}`);
   }

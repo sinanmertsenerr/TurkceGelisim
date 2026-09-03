@@ -10,6 +10,19 @@ export function fisherYates(items, rng = Math.random) {
   return copy;
 }
 
+// Serpiştirmede aynı "tür" sayılan konular: iki birleşik kelime konusu artık
+// aynı soru kalıbını kullandığı için arka arkaya gelmemeli.
+const CONCEPT_GROUPS = Object.freeze({
+  "Bitişik yazılan birleşik kelimeler": "Birleşik kelimeler",
+  "Ayrı yazılan birleşik kelimeler": "Birleşik kelimeler",
+  "Bağlaç olan da/de": "da/de",
+  "Bulunma durumu eki": "da/de",
+});
+
+export function conceptGroupOf(question) {
+  return CONCEPT_GROUPS[question.topic] ?? question.topic;
+}
+
 export function interleaveByConcept(questions, conceptOf = (question) => question.topic, rng = Math.random) {
   const byConcept = new Map();
   for (const question of questions) {
@@ -25,15 +38,23 @@ export function interleaveByConcept(questions, conceptOf = (question) => questio
 
   while (ordered.length < questions.length) {
     lanes.sort((a, b) => b.length - a.length);
+    const previous = ordered.length >= 2 ? conceptOf(ordered[ordered.length - 2]) : null;
     let picked = false;
-    for (const lane of lanes) {
-      if (lane.length && conceptOf(lane[lane.length - 1]) !== lastConcept) {
+    // Önce hem bir önceki hem iki önceki konudan farklı bir şerit dene;
+    // olmuyorsa yalnız bir öncekinden farklı olsun.
+    for (const avoidPrevious of [true, false]) {
+      for (const lane of lanes) {
+        if (!lane.length) continue;
+        const concept = conceptOf(lane[lane.length - 1]);
+        if (concept === lastConcept) continue;
+        if (avoidPrevious && concept === previous) continue;
         const question = lane.pop();
-        lastConcept = conceptOf(question);
+        lastConcept = concept;
         ordered.push(question);
         picked = true;
         break;
       }
+      if (picked) break;
     }
     if (!picked) {
       const lane = lanes.find((entry) => entry.length);

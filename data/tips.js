@@ -52,13 +52,13 @@ export const TIPS_BY_TOPIC = Object.freeze({
     "Ses değişiyorsa ya da anlam kaymışsa yapıştır",
     "İki test: (1) Birleşince harf düşüyor veya türüyorsa bitişik. (2) Kelimeler gerçek anlamından kopup yeni bir şeyin adı olmuşsa bitişik.",
     ["his + etmek → hissetmek · kayıp + olmak → kaybolmak · af + etmek → affetmek", "kuşburnu (bitki, kuşun burnu değil) · hanımgöbeği (tatlı) · aslanağzı (çiçek)"],
-    "-a/-e ile kaynaşan fiiller de bitişik: alıvermek, uyuyakalmak, çıkagelmek.",
+    "Ezber grubu: biraz, birçok, birkaç, birtakım, herhangi, hiçbir bitişik. -a/-e ile kaynaşan fiiller de: alıvermek, uyuyakalmak.",
   ),
   "Ayrı yazılan birleşik kelimeler": tip(
     "Hiçbir şey değişmiyorsa ayrı",
     "Ses düşmüyor, türemiyor, anlam da kaymıyorsa ayrı yaz. Hayvan ve bitki adlarında ikinci kelime tür adıysa (balığı, kuşu, ağacı, otu) ayrı.",
     ["dans etmek, terk etmek, var olmak → harf oynamıyor, ayrı", "ton balığı, ardıç kuşu, çam ağacı → gerçekten balık, kuş, ağaç"],
-    "Kıyas: köpek balığı gerçekten bir balık → ayrı; kuşburnu bir bitki → bitişik.",
+    "Soruda parantezdeki anlam notuna bak: “balık” yazıyorsa ikinci kelime gerçek, ayrı; “bitki” yazıyorsa (kuşburnu) anlam kaymış, bitişik.",
   ),
   "Büyük harfler": tip(
     "Tek olan şey büyük, çoğunun adı küçük",
