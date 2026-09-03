@@ -74,9 +74,27 @@ export function weakestTopic(entries) {
   return weakest;
 }
 
-export function selectSessionQuestions(pool, requestedSize, rng = Math.random) {
+// Konu bazlı dengeli seçim: her turda her konudan bir soru alınır, böylece
+// büyük konular (bitişik/ayrı yazım) oturumu tek başına doldurmaz.
+export function selectSessionQuestions(pool, requestedSize, rng = Math.random, conceptOf = (question) => question.topic) {
   const size = Math.min(Math.max(Number(requestedSize) || 20, 1), pool.length);
-  return fisherYates(pool, rng).slice(0, size);
+  const lanes = new Map();
+  for (const question of fisherYates(pool, rng)) {
+    const key = conceptOf(question);
+    if (!lanes.has(key)) lanes.set(key, []);
+    lanes.get(key).push(question);
+  }
+
+  const selected = [];
+  let order = fisherYates([...lanes.values()], rng);
+  while (selected.length < size && order.length) {
+    for (const lane of order) {
+      if (selected.length >= size) break;
+      selected.push(lane.shift());
+    }
+    order = fisherYates(order.filter((lane) => lane.length), rng);
+  }
+  return selected;
 }
 
 export function countResponses(responses) {
