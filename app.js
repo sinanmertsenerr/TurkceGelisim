@@ -1,5 +1,5 @@
 import { STORAGE_KEY } from "./core.js";
-import { BANK_VERSION } from "./questions.js";
+import { BANK_VERSION, QUESTIONS, SOURCES, STUDY_TOPICS } from "./questions.js";
 import { getElements } from "./ui/dom.js";
 import { goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
@@ -87,6 +87,9 @@ window.addEventListener("storage", (event) => {
 installKeyboardShortcuts(elements);
 
 elements.bankVersion.textContent = BANK_VERSION;
+elements.metricQuestions.textContent = String(QUESTIONS.length);
+elements.metricTopics.textContent = String(STUDY_TOPICS.length);
+elements.metricSources.textContent = String(Object.keys(SOURCES).length);
 populateTopics(elements);
 loadResumableSession(elements);
 goToStep(elements, "mode", { push: false, focus: false });
