@@ -8,6 +8,7 @@ Türkçe yazım kurallarını resmî TDK kaynaklarıyla çalışmak için hazır
 - Birleşik kelime soruları üç gerçek kelime sunar, yalnız biri doğru yazılmıştır; her seçenekte kısa bir anlam notu bulunur (kuşburnu (bitki))
 - Oturum seçimi konu bazlı dengelidir ve arka arkaya aynı konu gelmez
 - İki çalışma biçimi: **Karma** (bir düzeyin tüm konuları karışık) ve **Konu odaklı** (da/de, ki, noktalama gibi 13 kuraldan biri; tek düzey veya tüm düzeyler birlikte)
+- Adımlı kurulum: biçim → (konu) → düzey ve soru adedi; her adım tek ekrana sığar, tarayıcı geri tuşu adımı geri alır
 - 10, 20, 50 veya 100 soruluk çalışma oturumları
 - Anlık cevaplanan, doğru ve yanlış sayaçları
 - Her cevaptan sonra kısa açıklama ve doğrudan TDK kaynak bağlantısı

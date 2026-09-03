@@ -1,7 +1,7 @@
 import { STORAGE_KEY } from "./core.js";
 import { BANK_VERSION } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { renderLevelCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
+import { goToPreviousStep, goToStep, renderLevelCards, renderModeCards, renderTopicCards, selectedLevel, selectedSessionSize, selectedTopic, syncHomeSelections } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { closeLibraryDetail, openLibraryDetail, populateTopics, renderLibrary, syncLibraryDetailState } from "./ui/library.js";
 import { createSessionController } from "./ui/session.js";
@@ -14,14 +14,22 @@ const elements = getElements();
 const controller = createSessionController({ elements });
 
 installTheme(elements);
+renderModeCards(elements);
 renderLevelCards(elements);
 renderTopicCards(elements);
 elements.startSessionButton.addEventListener("click", () => controller.startNewSession(selectedLevel(), selectedSessionSize(), selectedTopic()));
 syncHomeSelections(elements);
 
-for (const input of document.querySelectorAll('input[name="session-size"], input[name="study-mode"]')) {
+for (const input of document.querySelectorAll('input[name="session-size"]')) {
   input.addEventListener("change", () => syncHomeSelections(elements));
 }
+
+elements.stepBackButton.addEventListener("click", () => goToPreviousStep(elements));
+history.replaceState({ homeStep: "mode" }, "");
+window.addEventListener("popstate", (event) => {
+  if (document.body.dataset.screen !== "home" || !event.state?.homeStep) return;
+  goToStep(elements, event.state.homeStep, { push: false });
+});
 
 elements.homeLogo.addEventListener("click", controller.showHome);
 elements.navPractice.addEventListener("click", controller.showHome);
@@ -82,4 +90,5 @@ installKeyboardShortcuts(elements);
 elements.bankVersion.textContent = BANK_VERSION;
 populateTopics(elements);
 loadResumableSession(elements);
+goToStep(elements, "mode", { push: false, focus: false });
 showScreen(elements, "home", { focus: false });

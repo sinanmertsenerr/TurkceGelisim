@@ -1,6 +1,6 @@
 import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { QUESTIONS_BY_LEVEL, questionsForStudy } from "../questions.js";
-import { applyHomeSettings, updateResumePanel } from "./home.js";
+import { applyHomeSettings, goToStep, updateResumePanel } from "./home.js";
 import { renderLibrary } from "./library.js";
 import { createQuizView } from "./quiz.js";
 import { renderResult, renderReview } from "./result.js";
@@ -32,6 +32,7 @@ export function createSessionController({ elements }) {
     // seçimi yine alt konular (bağlaç/ek, bitişik/ayrı) arasında dengelenir.
     const selected = interleaveByConcept(selectSessionQuestions(pool, size), conceptGroupOf);
     state.lastSettings = { level, size: selected.length, topic };
+    state.homeConfigured = true;
     applyHomeSettings(elements, state.lastSettings);
     state.activeSession = makeSession(level, selected.map(({ id }) => id), "normal", selected.length, topic);
     state.completedSession = null;
@@ -46,6 +47,7 @@ export function createSessionController({ elements }) {
     state.activeSession = state.resumableSession;
     state.completedSession = null;
     state.lastSettings = { level: state.activeSession.level, size: state.activeSession.requestedSize, topic: state.activeSession.topic ?? null };
+    state.homeConfigured = true;
     applyHomeSettings(elements, state.lastSettings);
     showScreen(elements, "quiz", { focus: false });
     quizView.renderQuestion();
@@ -90,10 +92,13 @@ export function createSessionController({ elements }) {
     }
   }
 
+  // Bir oturum kurulduysa ana sayfa doğrudan son adımda açılır; seçimler
+  // özet çipleriyle görünür ve oradan geri dönülebilir.
   function showHome() {
     saveActiveForResume();
     updateResumePanel(elements);
     showScreen(elements, "home");
+    goToStep(elements, state.homeConfigured ? "session" : "mode", { push: false, focus: false });
   }
 
   function openLibrary() {
