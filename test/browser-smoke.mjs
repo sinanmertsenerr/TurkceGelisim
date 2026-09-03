@@ -8,6 +8,8 @@ import { extname, join, resolve, sep } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
+import { QUESTIONS, QUESTIONS_BY_LEVEL } from "../questions.js";
+
 const projectRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const chromeCandidates = [
   process.env.CHROME_BIN,
@@ -247,7 +249,7 @@ async function run() {
       unnamedButtons: [...document.querySelectorAll("button")].filter((button) => !button.textContent.trim() && !button.getAttribute("aria-label")).length
     }))()`);
     assert.equal(home.levels, 4);
-    assert.match(home.metrics, /400 yeni soru/);
+    assert.match(home.metrics, new RegExp(`${QUESTIONS.length} soru`));
     assert.ok(home.overflow <= 0, `Ana sayfada ${home.overflow}px yatay taşma var.`);
     assert.equal(home.unnamedButtons, 0);
 
@@ -299,7 +301,7 @@ async function run() {
       words: [...document.querySelectorAll(".library-card .library-word")].filter((node) => node.textContent.trim()).length,
       overflow: document.documentElement.scrollWidth - window.innerWidth
     }))()`);
-    assert.match(library.summary, /^400 sonuç/);
+    assert.match(library.summary, new RegExp(`^${QUESTIONS.length} sonuç`));
     assert.equal(library.words, 24);
     assert.ok(library.overflow <= 0, `Kural bankasında ${library.overflow}px yatay taşma var.`);
 
@@ -324,7 +326,7 @@ async function run() {
       level.value = "kolay";
       level.dispatchEvent(new Event("change", { bubbles: true }));
     })()`);
-    assert.match(await client.evaluate('document.querySelector("#librarySummary").textContent'), /^100 sonuç/);
+    assert.match(await client.evaluate('document.querySelector("#librarySummary").textContent'), new RegExp(`^${QUESTIONS_BY_LEVEL.kolay.length} sonuç`));
     await client.evaluate(`(() => {
       const level = document.querySelector("#libraryLevel");
       level.value = "all";
@@ -415,7 +417,7 @@ async function run() {
     assert.equal(topicHome.levelChecked, "true");
     assert.equal(topicHome.allLevelsVisible, true);
     assert.equal(topicHome.zorDisabled, "false");
-    assert.equal(topicHome.hundredDisabled, true, "23 soruluk konuda 100 seçeneği kapalı olmalı.");
+    assert.equal(topicHome.hundredDisabled, true, "100 sorudan küçük konuda 100 seçeneği kapalı olmalı.");
     assert.equal(topicHome.twentyDisabled, false);
     assert.equal(topicHome.startDisabled, false);
     assert.ok(topicHome.overflow <= 0, `Konu modunda ${topicHome.overflow}px yatay taşma var.`);
@@ -470,10 +472,10 @@ async function run() {
     assert.ok(Math.min(...targetSizes) >= 44, `En küçük görünür etkileşim hedefi ${Math.min(...targetSizes)}px.`);
     assert.deepEqual(browserErrors, []);
 
-    console.log("✓ Ana sayfa: 4 seviye, 400 soru özeti, mobil taşma yok");
+    console.log(`✓ Ana sayfa: 4 seviye, ${QUESTIONS.length} soru özeti, mobil taşma yok`);
     console.log("✓ Quiz: canlı sayaç, TDK kaynağı, seçenek kilidi");
     console.log("✓ Devam: localStorage + sayfa yenileme sonrası geri yükleme");
-    console.log("✓ Kural bankası: 400 kayıt, filtre, arama, tembel render");
+    console.log(`✓ Kural bankası: ${QUESTIONS.length} kayıt, filtre, arama, tembel render`);
     console.log(`✓ Sonuç: ${completion.correct} doğru + ${completion.wrong} yanlış = 20; yanlış tekrar kuyruğu çalıştı`);
     console.log("✓ Konu odaklı çalışma: da/de havuzu, tüm düzeyler, devam kaydı");
     console.log("✓ Erişilebilirlik: durum bölgesi, adlandırılmış kontroller, ≥44px hedefler");

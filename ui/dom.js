@@ -84,6 +84,9 @@ export function getElements() {
     libraryDialogExplanation: byId("libraryDialogExplanation"),
     libraryDialogSource: byId("libraryDialogSource"),
     bankVersion: byId("bankVersion"),
+    metricQuestions: byId("metricQuestions"),
+    metricTopics: byId("metricTopics"),
+    metricSources: byId("metricSources"),
   };
 }
 

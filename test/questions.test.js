@@ -14,15 +14,16 @@ import {
   validateQuestionBank,
 } from "../questions.js";
 
-test("soru bankası dört seviyede tam 400 kayıt içerir", () => {
-  assert.equal(QUESTIONS.length, 400);
+test("soru bankası dört seviyede en az 100’er kayıt içerir ve toplam düzeylerin toplamıdır", () => {
   assert.deepEqual(LEVELS.map(({ id }) => id), ["kolay", "orta", "zor", "uzman"]);
-  for (const { id } of LEVELS) assert.equal(QUESTIONS_BY_LEVEL[id].length, 100);
+  for (const { id } of LEVELS) assert.ok(QUESTIONS_BY_LEVEL[id].length >= 100, `${id}: ${QUESTIONS_BY_LEVEL[id].length}`);
+  assert.equal(QUESTIONS.length, LEVELS.reduce((sum, { id }) => sum + QUESTIONS_BY_LEVEL[id].length, 0));
+  assert.ok(QUESTIONS.length >= 650, `toplam ${QUESTIONS.length}`);
 });
 
 test("şema, kimlik, seçenek ve tekrar doğrulaması temizdir", () => {
   assert.deepEqual(validateQuestionBank(), []);
-  assert.equal(new Set(QUESTIONS.map(({ id }) => id)).size, 400);
+  assert.equal(new Set(QUESTIONS.map(({ id }) => id)).size, QUESTIONS.length);
   for (const question of QUESTIONS) {
     assert.match(question.id, /^[a-z0-9-]+$/);
     assert.ok(question.prompt.length >= 25);
@@ -56,7 +57,8 @@ test("doğru seçenek konumu tek bir harfe yığılmaz", () => {
     }
     const used = positions.filter(Boolean);
     assert.equal(used.length, 3);
-    assert.ok(Math.max(...used) - Math.min(...used) <= 20, `${id}: ${positions.join("/")}`);
+    const tolerance = Math.max(20, Math.round(QUESTIONS_BY_LEVEL[id].length * 0.15));
+    assert.ok(Math.max(...used) - Math.min(...used) <= tolerance, `${id}: ${positions.join("/")}`);
   }
 });
 
@@ -75,10 +77,10 @@ test("her ham konu tam olarak bir çalışma konusuna bağlıdır", () => {
 
 test("konu havuzu bankanın tamamını kayıpsız böler ve düzeyle daraltılır", () => {
   const total = STUDY_TOPICS.reduce((sum, { id }) => sum + studyPoolSize(id), 0);
-  assert.equal(total, 400);
+  assert.equal(total, QUESTIONS.length);
   for (const { id } of STUDY_TOPICS) {
     const all = questionsForStudy(id, ALL_LEVELS_ID);
-    assert.ok(all.length >= 5, `${id}: en az 5 soru olmalı`);
+    assert.ok(all.length >= 20, `${id}: en az 20 soru olmalı, ${all.length} var`);
     assert.ok(all.every((question) => studyTopicIdOf(question) === id));
     const perLevel = LEVELS.reduce((sum, level) => sum + studyPoolSize(id, level.id), 0);
     assert.equal(perLevel, all.length);
@@ -87,6 +89,6 @@ test("konu havuzu bankanın tamamını kayıpsız böler ve düzeyle daraltılı
     }
   }
   assert.equal(studyPoolSize("birlesik"), 240);
-  assert.equal(studyPoolSize("da-de", "kolay"), 12);
+  assert.ok(studyPoolSize("da-de", "kolay") >= 12);
   assert.equal(studyPoolSize("olmayan-konu"), 0);
 });

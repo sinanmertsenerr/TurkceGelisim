@@ -12,7 +12,8 @@ test("normalizeText aksanları ve noktalamayı sadeleştirir", () => {
 
 test("kısa ekler (de, mi, ki) kalıp cümlelerdeki alt dizelere takılmaz", () => {
   const results = filterQuestions(QUESTIONS, { query: "de" });
-  assert.ok(results.length > 0 && results.length < 60, `de için ${results.length} sonuç`);
+  // Bankanın en fazla dörtte biri: "de" içeren her açıklamaya değil, gerçekten de/da içeren sorulara düşmeli.
+  assert.ok(results.length > 0 && results.length < QUESTIONS.length / 4, `de için ${results.length} sonuç`);
   assert.ok(topicsOf(results).has("Bağlaç olan da/de"));
   assert.ok(!topicsOf(results).has("Ayrı yazılan birleşik kelimeler"));
 

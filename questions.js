@@ -1,4 +1,5 @@
 import { KOLAY_QUESTIONS } from "./data/kolay.js";
+import { KONU_HAVUZU_BY_LEVEL } from "./data/konu-havuzu.js";
 import { ORTA_QUESTIONS } from "./data/orta.js";
 import { UZMAN_QUESTIONS } from "./data/uzman.js";
 import { ZOR_QUESTIONS } from "./data/zor.js";
@@ -14,12 +15,13 @@ export const LEVELS = Object.freeze([
   Object.freeze({ id: "uzman", label: "Uzman", eyebrow: "Seviye 4", description: "İnce ayrımlar, düzeltme işareti ve karma yazım" }),
 ]);
 
-export const QUESTIONS_BY_LEVEL = Object.freeze({
-  kolay: KOLAY_QUESTIONS,
-  orta: ORTA_QUESTIONS,
-  zor: ZOR_QUESTIONS,
-  uzman: UZMAN_QUESTIONS,
-});
+// Her düzey: 100 soruluk çekirdek banka + konu odaklı çalışma için ek havuz.
+const CORE_BY_LEVEL = { kolay: KOLAY_QUESTIONS, orta: ORTA_QUESTIONS, zor: ZOR_QUESTIONS, uzman: UZMAN_QUESTIONS };
+export const CORE_LEVEL_SIZE = 100;
+
+export const QUESTIONS_BY_LEVEL = Object.freeze(Object.fromEntries(
+  LEVELS.map(({ id }) => [id, Object.freeze([...CORE_BY_LEVEL[id], ...KONU_HAVUZU_BY_LEVEL[id]])]),
+));
 
 export const QUESTIONS = Object.freeze(LEVELS.flatMap(({ id }) => QUESTIONS_BY_LEVEL[id]));
 export const QUESTION_BY_ID = new Map(QUESTIONS.map((question) => [question.id, question]));
@@ -45,8 +47,8 @@ export function validateQuestionBank() {
   const fingerprints = new Set();
 
   for (const level of LEVELS) {
-    const questions = QUESTIONS_BY_LEVEL[level.id];
-    if (questions.length !== 100) errors.push(`${level.id}: 100 yerine ${questions.length} soru var.`);
+    const core = CORE_BY_LEVEL[level.id];
+    if (core.length !== CORE_LEVEL_SIZE) errors.push(`${level.id}: çekirdek bankada ${CORE_LEVEL_SIZE} yerine ${core.length} soru var.`);
   }
 
   for (const question of QUESTIONS) {
@@ -72,7 +74,7 @@ export function validateQuestionBank() {
     fingerprints.add(fingerprint);
   }
 
-  if (QUESTIONS.length !== 400) errors.push(`Toplam 400 yerine ${QUESTIONS.length} soru var.`);
+  if (QUESTIONS.length < LEVELS.length * CORE_LEVEL_SIZE) errors.push(`Toplam en az ${LEVELS.length * CORE_LEVEL_SIZE} soru olmalı, ${QUESTIONS.length} var.`);
   return errors;
 }
 

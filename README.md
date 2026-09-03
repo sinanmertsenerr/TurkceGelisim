@@ -4,17 +4,17 @@ Türkçe yazım kurallarını resmî TDK kaynaklarıyla çalışmak için hazır
 
 ## Neler var?
 
-- Dört düzeyde 100'er soru: **Kolay, Orta, Zor, Uzman** — toplam 400 soru
+- Dört düzeyde 100'er soruluk çekirdek banka (**Kolay, Orta, Zor, Uzman**) ve konu odaklı çalışma için 279 soruluk ek havuz: toplam 679 soru
 - Birleşik kelime soruları üç gerçek kelime sunar, yalnız biri doğru yazılmıştır; her seçenekte kısa bir anlam notu bulunur (kuşburnu (bitki))
 - Oturum seçimi konu bazlı dengelidir ve arka arkaya aynı konu gelmez
-- İki çalışma biçimi: **Karma** (bir düzeyin tüm konuları karışık) ve **Konu odaklı** (da/de, ki, noktalama gibi 13 kuraldan biri; tek düzey veya tüm düzeyler birlikte)
+- İki çalışma biçimi: **Karma** (bir düzeyin tüm konuları karışık) ve **Konu odaklı** (da/de, ki, noktalama gibi 13 kuraldan biri; tek düzey veya tüm düzeyler birlikte). Her çalışma konusunda en az 27 soru var; birleşik kelimelerde 240
 - Adımlı kurulum: biçim → (konu) → düzey ve soru adedi; her adım tek ekrana sığar, tarayıcı geri tuşu adımı geri alır
 - 10, 20, 50 veya 100 soruluk çalışma oturumları
 - Anlık cevaplanan, doğru ve yanlış sayaçları
 - Her cevaptan sonra kısa açıklama ve doğrudan TDK kaynak bağlantısı
 - Yarım kalan oturumu bu cihazda saklama ve sürdürme
 - Yanlış cevapları ayrı bir turda yeniden çözme
-- Aranabilir ve düzeye göre filtrelenebilir 400 kartlık bilgi kütüphanesi
+- Aranabilir ve düzeye göre filtrelenebilir, tüm bankayı kapsayan bilgi kütüphanesi
 - Klavye kullanımı, ekran okuyucu bildirimleri, azaltılmış hareket ve mobil ekran desteği
 - Hesap, reklam, izleyici veya sunucuya veri gönderimi yok
 
@@ -53,12 +53,12 @@ Test paketlerinin haricî npm bağımlılığı yoktur.
 - `ui/`: ekranlar ve etkileşim modülleri (quiz, sonuç, kural bankası, depolama, klavye)
 - `core.js`: test edilebilir oturum ve istatistik işlevleri
 - `questions.js`: soru bankasının tek giriş noktası
-- `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları ve dört düzeyin verileri
+- `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları, dört düzeyin çekirdek verileri ve `konu-havuzu.js` ek soru havuzu
 - `test/`: birim, veri, canlı kaynak ve gerçek tarayıcı kontrolleri
 
 ## İçerik ve kaynak sözleşmesi
 
-Her soruda kararlı bir kimlik, düzey, konu, tek doğru cevap, açıklama, kaynak kimliği ve son gözden geçirme tarihi bulunur. Banka 14 resmî TDK Yazım Kuralları sayfasına bağlıdır. Bitişik/ayrı yazım sorularındaki 320 doğru biçim, otomatik kaynak testiyle ilgili TDK sayfasında birebir aranır; diğer 80 bağlam ve kural sorusu da ilgili resmî kurala bağlantı verir.
+Her soruda kararlı bir kimlik, düzey, konu, tek doğru cevap, açıklama, kaynak kimliği ve son gözden geçirme tarihi bulunur. Banka 14 resmî TDK Yazım Kuralları sayfasına bağlıdır. Bitişik/ayrı yazım sorularındaki 320 doğru biçim, otomatik kaynak testiyle ilgili TDK sayfasında birebir aranır; diğer bağlam ve kural soruları (çekirdekte 80, ek havuzda 279) ÖSYM tarzı özgün cümlelerle yazılmıştır ve ilgili resmî kurala bağlantı verir.
 
 Kaynaklar çevrim içi olduğundan TDK'nin sayfa yapısı veya kural metni değişirse canlı kaynak testi bunu görünür kılar. Bankanın son kaynak gözden geçirme tarihi **24 Ağustos 2026**'dır.
 
