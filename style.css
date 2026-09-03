@@ -2281,8 +2281,9 @@ progress::-moz-progress-bar {
   }
 
   /* Dar ekranda üst çubuk nefes alır: sekmeler daralır, tema düğmesi kenara yapışmaz */
+  /* Yan boşluk .shell ile aynı (1rem): çubuğun kenarları içerik kartlarıyla birebir hizalanır. */
   .app-header {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 1rem;
   }
 
   /* Dar ekranda yan sütunlar eşit (44px'lik marka simgesi ve tema düğmesi),
@@ -2312,10 +2313,6 @@ progress::-moz-progress-bar {
   .nav-tab svg {
     width: 14px;
     height: 14px;
-  }
-
-  .theme-toggle {
-    margin-right: 0.1rem;
   }
 
   .choice-grid {
