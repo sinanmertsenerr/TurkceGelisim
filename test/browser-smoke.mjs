@@ -233,9 +233,11 @@ async function run() {
     await waitUntil(client, 'document.readyState === "complete" && document.querySelectorAll(".mode-card").length === 2 && !document.querySelector("#step-mode").hidden', "ana sayfa yüklemesi");
     await capture("01-mobile-home");
     assert.equal(await client.evaluate('document.querySelector("#step-session").hidden'), true, "İlk adımda oturum ayarları gizli olmalı.");
-    assert.equal(await client.evaluate('document.querySelector("#stepBackButton").hidden'), true, "İlk adımda geri düğmesi gizli olmalı.");
+    assert.equal(await client.evaluate('document.querySelectorAll("#stepSummary .summary-chip").length'), 0, "İlk adımda geri çipi olmamalı.");
+    assert.equal(await client.evaluate('document.querySelector("#homeEyebrow").textContent'), "Yazım antrenmanı");
     await client.evaluate('document.querySelector("[data-mode=karma]").click()');
     await waitUntil(client, '!document.querySelector("#step-session").hidden && document.querySelector("#step-mode").hidden', "karma modda oturum adımı");
+    assert.equal(await client.evaluate('document.querySelector("#homeEyebrow").textContent'), "Karma çalışma");
     await capture("01b-mobile-session-step");
 
     const home = await client.evaluate(`(() => ({
@@ -387,14 +389,16 @@ async function run() {
     await waitUntil(client, '!document.querySelector("#step-mode").hidden', "özetten biçim adımına dönüş");
     await client.evaluate('document.querySelector("[data-mode=konu]").click()');
     await waitUntil(client, '!document.querySelector("#step-topic").hidden && document.querySelectorAll(".topic-card").length >= 10', "konu adımı");
-    await client.evaluate('document.querySelector("#stepBackButton").click()');
-    await waitUntil(client, '!document.querySelector("#step-mode").hidden && document.querySelector("#step-topic").hidden', "geri düğmesiyle biçim adımı");
+    assert.equal(await client.evaluate('document.querySelector("#homeEyebrow").textContent'), "Konu odaklı");
+    await client.evaluate('document.querySelector("#stepSummary .summary-chip[data-step=mode]").click()');
+    await waitUntil(client, '!document.querySelector("#step-mode").hidden && document.querySelector("#step-topic").hidden', "geri çipiyle biçim adımı");
     await client.evaluate('document.querySelector("[data-mode=konu]").click()');
     await waitUntil(client, '!document.querySelector("#step-topic").hidden', "konu adımına yeniden geçiş");
     await capture("05a-mobile-topic-step");
     await client.evaluate('document.querySelector("[data-topic=da-de]").click()');
     await waitUntil(client, '!document.querySelector("#step-session").hidden && document.querySelectorAll("#stepSummary .summary-chip").length === 2', "konu sonrası oturum adımı");
     assert.equal(await client.evaluate('document.querySelector("[data-level=tum]").getAttribute("aria-checked")'), "true", "Konu moduna geçince Tüm düzeyler seçili gelmeli.");
+    assert.equal(await client.evaluate('document.querySelector("#homeEyebrow").textContent'), "Konu odaklı · da/de yazımı");
     await client.evaluate('document.querySelector("[data-level=tum]").click()');
     await capture("05-mobile-topic-mode");
     const topicHome = await client.evaluate(`(() => ({

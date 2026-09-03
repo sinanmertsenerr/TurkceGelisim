@@ -895,11 +895,6 @@ kbd {
   min-height: 44px;
 }
 
-.step-back {
-  min-height: 44px;
-  padding-inline: 0.75rem;
-}
-
 .step-indicator {
   display: flex;
   gap: 0.35rem;
@@ -958,10 +953,6 @@ kbd {
   margin: 0;
 }
 
-.step-summary:empty {
-  display: none;
-}
-
 .summary-chip {
   display: inline-flex;
   align-items: center;
@@ -983,10 +974,9 @@ kbd {
   color: var(--primary);
 }
 
-.summary-chip span:last-child {
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 500;
+.summary-chip:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .topic-grid {

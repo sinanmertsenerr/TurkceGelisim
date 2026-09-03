@@ -43,7 +43,7 @@
     <section class="screen" id="screen-home" data-title="Yazım antrenmanı">
       <div class="shell home-shell">
         <div class="home-hero">
-          <p class="eyebrow">Yazım antrenmanı</p>
+          <p class="eyebrow" id="homeEyebrow">Yazım antrenmanı</p>
           <h1 tabindex="-1">Doğru Türkçe, <em>duru zihin.</em></h1>
           <p>Telaş ve puan kaygısı olmadan TDK yazım kurallarını kalıcı bir kavrayışla çalış. Her cevabın tüyosu ve resmî kaynağı anında önünde.</p>
         </div>
@@ -62,7 +62,7 @@
 
           <div class="setup-steps" id="setupSteps">
             <div class="step-nav">
-              <button class="btn btn-subtle step-back" id="stepBackButton" type="button" hidden>← Geri</button>
+              <p class="step-summary" id="stepSummary" aria-label="Seçimlerin"></p>
               <ol class="step-indicator" id="stepIndicator" aria-label="Kurulum adımları">
                 <li data-step="mode"><span class="step-num">1</span><span class="step-name">Biçim</span></li>
                 <li data-step="topic"><span class="step-num">2</span><span class="step-name">Konu</span></li>
@@ -92,7 +92,6 @@
             </section>
 
             <section class="setup-step" id="step-session" data-step="session" hidden>
-              <p class="step-summary" id="stepSummary" aria-label="Seçimlerin"></p>
 
               <section class="selection-group" aria-labelledby="levelsTitle">
                 <h2 class="selection-label" id="levelsTitle" tabindex="-1">Zorluk düzeyi</h2>
