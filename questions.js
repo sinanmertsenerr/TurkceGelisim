@@ -17,7 +17,7 @@ export const LEVELS = Object.freeze([
 
 // Her düzey: 100 soruluk çekirdek banka + konu odaklı çalışma için ek havuz.
 const CORE_BY_LEVEL = { kolay: KOLAY_QUESTIONS, orta: ORTA_QUESTIONS, zor: ZOR_QUESTIONS, uzman: UZMAN_QUESTIONS };
-export const CORE_LEVEL_SIZE = 100;
+const CORE_LEVEL_SIZE = 100;
 
 export const QUESTIONS_BY_LEVEL = Object.freeze(Object.fromEntries(
   LEVELS.map(({ id }) => [id, Object.freeze([...CORE_BY_LEVEL[id], ...KONU_HAVUZU_BY_LEVEL[id]])]),
@@ -41,6 +41,10 @@ export function studyPoolSize(studyTopicId, levelId = ALL_LEVELS_ID) {
 }
 
 const normalized = (text) => text.normalize("NFC").trim().replaceAll(/\s+/g, " ");
+
+// Banka değişmezleri: CI'da test/questions.test.js çalıştırır, üretimde değil.
+// İçe aktarımda çalıştırılıp throw edilirse tek bozuk soru tüm uygulamayı
+// boş sayfaya çevirir; denetim bu yüzden yalnız testte.
 
 export function validateQuestionBank() {
   const errors = [];
@@ -77,9 +81,4 @@ export function validateQuestionBank() {
 
   if (QUESTIONS.length < LEVELS.length * CORE_LEVEL_SIZE) errors.push(`Toplam en az ${LEVELS.length * CORE_LEVEL_SIZE} soru olmalı, ${QUESTIONS.length} var.`);
   return errors;
-}
-
-const validationErrors = validateQuestionBank();
-if (validationErrors.length) {
-  throw new Error(`Soru bankası doğrulanamadı:\n${validationErrors.join("\n")}`);
 }

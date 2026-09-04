@@ -38,13 +38,15 @@ Node.js 20 veya daha yeni bir sürümle:
 ```bash
 npm ci
 npm run lint
+npm run test:surface
 npm test
 npm run test:sources
 npm run test:browser
 ```
 
 - `npm run lint`: ESLint ile tüm JavaScript dosyalarını denetler (tek geliştirme bağımlılığı).
-- `npm test`: soru bankası sözleşmesini, oturum çekirdeğini ve deployment sözleşmesini doğrular.
+- `npm run test:surface`: her `export`'un başka bir dosyada tüketicisi olduğunu doğrular; tüketicisiz export iç detay sızmasıdır ve derlemeyi düşürür.
+- `npm test`: soru bankası sözleşmesini, oturum çekirdeğini, kurulum ve sonuç mantığını ve deployment sözleşmesini doğrular.
 - `npm run test:sources`: ağ üzerinden 14 resmî TDK sayfasına erişir; kaynak metinlerini ve 320 yazım örneğini kontrol eder.
 - `npm run test:browser`: yerel Chrome/Chromium ile mobil quiz, sayaç, kayıtlı oturum, kütüphane, sonuç, konu odaklı çalışma ve yanlış defteri akışlarını bağımsız adımlar hâlinde sınar. `npm run test:browser -- --only defter` tek adımı çalıştırır. Gerekirse tarayıcı yolu `CHROME_BIN` ile verilebilir.
 
@@ -56,7 +58,7 @@ Testlerin haricî npm bağımlılığı yoktur; `npm ci` yalnız ESLint'i kurar.
 - `styles/`: görsel sistem; belirteçler (`tokens.css`), temel, üst çubuk, düğmeler ve ekran başına birer dosya. Kırılımlar ilgili dosyanın sonundadır
 - `app.js`: bileşim kökü; modülleri kurar, gezinmeyi ve sekmeler arası eşitlemeyi bağlar
 - `core.js`: saf, test edilebilir oturum ve istatistik işlevleri (DOM yok)
-- `questions.js`: soru bankasının tek giriş noktası; yüklenirken bankayı doğrular
+- `questions.js`: soru bankasının tek giriş noktası. `validateQuestionBank()` yalnız testte çalışır: içe aktarımda `throw` edilseydi tek bozuk soru tüm uygulamayı boş sayfaya çevirirdi
 - `ui/`: ekran modülleri. Her ekran kendi olaylarını `install*` ile bağlar; `state.js` tek gerçek kaynaktır, DOM onu yansıtır
   - `home.js` kurulum akışı (saf mantığı `setup.js`, adımlı gezinme `home-steps.js`, metinler `copy.js`), `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
   - `session.js` oturum yaşam döngüsü denetleyicisi, `session-store.js` ve `notebook.js` kalıcılık, `local-storage.js` güvenli depolama sarmalayıcısı

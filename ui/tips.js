@@ -1,20 +1,20 @@
 import { tipForTopic } from "../data/tips.js";
-import { byId } from "./dom.js";
 
 /**
- * Tüyoyu verilen kutuya basar.
+ * Tüyoyu verilen kutuya basar. Şablon `elements` üzerinden geçirilir;
+ * bu modül de diğerleri gibi küresel DOM'a uzanmaz.
  * Soru geri bildiriminde tüyo açık durur; liste ekranlarında aynı konu
  * arka arkaya tekrarlandığı için yalnız akılda kalan başlık görünür,
  * ayrıntı istendiğinde açılır.
  */
-export function renderTip(container, topic, { collapsible = false } = {}) {
+export function renderTip(elements, container, topic, { collapsible = false } = {}) {
   if (!container) return;
   container.replaceChildren();
 
   const tip = tipForTopic(topic);
   if (!tip) return;
 
-  const node = byId("tipTemplate").content.firstElementChild.cloneNode(true);
+  const node = elements.tipTemplate.content.firstElementChild.cloneNode(true);
   node.querySelector(".tip-title").textContent = tip.title;
   node.querySelector(".tip-test").textContent = tip.test;
 

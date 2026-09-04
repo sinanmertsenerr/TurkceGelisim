@@ -136,32 +136,48 @@ export function makeStoredSession(bankVersion, session) {
   };
 }
 
+const MAX_SESSION_SIZE = 100;
+
+// Kayıttaki alanların tek tek biçim denetimi. Adlandırılmış kurallar, hangi
+// koşulun düştüğünü okurken görünür kılar.
+const SESSION_SHAPE_RULES = Object.freeze({
+  bilinenBicim: (session) => ["normal", "wrong-review", "notebook"].includes(session.mode),
+  duzeyMetin: (session) => typeof session.level === "string",
+  konuMetinVeyaYok: (session) => session.topic == null || typeof session.topic === "string",
+  gecerliAdet: (session) => Number.isInteger(session.requestedSize)
+    && session.requestedSize >= 1
+    && session.requestedSize <= MAX_SESSION_SIZE,
+  soruListesiDolu: (session) => Array.isArray(session.questionIds)
+    && session.questionIds.length >= 1
+    && session.questionIds.length <= MAX_SESSION_SIZE,
+  sorularYinelenmez: (session) => new Set(session.questionIds).size === session.questionIds.length,
+  imlecListeIcinde: (session) => Number.isInteger(session.index)
+    && session.index >= 0
+    && session.index < session.questionIds.length,
+  // Cevap sayısı imlecle uyumlu olmalı: son soru cevaplanmış ya da cevaplanmamış olabilir.
+  cevaplarImlecleUyumlu: (session) => Array.isArray(session.responses)
+    && [session.index, session.index + 1].includes(session.responses.length),
+});
+
+// Kayıttaki ilk bozuk kuralın adını döndürür; her şey yolundaysa null.
+export function brokenSessionRule(session) {
+  if (!session) return "kayitYok";
+  for (const [name, holds] of Object.entries(SESSION_SHAPE_RULES)) {
+    if (!holds(session)) return name;
+  }
+  return null;
+}
+
 // Oturum ya bir düzeyin karma havuzundan (topic yok) ya da bir çalışma
 // konusundan gelir. Konu oturumunda düzey "tum" ise dört düzey birlikte kullanılır.
 export function isResumableSession(session, questionById, { allLevelsId = "tum", studyTopicOf = null } = {}) {
-  if (
-    !session
-    || !["normal", "wrong-review", "notebook"].includes(session.mode)
-    || typeof session.level !== "string"
-    || (session.topic != null && typeof session.topic !== "string")
-    || !Number.isInteger(session.requestedSize)
-    || session.requestedSize < 1
-    || session.requestedSize > 100
-    || !Array.isArray(session.questionIds)
-    || session.questionIds.length < 1
-    || session.questionIds.length > 100
-    || new Set(session.questionIds).size !== session.questionIds.length
-    || !Number.isInteger(session.index)
-    || session.index < 0
-    || session.index >= session.questionIds.length
-    || !Array.isArray(session.responses)
-    || ![session.index, session.index + 1].includes(session.responses.length)
-  ) return false;
+  if (brokenSessionRule(session)) return false;
 
   const topicSession = typeof session.topic === "string";
   if (topicSession && typeof studyTopicOf !== "function") return false;
   // Defter oturumu düzeyden bağımsızdır: dört düzey birlikte gelir.
   if (!topicSession && session.level === allLevelsId && session.mode !== "notebook") return false;
+
   const belongs = (question) => {
     if (!question) return false;
     if (topicSession && studyTopicOf(question) !== session.topic) return false;
@@ -207,7 +223,7 @@ export function parseStoredSession(raw, bankVersion, validQuestionIds) {
 // Yanlış cevaplanan sorular oturumlar arasında bu defterde birikir. Bir soru
 // üst üste iki kez doğru cevaplanınca "kavrandı" sayılır ve defterden çıkar.
 export const NOTEBOOK_STORAGE_KEY = "turkce-gelisim:yanlis-defteri:v1";
-export const NOTEBOOK_SCHEMA_VERSION = 1;
+const NOTEBOOK_SCHEMA_VERSION = 1;
 export const NOTEBOOK_CLEAR_STREAK = 2;
 
 export function applyResponseToNotebook(entries, questionId, correct, now = new Date().toISOString()) {

@@ -87,7 +87,7 @@ const GLOSS_EXACT = {
   "belirsizlik sözü": "belirsizlik sözü",
 };
 
-export function glossOf(meaning) {
+function glossOf(meaning) {
   if (!meaning) return "fiil";
   if (GLOSS_EXACT[meaning]) return GLOSS_EXACT[meaning];
   return meaning.replace(/ adı$/, "");

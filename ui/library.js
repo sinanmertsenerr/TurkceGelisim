@@ -101,7 +101,7 @@ function markSelectedCard(elements, questionId) {
 }
 
 // Geniş ekranda detay paneli boşken yer tutucu görünür; dar ekranda yer tutucu gizlidir.
-export function syncLibraryDetailState(elements) {
+function syncLibraryDetailState(elements) {
   elements.libraryPlaceholder.hidden = !isWideLibrary() || elements.libraryDialog.open;
   markSelectedCard(elements, openQuestionId(elements));
 }
@@ -117,7 +117,7 @@ function fillDetail(elements, question) {
   const wrongForms = wrongChoicesFor(question);
   elements.libraryDialogWrong.hidden = !wrongForms.length;
   elements.libraryDialogWrong.replaceChildren(...strikeList(wrongForms));
-  renderTip(elements.libraryDialogTip, question.topic);
+  renderTip(elements, elements.libraryDialogTip, question.topic);
   elements.libraryDialogExplanation.textContent = question.explanation;
   elements.libraryDialogSource.href = source.url;
   elements.libraryDialogSource.textContent = `${source.title} ↗`;
@@ -137,7 +137,7 @@ function openDialog(dialog, wide) {
   }
 }
 
-export function openLibraryDetail(elements, questionId) {
+function openLibraryDetail(elements, questionId) {
   const question = QUESTION_BY_ID.get(questionId);
   if (!question) return;
   const dialog = elements.libraryDialog;
@@ -153,7 +153,7 @@ export function openLibraryDetail(elements, questionId) {
   else elements.libraryDialogClose.focus();
 }
 
-export function closeLibraryDetail(elements) {
+function closeLibraryDetail(elements) {
   const dialog = elements.libraryDialog;
   if (dialog.open) dialog.close();
   else dialog.removeAttribute("open");

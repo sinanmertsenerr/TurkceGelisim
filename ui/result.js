@@ -79,7 +79,7 @@ function renderTopicMastery(elements, completedSession) {
   elements.topicMasteryList.replaceChildren(...nodes);
 }
 
-export function renderNextStep(elements, completedSession) {
+function renderNextStep(elements, completedSession) {
   elements.nextStepCard.hidden = false;
   elements.nextStepText.textContent = nextStepText(completedSession);
 }
@@ -121,14 +121,14 @@ function buildReviewCard(elements, response) {
     ? `Cevabın: ${chosen.text}`
     : `Cevabın: ${chosen.text} · Doğru: ${correctChoiceFor(question).text}`;
   card.querySelector(".review-explanation").textContent = question.explanation;
-  renderTip(card.querySelector(".tip-box"), question.topic, { collapsible: true });
+  renderTip(elements, card.querySelector(".tip-box"), question.topic, { collapsible: true });
   const link = card.querySelector("a");
   link.href = source.url;
   link.textContent = `${source.title} ↗`;
   return card;
 }
 
-export function renderReview(elements, completedSession) {
+function renderReview(elements, completedSession) {
   const visible = completedSession.responses.slice(0, state.reviewLimit);
   elements.reviewList.replaceChildren(...visible.map((response) => buildReviewCard(elements, response)));
   elements.reviewMoreButton.hidden = state.reviewLimit >= completedSession.responses.length;

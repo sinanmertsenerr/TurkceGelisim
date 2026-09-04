@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test test/core.test.js test/setup.test.js test/copy.test.js test/questions.test.js test/tips.test.js test/search.test.js test/deployment.test.js",
+    "test": "node --test test/core.test.js test/setup.test.js test/copy.test.js test/result.test.js test/questions.test.js test/tips.test.js test/search.test.js test/deployment.test.js",
+    "test:surface": "node test/api-surface.mjs",
     "test:browser": "node test/browser-smoke.mjs",
     "test:sources": "node test/source-presence.mjs",
-    "test:ci": "npm run lint && npm test && npm run test:browser"
+    "test:ci": "npm run lint && npm run test:surface && npm test && npm run test:browser"
   },
   "engines": {
     "node": ">=20"

@@ -133,14 +133,14 @@
 
 :root[data-theme="dark"] .choice-btn.selected,
 :root[data-theme="dark"] .choice-btn:has(input:checked) {
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: 0 0 16px var(--primary-glow);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .choice-btn.selected,
   :root:not([data-theme="light"]) .choice-btn:has(input:checked) {
-    color: #fff;
+    color: var(--on-accent);
     box-shadow: 0 0 16px var(--primary-glow);
   }
 }
@@ -318,7 +318,7 @@
 }
 
 .step-indicator li[aria-current="step"] .step-num {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--primary);
 }
 

@@ -13,7 +13,7 @@ export function normalizeText(text) {
     .trim();
 }
 
-export function tokenize(text) {
+function tokenize(text) {
   return normalizeText(text).split(" ").filter(Boolean);
 }
 

@@ -1,5 +1,3 @@
-export const byId = (id) => document.getElementById(id);
-
 // Kimlikli her öğe kimliğiyle aynı adla toplanır: elements.startSessionButton === #startSessionButton.
 // Yeni bir öğe eklemek için HTML'e id vermek yeterlidir.
 export function getElements() {

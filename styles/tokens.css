@@ -17,6 +17,9 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
   --text-inverse: #ffffff;
+  /* Doygun renk dolgusunun (birincil, vurgu, başarı, hata) üzerindeki yazı.
+     --text-inverse temayla dönerken bu sabit kalır: dolgu her iki temada da koyudur. */
+  --on-accent: #ffffff;
 
   --primary: #4f46e5;
   --primary-hover: #4338ca;

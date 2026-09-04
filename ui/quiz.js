@@ -80,7 +80,7 @@ export function createQuizView(elements, { onFinish }) {
       : `Yanlış. Doğrusu: ${correctChoiceFor(question).text}`;
     elements.feedbackExplanation.textContent = question.explanation;
     elements.feedbackExplanation.hidden = false;
-    renderTip(elements.feedbackTip, question.topic);
+    renderTip(elements, elements.feedbackTip, question.topic);
     elements.feedbackSource.textContent = `Kaynak: ${source.title} ↗`;
     elements.feedbackSource.href = source.url;
     elements.feedbackSource.hidden = false;

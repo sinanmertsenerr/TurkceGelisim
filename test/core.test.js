@@ -6,6 +6,7 @@ import {
   countResponses,
   fisherYates,
   interleaveByConcept,
+  brokenSessionRule,
   isResumableSession,
   makeStoredNotebook,
   makeStoredSession,
@@ -136,6 +137,29 @@ test("devam oturumu sıra, seviye, seçenek ve sayaç tutarlılığını korur",
   assert.equal(isResumableSession({ ...valid, responses: [{ ...valid.responses[0], correct: false }] }, questions), false);
   assert.equal(isResumableSession({ ...valid, responses: [{ questionId: "kolay-2", choiceId: "b", correct: true }] }, questions), false);
   assert.equal(isResumableSession({ ...valid, level: "tum" }, questions), false, "karma oturum sanal düzeyle açılmaz");
+});
+
+test("bozuk kayıtta hangi kuralın düştüğü adıyla bildirilir", () => {
+  const valid = {
+    level: "kolay",
+    mode: "normal",
+    requestedSize: 2,
+    questionIds: ["kolay-1", "kolay-2"],
+    index: 1,
+    responses: [{ questionId: "kolay-1", choiceId: "a", correct: true }],
+  };
+
+  assert.equal(brokenSessionRule(valid), null);
+  assert.equal(brokenSessionRule(null), "kayitYok");
+  assert.equal(brokenSessionRule({ ...valid, mode: "serbest" }), "bilinenBicim");
+  assert.equal(brokenSessionRule({ ...valid, level: 3 }), "duzeyMetin");
+  assert.equal(brokenSessionRule({ ...valid, topic: 42 }), "konuMetinVeyaYok");
+  assert.equal(brokenSessionRule({ ...valid, requestedSize: 0 }), "gecerliAdet");
+  assert.equal(brokenSessionRule({ ...valid, requestedSize: 101 }), "gecerliAdet");
+  assert.equal(brokenSessionRule({ ...valid, questionIds: [] }), "soruListesiDolu");
+  assert.equal(brokenSessionRule({ ...valid, questionIds: ["kolay-1", "kolay-1"] }), "sorularYinelenmez");
+  assert.equal(brokenSessionRule({ ...valid, index: 2 }), "imlecListeIcinde");
+  assert.equal(brokenSessionRule({ ...valid, responses: [] }), "cevaplarImlecleUyumlu");
 });
 
 test("konu odaklı oturum konu ve düzey eşleşmesini korur", () => {

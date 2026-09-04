@@ -237,7 +237,7 @@ progress::-moz-progress-bar {
 
 .choice-button.is-correct .choice-key {
   border-color: var(--success);
-  color: #fff;
+  color: var(--on-accent);
   background: var(--success);
 }
 
@@ -252,7 +252,7 @@ progress::-moz-progress-bar {
 
 .choice-button.is-wrong .choice-key {
   border-color: var(--danger);
-  color: #fff;
+  color: var(--on-accent);
   background: var(--danger);
 }
 

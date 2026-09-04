@@ -8,7 +8,7 @@ function storedTheme() {
   return value === "dark" || value === "light" ? value : null;
 }
 
-export function applyTheme(elements, theme) {
+function applyTheme(elements, theme) {
   document.documentElement.dataset.theme = theme;
   const dark = theme === "dark";
   elements.themeToggle.setAttribute("aria-pressed", String(dark));

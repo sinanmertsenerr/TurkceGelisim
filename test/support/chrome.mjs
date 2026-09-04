@@ -173,6 +173,11 @@ function chromeArguments(profileDirectory) {
 }
 
 /** Sayfa sürücüsü: sık kullanılan DOM işlemlerini tek satırlık çağrılara indirger. */
+// Gömülü yazı tipleri yerine oturana kadar ölçüler bir kırıntı oynar; 44px'lik
+// dokunma hedefleri 43.99998 olarak ölçülüp testi rastgele düşürüyordu.
+// readyState "complete" yazı tiplerini kapsamaz, bu yüzden ayrıca beklenir.
+const LAYOUT_SETTLED = 'document.readyState === "complete" && document.fonts.status === "loaded"';
+
 export function createPage(client, origin) {
   const selectorLiteral = (selector) => JSON.stringify(selector);
   const page = {
@@ -182,7 +187,7 @@ export function createPage(client, origin) {
     async open({ clearStorage = false, readyExpression = "true" } = {}) {
       await client.evaluate(`(() => { ${clearStorage ? "localStorage.clear();" : ""} window.__smokeStale = true; })()`);
       await client.send("Page.navigate", { url: origin });
-      await page.waitFor(`!window.__smokeStale && document.readyState === "complete" && (${readyExpression})`, "sayfa açılışı");
+      await page.waitFor(`!window.__smokeStale && ${LAYOUT_SETTLED} && (${readyExpression})`, "sayfa açılışı");
     },
     evaluate: (expression) => client.evaluate(expression),
     click: (selector) => client.evaluate(`document.querySelector(${selectorLiteral(selector)}).click()`),
@@ -206,7 +211,7 @@ export function createPage(client, origin) {
     },
     async reload(readyExpression, label) {
       await client.send("Page.reload", { ignoreCache: true });
-      await page.waitFor(`document.readyState === "complete" && (${readyExpression})`, label);
+      await page.waitFor(`${LAYOUT_SETTLED} && (${readyExpression})`, label);
     },
     async screenshot(name) {
       if (!process.env.SMOKE_SCREENSHOT_DIR) return;
@@ -257,7 +262,7 @@ export async function launchBrowser({ width = 390, height = 844 } = {}) {
     await client.send("Page.enable");
     await client.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
     await client.send("Page.navigate", { url: origin });
-    await createPage(client, origin).waitFor('document.readyState === "complete"', "ilk yükleme");
+    await createPage(client, origin).waitFor(LAYOUT_SETTLED, "ilk yükleme");
   } catch (error) {
     await close();
     throw error;

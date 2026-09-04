@@ -5,7 +5,7 @@ import { MINUTES_PER_QUESTION, MIN_SESSION_MINUTES, SESSION_SIZES } from "./cons
 import { LEVEL_BY_ID } from "./helpers.js";
 
 // Biçimler HTML'deki data-mode değerleriyle birebir aynıdır.
-export const SETUP_MODES = Object.freeze(["karma", "konu", "defter"]);
+const SETUP_MODES = Object.freeze(["karma", "konu", "defter"]);
 
 // Oturumun düzeyi: karma modda düzey, konu modunda konu düzeyi, defterde tüm düzeyler.
 export function setupLevel({ mode, level, topicLevel }) {
