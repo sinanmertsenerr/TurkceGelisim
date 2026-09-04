@@ -3,7 +3,7 @@
 import { NOTEBOOK_STORAGE_KEY, STORAGE_KEY } from "./core.js";
 import { BANK_VERSION, QUESTIONS, SOURCES, STUDY_TOPICS } from "./questions.js";
 import { getElements } from "./ui/dom.js";
-import { installHome, renderHome, updateResumePanel } from "./ui/home.js";
+import { installHome, updateResumePanel, updateSetup } from "./ui/home.js";
 import { installKeyboardShortcuts } from "./ui/keyboard.js";
 import { installLibrary } from "./ui/library.js";
 import { loadNotebook } from "./ui/notebook.js";
@@ -30,7 +30,7 @@ function installCrossTabSync(elements) {
     }
     if (event.key === NOTEBOOK_STORAGE_KEY) {
       loadNotebook();
-      renderHome(elements);
+      updateSetup(elements);
     }
   });
 }

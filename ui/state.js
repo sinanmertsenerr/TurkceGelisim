@@ -2,7 +2,8 @@ import { ALL_LEVELS_ID, LEVELS, STUDY_TOPICS } from "../questions.js";
 import { DEFAULT_SESSION_SIZE, LIBRARY_PAGE_SIZE, REVIEW_PAGE_SIZE } from "./constants.js";
 
 export const state = {
-  // Ana sayfa kurulumu: tek gerçek kaynak budur, DOM yalnız yansıtır (ui/home.js).
+  // Ana sayfa kurulumu: tek gerçek kaynak budur, DOM yalnız yansıtır.
+  // Yalnız ui/home.js'teki updateSetup yazar; okuyanlar bu nesneyi değiştirmez.
   // `level` karma modun düzeyi, `topicLevel` konu modunun düzeyidir (tüm düzeyler olabilir);
   // iki mod arasında geçişte her biri kendi seçimini korur.
   setup: {

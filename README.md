@@ -58,7 +58,7 @@ Testlerin haricî npm bağımlılığı yoktur; `npm ci` yalnız ESLint'i kurar.
 - `core.js`: saf, test edilebilir oturum ve istatistik işlevleri (DOM yok)
 - `questions.js`: soru bankasının tek giriş noktası; yüklenirken bankayı doğrular
 - `ui/`: ekran modülleri. Her ekran kendi olaylarını `install*` ile bağlar; `state.js` tek gerçek kaynaktır, DOM onu yansıtır
-  - `home.js` kurulum akışı (saf mantığı `setup.js`), `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
+  - `home.js` kurulum akışı (saf mantığı `setup.js`, adımlı gezinme `home-steps.js`, metinler `copy.js`), `quiz.js` soru ekranı, `result.js` sonuç, `library.js` kural bankası
   - `session.js` oturum yaşam döngüsü denetleyicisi, `session-store.js` ve `notebook.js` kalıcılık, `local-storage.js` güvenli depolama sarmalayıcısı
   - `dom.js`, `screens.js`, `keyboard.js`, `theme.js`, `tips.js`, `search.js`, `helpers.js`, `constants.js`
 - `data/`: TDK kaynak kataloğu, soru fabrikaları, çalışma konusu grupları, dört düzeyin çekirdek verileri ve `konu-havuzu.js` ek soru havuzu

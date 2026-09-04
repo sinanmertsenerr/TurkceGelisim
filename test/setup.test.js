@@ -7,6 +7,7 @@ import {
   homeSteps,
   isSizeSelectable,
   largestSelectableSize,
+  levelFieldFor,
   nearestSessionSize,
   normalizeSetup,
   poolSizeFor,
@@ -85,4 +86,10 @@ test("adımlar biçime göre değişir", () => {
   assert.deepEqual(homeSteps(base), ["mode", "session"]);
   assert.deepEqual(homeSteps({ ...base, mode: "konu" }), ["mode", "topic", "session"]);
   assert.deepEqual(homeSteps({ ...base, mode: "defter" }), ["mode", "session"]);
+});
+
+test("düzey seçimi biçime göre farklı alana yazılır", () => {
+  assert.equal(levelFieldFor("karma"), "level");
+  assert.equal(levelFieldFor("defter"), "level");
+  assert.equal(levelFieldFor("konu"), "topicLevel");
 });

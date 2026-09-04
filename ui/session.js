@@ -1,7 +1,8 @@
 import { conceptGroupOf, fisherYates, interleaveByConcept, selectSessionQuestions } from "../core.js";
 import { ALL_LEVELS_ID, QUESTIONS_BY_LEVEL, questionsForStudy } from "../questions.js";
-import { applySessionSetup, goToStep, renderHome, updateResumePanel } from "./home.js";
-import { setupLevel, setupTopic } from "./setup.js";
+import { goToStep } from "./home-steps.js";
+import { updateResumePanel, updateSetup } from "./home.js";
+import { setupFromSession, setupLevel, setupTopic } from "./setup.js";
 import { renderLibrary } from "./library.js";
 import { notebookQuestions } from "./notebook.js";
 import { createQuizView } from "./quiz.js";
@@ -40,7 +41,7 @@ export function createSessionController(elements) {
     state.completedSession = null;
     state.resumableSession = session;
     state.homeConfigured = true;
-    applySessionSetup(elements, session);
+    updateSetup(elements, setupFromSession(session));
     persistSession(session);
     showScreen(elements, "quiz", { focus: false });
     quizView.renderQuestion();
@@ -117,7 +118,7 @@ export function createSessionController(elements) {
   function showHome() {
     saveActiveForResume();
     updateResumePanel(elements);
-    renderHome(elements);
+    updateSetup(elements);
     showScreen(elements, "home");
     goToStep(elements, state.homeConfigured ? "session" : "mode", { push: false, focus: false });
   }

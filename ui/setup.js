@@ -1,7 +1,7 @@
 // Ana sayfa kurulumunun saf mantığı: DOM'suz, birim testli. ui/home.js bu
 // işlevleri state.setup üzerinde uygular ve sonucu DOM'a yansıtır.
 import { ALL_LEVELS_ID, LEVELS, QUESTIONS_BY_LEVEL, STUDY_TOPIC_BY_ID, STUDY_TOPICS, studyPoolSize } from "../questions.js";
-import { SESSION_SIZES } from "./constants.js";
+import { MINUTES_PER_QUESTION, MIN_SESSION_MINUTES, SESSION_SIZES } from "./constants.js";
 import { LEVEL_BY_ID } from "./helpers.js";
 
 // Biçimler HTML'deki data-mode değerleriyle birebir aynıdır.
@@ -17,6 +17,13 @@ export function setupLevel({ mode, level, topicLevel }) {
 export function setupTopic({ mode, topic }) {
   return mode === "konu" ? topic : null;
 }
+
+// Düzey seçimi konu modunda topicLevel'a, diğer biçimlerde level'a yazılır;
+// böylece iki mod arasında geçişte her biri kendi düzeyini korur.
+export const levelFieldFor = (mode) => (mode === "konu" ? "topicLevel" : "level");
+
+// Oturumun tahmini süresi; çok kısa oturumlarda alt sınır uygulanır.
+export const estimateMinutes = (size) => Math.max(MIN_SESSION_MINUTES, Math.round(size * MINUTES_PER_QUESTION));
 
 // Seçime göre havuzdaki soru sayısı: karma modda düzeyin tamamı, konu modunda
 // konu × düzey kesişimi, defterde biriken yanlışlar.
